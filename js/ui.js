@@ -143,6 +143,8 @@ var UI = (function () {
     window.addEventListener("pagehide",function(){setActive(false);});
     window.addEventListener("pageshow",function(e){if(e.persisted&&!document.hidden)setActive(true);});
     Game.init(); if(!document.hidden)Game.resume(); else hiddenAt=Date.now(); UI.native.init();
+    // Deep link: #camp / #monsters / #dex / #settings opens that tab on load (review screenshots, share links).
+    var deep=(location.hash||"").replace("#",""); if(["camp","monsters","dex","settings"].indexOf(deep)>=0)openSheet(deep);
   }
   return { fmt:fmt, init:init, openSheet:openSheet, toast:toast, setActive:setActive, closeOverlay:closeOverlay,
     svgNode:svgNode, animate:animate, stageLabel:stageLabel, refreshSheet:function(){sheetSignature="";renderSheet(Game.getState());} };
