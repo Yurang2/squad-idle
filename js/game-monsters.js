@@ -8,11 +8,13 @@ Game.registerMonsters(function (host) {
     for (var i = 0; i < weights.length; i++) { draw -= weights[i]; if (draw < 0) return i; }
     return weights.length - 1;
   }
-  function potentials(rarity) {
+  function potentials(rarity, pool, count) {
     var rank = DATA.rarityOrder.indexOf(rarity), result = [];
+    pool = pool || DATA.potentialPool;
+    count = count === undefined ? [1, 2, 3, 3][rank] : count;
     // DECISION: Preserve independent weighted trait lines; duplicate percentages add before multiplication.
-    for (var i = 0; i < DATA.rarities[rarity].lines; i++) {
-      var option = DATA.potentialPool[weighted(DATA.potentialPool.map(function (p) { return p.weights[rank]; }))];
+    for (var i = 0; i < count; i++) {
+      var option = pool[weighted(pool.map(function (p) { return p.weights[rank]; }))];
       var range = option.ranges[rank];
       result.push({ id: option.id, value: Math.round((range[0] + Game.rng() * (range[1] - range[0])) * 10000) / 10000 });
     }
@@ -22,7 +24,7 @@ Game.registerMonsters(function (host) {
     if (!Object.hasOwn(DATA.species, speciesId) || (rarity !== undefined && !DATA.rarityOrder.includes(rarity))) return null;
     rarity = rarity || DATA.rarityOrder[weighted(DATA.rarityWeights)];
     return { uid: "monster-" + host.state().nextMonsterUid++, speciesId: speciesId, rarity: rarity, level: 1, xp: 0,
-      traits: potentials(rarity), enhance: 0, evo: 1, party: null, camp: null };
+      traits: potentials(rarity), enhance: 0, evo: 1, party: null, camp: null, locked: false, accessory: null };
   }
   function getRank(xp) {
     xp = xp === undefined ? host.state().tamerXP : xp;
@@ -47,9 +49,15 @@ Game.registerMonsters(function (host) {
     var species = DATA.species[m.speciesId], result = Object.assign({}, species.baseStats), sums = {};
     var scale = (1 + species.growth) ** (m.level - 1) * DATA.rarities[m.rarity].multiplier;
     ["hp", "atk", "def"].forEach(function (key) { result[key] = Math.round(result[key] * scale); });
-    m.traits.forEach(function (p) { sums[p.id] = (sums[p.id] || 0) + p.value; });
+    var item = host.state().accessories.find(function (a) { return a.uid === m.accessory; });
+    if (item) Object.keys(DATA.accessory.base).forEach(function (key) { result[key] += DATA.accessory.base[key] * DATA.rarities[item.rarity].multiplier; });
+    m.traits.concat(item ? item.potentials : []).forEach(function (p) { sums[p.id] = (sums[p.id] || 0) + p.value; });
     ["hp", "atk", "def", "attackSpeed"].forEach(function (key) { result[key] *= 1 + (sums[key + "Pct"] || 0); });
     result.critChance = Math.min(1, result.critChance + (sums.critChance || 0)); result.critDamage += sums.critDamage || 0;
+    // DECISION: Evolution and additive enhancement multiply all six combat stats; crit probability caps at 100%.
+    var growth = DATA.evolution.multiplier ** (m.evo - 1) * (1 + DATA.enhancement.perStage * m.enhance);
+    Object.keys(DATA.cpWeights).forEach(function (key) { result[key] *= growth; });
+    result.critChance = Math.min(1, result.critChance);
     return result;
   }
   function grantXP(amount) {
@@ -89,14 +97,16 @@ Game.registerMonsters(function (host) {
     if (!m || !/^monster-[1-9]\d*$/.test(m.uid) || !Number.isSafeInteger(Number(m.uid.slice(8))) || !Object.hasOwn(DATA.species, m.speciesId) ||
       !DATA.rarityOrder.includes(m.rarity) || !Number.isInteger(m.level) || m.level < 1 || m.level > DATA.maxLevel ||
       !Number.isSafeInteger(m.xp) || m.xp < 0 || m.xp >= DATA.xpToNext(m.level) || (m.level === DATA.maxLevel && m.xp !== 0) ||
-      m.enhance !== 0 || m.evo !== 1 || m.camp !== null || (m.party !== null && (!Number.isInteger(m.party) || m.party < 0 || m.party > 4))) return false;
+      !Number.isInteger(m.enhance) || m.enhance < 0 || m.enhance > 10 || !Number.isInteger(m.evo) || m.evo < 1 || m.evo > 3 ||
+      typeof m.locked !== "boolean" || (m.accessory !== null && !/^accessory-[1-9]\d*$/.test(m.accessory)) ||
+      m.camp !== null || (m.party !== null && (!Number.isInteger(m.party) || m.party < 0 || m.party > 4))) return false;
     var rank = DATA.rarityOrder.indexOf(m.rarity);
-    return Array.isArray(m.traits) && m.traits.length === DATA.rarities[m.rarity].lines && m.traits.every(function (t) {
+    return Array.isArray(m.traits) && (m.traits.length === [1,2,3,3][rank] || (m.evo === 1 && m.traits.length === DATA.rarities[m.rarity].lines)) && m.traits.every(function (t) {
       var def = DATA.potentialPool.find(function (p) { return p.id === t.id; });
       return def && Number.isFinite(t.value) && t.value >= def.ranges[rank][0] && t.value <= def.ranges[rank][1];
     });
   }
-  return { stats: stats, grantXP: grantXP, receive: receive, validateMonster: validateMonster, setOffline: function (v) { offline = v; },
+  return { stats: stats, grantXP: grantXP, receive: receive, validateMonster: validateMonster, potentials: potentials, weighted: weighted, setOffline: function (v) { offline = v; },
     api: { rollMonster: rollMonster, monsterStats: stats, getRank: getRank, partySlots: partySlots, toggleParty: toggleParty,
       canCapture: canCapture, getDex: getDex, captureMultiplier: function () { return offline ? DATA.offline.captureRate : 1; } } };
 });

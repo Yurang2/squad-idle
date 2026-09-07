@@ -3,6 +3,7 @@
   var captureFrame=0, cardFrame=0;
   UI.icon=function(name) {
     var paths={
+      accessory:'<path d="M4 4c0 12 16 12 16 0M9 16l3-3 3 3-3 5-3-5z"/>',
       gold:'<circle cx="12" cy="12" r="8"/><path d="M12 7v10m3-8h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9"/>',
       lantern:'<path d="M8 8h8l2 12H6L8 8zm1 0V5a3 3 0 0 1 6 0v3M5 20h14M9 12v4m6-4v4"/>',
       compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5 5-3z"/>',

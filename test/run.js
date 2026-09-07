@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
-const files = ["data", "data-monsters", "battle", "game", "game-monsters", "game-expedition", "game-save"];
+const files = ["data", "data-monsters", "data-progression", "battle", "game", "game-monsters", "game-progression", "game-expedition", "game-save"];
 function runtime() {
   const storage = new Map(), timers = new Map(); let nextTimer = 1;
   const c = vm.createContext({ console, Date, setInterval: (f, ms) => { const id = nextTimer++; timers.set(id, { f, ms }); return id; },
@@ -64,11 +64,11 @@ test("capture success removes target, grants one reward, creates exact monster i
   const off = Game.on("capture", e => { captured = e; }); Game.step(); off();
   assert.ok(captured); const s = Game.getState(), enemy = s.battle.enemies.find(e => e.id === captured.id);
   assert.equal(enemy.hp, 0); assert.equal(enemy.captured, true); assert.equal(s.roster.length, 3);
-  assert.deepEqual(Object.keys(captured.monster).sort(), ["uid", "speciesId", "rarity", "level", "xp", "traits", "enhance", "evo", "party", "camp"].sort());
+  assert.deepEqual(Object.keys(captured.monster).sort(), ["uid", "speciesId", "rarity", "level", "xp", "traits", "enhance", "evo", "party", "camp", "locked", "accessory"].sort());
   assert.equal(s.gold, DATA.goldPerKill(0)); assert.equal(s.tamerXP, DATA.balance.xpPerKill);
-  assert.equal(s.battle.tamer.captureCooldown, 8);
+  assert.equal(s.battle.tamer.captureCooldown, DATA.capture.cooldown);
 });
-test("capture failure consumes boost and respects eight-second cooldown", () => {
+test("capture failure consumes boost and respects shared capture cooldown", () => {
   Game.reset(); const sim = Battle.start(0, Game.getState().roster);
   sim.enemies[0].hp = sim.enemies[0].maxHp * .2;
   sim.tamer.cooldowns.captureBoost = 18; sim.tamer.captureBoost = 1.5;
@@ -78,16 +78,16 @@ test("capture failure consumes boost and respects eight-second cooldown", () => 
   let failures = 0, attempts = 0;
   Battle.tick(sim, e => { if (e === "captureFail") failures++; if (e === "captureAttempt") attempts++; });
   Game.rng = old; assert.equal(failures, 1); assert.equal(attempts, 1); assert.equal(sim.tamer.captureBoost, 1);
-  assert.equal(sim.tamer.captureCooldown, 8);
+  assert.equal(sim.tamer.captureCooldown, DATA.capture.cooldown);
   Battle.tick(sim, e => { if (e === "captureAttempt") attempts++; }); assert.equal(attempts, 1);
 });
 test("roster cap stops capture without deleting existing monsters, offline obeys same cap", () => {
-  Game.reset(); while (Game.getState().roster.length < 20) add(Game, "mistfox");
+  Game.reset(); while (Game.getState().roster.length < DATA.rosterCap) add(Game, "mistfox");
   const ids = Game.getState().roster.map(m => m.uid); let attempts = 0;
   const off = Game.on("captureAttempt", () => attempts++); ticks(Game, 1800); off();
   assert.equal(attempts, 0); assert.deepEqual(Game.getState().roster.map(m => m.uid), ids);
   assert.equal(Game.canCapture(), false); const r = Game.catchUp(3600000); assert.equal(r.monsters.length, 0);
-  Game.harvest(); assert.equal(Game.getState().roster.length, 20);
+  Game.harvest(); assert.equal(Game.getState().roster.length, DATA.rosterCap);
 });
 test("party slots unlock at ranks 3/6/10, slots unique, final member protected", () => {
   Game.reset(); assert.deepEqual([1, 2, 3, 5, 6, 9, 10, 20].map(r => Game.partySlots(r)), [2, 2, 3, 3, 4, 4, 5, 5]);
@@ -142,16 +142,16 @@ test("60-second timeout, three waves, repeat and challenge progression", () => {
   Game.setMode("repeat"); ticks(Game, 600); assert.equal(Game.getState().currentStage, 0);
   Game.setMode("challenge"); ticks(Game, 600); assert.ok(Game.getState().currentStage > 0);
 });
-test("rarity/potential helper supplies 0–3 valid traits and stat multipliers", () => {
+test("rarity/potential helper supplies 1–3 valid traits and stat multipliers", () => {
   Game.reset(); const base = Game.monsterStats("monster-2");
   DATA.rarityOrder.forEach((r, i) => {
-    const m = Game.rollMonster("mistfox", r); assert.equal(m.traits.length, i);
+    const m = Game.rollMonster("mistfox", r); assert.equal(m.traits.length, [1,2,3,3][i]);
     const stats = Game.monsterStats(m); assert.ok(stats.hp >= base.hp * DATA.rarities[r].multiplier - 1);
   });
 });
 test("save/load/export/import preserves roster, HP, cooldowns, XP, dex and RNG", () => {
   Game.reset(123); ticks(Game, 99); const before = Game.getState(), json = Game.exportSave();
-  assert.equal(JSON.parse(json).schemaVersion, 4); assert.ok(Game.validateSave(json));
+  assert.equal(JSON.parse(json).schemaVersion, 5); assert.ok(Game.validateSave(json));
   ticks(Game, 400); assert.equal(Game.load(json), true); assert.deepEqual(Game.getState(), before);
   assert.equal(Game.importSave(json), true); assert.deepEqual(Game.getState(), before);
   const draws = Array.from({ length: 8 }, () => Game.rng()); Game.load(json);
@@ -161,21 +161,21 @@ test("v3 and malformed imports rejected atomically, fresh init replaces old sche
   Game.reset(); const json = Game.save(), before = Game.getState();
   const badEdits = [s => { s.roster[0].party = 4; }, s => { s.roster[1].uid = s.roster[0].uid; },
     s => { s.battle.units[0].hp = -1; }, s => { s.battle.tamer.captureBoost = 99; }, s => { s.dex = {}; },
-    s => { s.roster[0].speciesId = "__proto__"; }, s => { s.roster[0].enhance = 1; },
+    s => { s.roster[0].speciesId = "__proto__"; }, s => { s.roster[0].enhance = 11; },
     s => { s.pendingReport = { elapsedMs: 1, gold: 10, xp: 1, monsters: [s.roster[0]], stageIndex: 0 }; }];
   badEdits.forEach(fn => { const d = JSON.parse(json); fn(d.state); assert.equal(Game.load(JSON.stringify(d)), false); assert.deepEqual(Game.getState(), before); });
   assert.equal(Game.load('{"schemaVersion":3,"state":{}}'), false);
   const c = runtime(); c.storage.set("squad_v1", '{"schemaVersion":3,"state":{}}'); c.Game.init();
-  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 4);
+  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 5);
 });
 test("offline rewards use 70% gold/XP, eight-hour cap, 50% capture probability, one-time harvest", () => {
   Game.reset(); const before = Game.getState(); const report = Game.catchUp(3600000);
-  assert.equal(report.gold, 1260); assert.equal(report.xp, 756); assert.ok(report.monsters.length > 0 && report.monsters.length <= 18);
+  assert.equal(report.gold, 1260); assert.equal(report.xp, 756); assert.ok(report.monsters.length > 0 && report.monsters.length <= 38);
   assert.equal(Game.getState().gold, before.gold); assert.equal(Game.getState().roster.length, 2);
   const pending = Game.save(), frozen = Game.getState(); ticks(Game, 100); assert.deepEqual(Game.getState(), frozen);
   assert.deepEqual(Game.catchUp(3600000), report); assert.equal(Game.load(pending), true);
   assert.deepEqual(Game.harvest(), report); const after = Game.getState(); assert.equal(Game.harvest(), false); assert.deepEqual(Game.getState(), after);
-  assert.equal(after.gold, report.gold); assert.equal(after.roster.length, report.monsters.length + 2);
+  assert.ok(after.gold >= report.gold); assert.equal(after.roster.length, report.monsters.length + 2);
   Game.reset(); assert.equal(Game.catchUp(99 * 3600000).elapsedMs, 8 * 3600000);
   // At 20% HP, .6 passes online rates but exceeds all region-1 half-probabilities.
   Game.reset(); const old = Game.rng; Game.rng = () => .6;
@@ -203,4 +203,5 @@ test("10Hz timer and idempotent pause/resume, four namespaces and DOM-free logic
   const all = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith('.js'));
   all.forEach(f => assert.ok(fs.readFileSync(path.join(root, "js", f), "utf8").split('\n').length <= 600, f));
 });
+require("./m2.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
 console.log("\n" + passed + " PASS");

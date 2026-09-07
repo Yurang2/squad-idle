@@ -21,17 +21,39 @@
     };
   };
   UI.initExpedition=function() {
-    var dialog=document.getElementById('offline-report');
+    var dialog=document.getElementById('offline-report'), frame=0, phase=0;
+    function revealAll() { cancelAnimationFrame(frame);phase=3;dialog.classList.add('sack-open','show-materials','show-accessories','show-monsters');document.getElementById('harvest-report').textContent='모두 수확하기'; }
+    function openSack() {
+      phase=1;dialog.classList.add('sack-open');document.getElementById('harvest-report').textContent='탭하여 건너뛰기';
+      var started=performance.now();
+      function advance(now) {
+        var elapsed=now-started;
+        if(elapsed>=400)dialog.classList.add('show-materials');
+        if(elapsed>=800)dialog.classList.add('show-accessories');
+        if(elapsed>=1200)dialog.classList.add('show-monsters');
+        if(elapsed>=1600)revealAll();else frame=requestAnimationFrame(advance);
+      }
+      frame=requestAnimationFrame(advance);
+    }
     Game.on('offlineReport',function(report){
       var minutes=Math.floor(report.elapsedMs/60000);
       document.getElementById('report-time').textContent=UI.fmt(minutes)+'분 동안 · '+UI.stageLabel(report.stageIndex)+' 탐험';
-      document.getElementById('report-rewards').innerHTML='<span>골드 <strong>'+UI.fmt(report.gold)+'</strong></span><span>경험치 <strong>'+UI.fmt(report.xp)+'</strong></span>';
+      cancelAnimationFrame(frame);phase=0;dialog.className='';document.getElementById('harvest-report').textContent='자루를 푼다';
+      document.getElementById('report-rewards').innerHTML='<span>골드 <strong>'+UI.fmt(report.gold)+'</strong></span><span>경험치 <strong>'+UI.fmt(report.xp)+'</strong></span><span>강화석 <strong>'+UI.fmt(report.materials.enhanceStone)+'</strong></span>';
+      var items=document.getElementById('report-accessories');
+      if(!items){items=document.createElement('div');items.id='report-accessories';document.getElementById('report-monsters').before(items);}
+      var room=DATA.accessory.cap-Game.getState().accessories.length,overflow=report.accessories.slice(room);
+      items.innerHTML='<h3>장신구 · '+UI.fmt(report.accessories.length)+'</h3>'+(overflow.length?'<p class="detail-note">보관 한도를 넘는 '+UI.fmt(overflow.length)+'개는 '+UI.fmt(overflow.reduce(function(sum,a){return sum+DATA.accessoryGold[DATA.rarityOrder.indexOf(a.rarity)];},0))+' 골드로 수확됩니다.</p>':'')+report.accessories.map(UI.accessoryCard).join('');
       document.getElementById('report-monsters').innerHTML=report.monsters.length?report.monsters.map(function(m,i){
-        return UI.monsterCard(m,false).replace('style="','style="animation-delay:'+Math.min(i*.2,2)+'s;');
+        return UI.monsterCard(m,false);
       }).join(''):'<p class="sheet-intro">이번 자루에는 새로운 동료가 없어요.</p>';
       if(!dialog.open)dialog.showModal();
     });
-    document.getElementById('harvest-report').onclick=function(){Game.harvest();dialog.close();document.getElementById('app').appendChild(document.getElementById('toast'));};
+    document.getElementById('harvest-report').onclick=function(){
+      if(phase===0){openSack();return;}if(phase===1){revealAll();return;}
+      Game.harvest();dialog.close();document.getElementById('app').appendChild(document.getElementById('toast'));
+    };
+    dialog.addEventListener('click',function(e){if(phase===1 && !e.target.closest('button'))revealAll();});
     dialog.addEventListener('cancel',function(e){e.preventDefault();document.getElementById('harvest-report').click();});
   };
 })();

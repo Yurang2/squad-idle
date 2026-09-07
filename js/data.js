@@ -1,11 +1,18 @@
 "use strict";
 
 var DATA = {
-  version: "0.5.0 · M1", schemaVersion: 4,
+  version: "0.6.0 · M2", schemaVersion: 5,
   tickMs: 100, autosaveMs: 3000, catchUpMaxMs: 60000, statsWindowMs: 300000,
-  resultTicks: 15, defaultSeed: 271828, rosterCap: 20, maxLevel: 100,
+  resultTicks: 15, defaultSeed: 271828, rosterCap: 40, maxLevel: 100,
   offline: { thresholdMs: 60000, maxMs: 28800000, efficiency: 0.7, captureRate: 0.5, fallbackKillsPerSec: 0.1 },
-  capture: { threshold: 0.3, cooldown: 8 },
+  // DECISION: Keep region-1 species rates .80–.92; 55s active-combat cooldown yields 60.61s/capture over 20 fresh five-minute seeds.
+  capture: { threshold: 0.3, cooldown: 55 },
+  evolution: { max: 3, bumpRate: 0.15, multiplier: 1.6 },
+  enhancement: { max: 10, perStage: 0.06, dropRate: 0.06 },
+  accessory: { cap: 40, dropRate: 0.05, rerollCost: 20, base: { hp: 8, atk: 1, def: 1 }, lines: [1, 2, 3, 3] },
+  releaseGold: [20, 40, 80, 160], accessoryGold: [20, 40, 80, 160], firstClearCoins: { normal: 10, boss: 30 },
+  // DECISION: Gold is an integer currency, so fractional enhancement prices round upward.
+  enhanceCost: function (stage) { return { stones: 2 + stage, gold: Math.ceil(50 * 1.5 ** stage) }; },
   // DECISION: Rank unlocks use cumulative battle XP, with +3% capture bonus per rank (cap +57%).
   rankXP: [0, 30, 90, 180, 300, 480, 720, 1020, 1380, 1800, 2300, 2900, 3600, 4400, 5300, 6300, 7400, 8600, 9900, 11300],
   partyRanks: [1, 1, 3, 6, 10],
@@ -17,7 +24,7 @@ var DATA = {
   assets: { tamer: "concepts/character/tamer_side.png", tamerCapture: "concepts/character/tamer_capture.png", companion: "concepts/character/fox_companion.png" },
   rarityOrder: ["rare", "epic", "unique", "legendary"],
   rarityWeights: [80, 17, 2.7, 0.3],
-  // DECISION: Preserve v0.1 rarity IDs/multipliers, with the design's four names and 0–3 traits.
+  // DECISION: Preserve v0.1 IDs/names/multipliers. lines records v4 legacy traits; M2 rolls use 1/2/3/3.
   rarities: {
     rare: { name: "일반", multiplier: 1, lines: 0, color: "#A9C4DC" },
     epic: { name: "희귀", multiplier: 1.15, lines: 1, color: "#C9B6E4" },

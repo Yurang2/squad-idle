@@ -15,8 +15,19 @@ Game.registerValidation(function (host) {
         (id !== "poison" || (finite(e.pulse) && e.pulse < 1.000001 && typeof e.source === "string"));
     });
   }
+  function accessory(a) {
+    if (!a || !/^accessory-[1-9]\d*$/.test(a.uid) || !Number.isSafeInteger(Number(a.uid.slice(10))) ||
+      !DATA.rarityOrder.includes(a.rarity) || typeof a.locked !== "boolean" || !Array.isArray(a.potentials)) return false;
+    var rank = DATA.rarityOrder.indexOf(a.rarity);
+    return a.potentials.length === DATA.accessory.lines[rank] && a.potentials.every(function (p) {
+      var def = DATA.accessoryPool.find(function (d) { return d.id === p.id; });
+      return def && finite(p.value) && p.value >= def.ranges[rank][0] && p.value <= def.ranges[rank][1];
+    });
+  }
   function validate(s) {
-    if (!s || s.schemaVersion !== 4 || !natural(s.gold) || !natural(s.tamerXP) || !natural(s.rngSeed) || s.rngSeed > 4294967295 ||
+    if (!s || s.schemaVersion !== 5 || !natural(s.gold) || !natural(s.coins) || !s.materials || !natural(s.materials.enhanceStone) ||
+      !natural(s.nextAccessoryUid) || s.nextAccessoryUid < 1 || !Array.isArray(s.accessories) || s.accessories.length > DATA.accessory.cap ||
+      !s.accessories.every(accessory) || !natural(s.tamerXP) || !natural(s.rngSeed) || s.rngSeed > 4294967295 ||
       !stage(s.currentStage) || !["repeat", "challenge"].includes(s.mode) || !natural(s.nextMonsterUid) || s.nextMonsterUid < 3 ||
       !natural(s.transitionTicks) || s.transitionTicks > DATA.resultTicks) return false;
     if (!Array.isArray(s.unlockedStages) || !unique(s.unlockedStages) || !s.unlockedStages.includes(0) ||
@@ -31,12 +42,18 @@ Game.registerValidation(function (host) {
       var e = s.dex[id]; return e && typeof e.seen === "boolean" && typeof e.caught === "boolean" && (!e.caught || e.seen);
     }) || !s.roster.every(function (m) { return s.dex[m.speciesId].caught; })) return false;
     var all = s.roster.slice(), report = s.pendingReport;
+    var items = s.accessories.slice(), equipped = s.roster.filter(function (m) { return m.accessory !== null; }).map(function (m) { return m.accessory; });
+    if (!unique(equipped) || !equipped.every(function (uid) { return items.some(function (a) { return a.uid === uid; }); })) return false;
     if (report !== null) {
       if (!report || !natural(report.elapsedMs) || report.elapsedMs > DATA.offline.maxMs || !natural(report.gold) || !natural(report.xp) ||
+        !report.materials || !natural(report.materials.enhanceStone) || !Array.isArray(report.accessories) || report.accessories.length > 100000 ||
+        !report.accessories.every(function (a) { return accessory(a) && !a.locked; }) ||
         report.stageIndex !== s.currentStage || !Array.isArray(report.monsters) || report.monsters.length + all.length > DATA.rosterCap ||
-        !report.monsters.every(function (m) { return host.monsters().validateMonster(m) && m.party === null; })) return false;
+        !report.monsters.every(function (m) { return host.monsters().validateMonster(m) && m.party === null && m.accessory === null && !m.locked; })) return false;
       all = all.concat(report.monsters);
+      items = items.concat(report.accessories);
     }
+    if (!unique(items.map(function (a) { return a.uid; })) || items.some(function (a) { return Number(a.uid.slice(10)) >= s.nextAccessoryUid; })) return false;
     if (!unique(all.map(function (m) { return m.uid; })) || all.some(function (m) { return Number(m.uid.slice(8)) >= s.nextMonsterUid; })) return false;
     if (!stats(s.stats) || s.statsKey !== s.currentStage || !s.stageStats || Array.isArray(s.stageStats) ||
       !Object.keys(s.stageStats).every(function (key) { return stage(Number(key)) && stats(s.stageStats[key]); })) return false;
@@ -44,7 +61,7 @@ Game.registerValidation(function (host) {
     if (!sim || sim.stageIndex !== s.currentStage || !natural(sim.ticks) || sim.ticks > 600 || !natural(sim.waveIndex) || sim.waveIndex > 2 ||
       !["fighting", "clear", "fail"].includes(sim.status)) return false;
     var t = sim.tamer;
-    if (!t || !finite(t.captureCooldown) || t.captureCooldown > 8 || ![1, 1.5].includes(t.captureBoost) || !t.cooldowns ||
+    if (!t || !finite(t.captureCooldown) || t.captureCooldown > DATA.capture.cooldown || ![1, 1.5].includes(t.captureBoost) || !t.cooldowns ||
       !DATA.tamerSkills.every(function (skill) { return finite(t.cooldowns[skill.id]) && t.cooldowns[skill.id] <= skill.cooldown; })) return false;
     function unit(u, side, index) {
       if (!u || !Object.hasOwn(DATA.species, u.speciesId) || u.side !== side || u.role !== DATA.species[u.speciesId].role ||

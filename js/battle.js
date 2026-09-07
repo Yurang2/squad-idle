@@ -19,7 +19,7 @@ var Battle = (function () {
       tamer: tamer || { captureCooldown: 0, captureBoost: 1, cooldowns: Object.fromEntries(DATA.tamerSkills.map(function (s) { return [s.id, s.initial]; })) },
       units: squad.map(function (m) {
         var stats = m.stats || Game.monsterStats(m);
-        return Object.assign({}, stats, { id: m.uid, speciesId: m.speciesId, side: "party", role: DATA.species[m.speciesId].role,
+        return Object.assign({}, stats, { id: m.uid, speciesId: m.speciesId, evo: m.evo, side: "party", role: DATA.species[m.speciesId].role,
           position: m.party, maxHp: stats.hp, cooldown: 0, skillCooldown: 3, effects: {} });
       }).sort(function (a, b) { return (a.role === "tank" ? 0 : 1) - (b.role === "tank" ? 0 : 1) || a.position - b.position; }) };
     spawnWave(sim, emit || function () {}); return sim;
@@ -94,7 +94,7 @@ var Battle = (function () {
     if (sim.tamer.captureCooldown > 0.000001 || !Game.canCapture()) return;
     var enemy = sim.enemies.find(function (u) { return !u.boss && u.hp > 0 && u.hp / u.maxHp < DATA.capture.threshold; });
     if (!enemy) return;
-    var p = captureProbability(enemy.speciesId, enemy.hp / enemy.maxHp, Game.getRank(), sim.tamer.captureBoost) * Game.captureMultiplier();
+    var p = captureProbability(enemy.speciesId, enemy.hp / enemy.maxHp, Game.getRank(), sim.tamer.captureBoost * (1 + Game.accessoryBonus("catchPct"))) * Game.captureMultiplier();
     sim.tamer.captureCooldown = DATA.capture.cooldown; sim.tamer.captureBoost = 1;
     emit("captureAttempt", { id: enemy.id, probability: p });
     if (Game.rng() < p) {

@@ -29,10 +29,11 @@ var UI = (function () {
   }
   function drawUnit(unit, index, count) {
     var p = position(unit, index, count), size = unit.boss ? 105 : unit.side === "party" ? 62 : 72;
+    size *= unit.evo === 3 ? 1.3 : unit.evo === 2 ? 1.15 : 1;
     var group = svgNode("g", { id: "sprite-" + unit.id, transform: "translate(" + p.x + " " + p.y + ")",
       "data-x":p.x,"data-y":p.y, class:"unit " + unit.side });
     group.appendChild(svgNode("ellipse", { cx:0,cy:0,rx:size*.29,ry:4,fill:"#DCCFD8",opacity:.6 }));
-    var body = svgNode("g", { class:"unit-body" }), art = svgNode("g", { transform:unit.side === "party" ? "scale(-1 1)" : "scale(1 1)" });
+    var body = svgNode("g", { class:"unit-body" }), art = svgNode("g", { class:unit.evo > 1 ? "evolved-rim" : "", transform:unit.side === "party" ? "scale(-1 1)" : "scale(1 1)" });
     art.appendChild(svgNode("image", { href:DATA.species[unit.speciesId].art,x:-size/2,y:-size*.92,width:size,height:size }));
     body.appendChild(art); group.appendChild(body);
     group.appendChild(svgNode("rect", { x:-20,y:7,width:40,height:3,rx:1.5,fill:"#FEF4E7" }));
@@ -95,7 +96,7 @@ var UI = (function () {
   }
   function renderSheet(state) {
     if(!activeSheet)return;
-    var signature=activeSheet+(activeSheet==="settings" ? "" : JSON.stringify([state.roster,state.dex,Game.getRank()]));
+    var signature=activeSheet+(activeSheet==="settings" ? "" : JSON.stringify([state.roster,state.dex,state.accessories,state.materials,state.gold,state.coins,Game.getRank()]));
     if(signature===sheetSignature)return; sheetSignature=signature;
     el("sheet-title").textContent=titles[activeSheet];
     if(activeSheet==="monsters")UI.renderMonsters(state);
@@ -104,7 +105,7 @@ var UI = (function () {
   }
   function openSheet(name) {
     if(name==="adventure") { el("sheet").close(); return; }
-    activeSheet=name; UI.selectedMonster=null; sheetSignature=""; renderSheet(Game.getState());
+    activeSheet=name; UI.selectedMonster=null; UI.monsterView=null; sheetSignature=""; renderSheet(Game.getState());
     if(!el("sheet").open)el("sheet").showModal();
     document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab===name);});
   }
@@ -113,12 +114,13 @@ var UI = (function () {
     else if(hiddenAt!==null) { var elapsed=Math.max(0,Date.now()-hiddenAt); hiddenAt=null; Game.catchUp(elapsed); Game.resume(); }
   }
   function closeOverlay() {
+    if(document.getElementById("evolution-reveal").open) { document.getElementById("close-evolution").click(); return true; }
     if(el("offline-report").open) { el("harvest-report").click(); return true; }
     if(el("sheet").open) { el("sheet").close(); return true; } return false;
   }
   function init() {
     document.querySelectorAll("[data-icon]").forEach(function(n){n.innerHTML=UI.icon(n.dataset.icon);});
-    UI.initArt(); UI.initExpedition();
+    UI.initArt(); UI.initExpedition(); UI.initProgression();
     Game.on("update",update); Game.on("stageStart",function(s){drawScene(s,true);});
     Game.on("wave",function(){drawScene(Game.getState(),false);}); Game.on("hit",hit); Game.on("unitDeath",death);
     Game.on("rankUp",function(e){toast("조련사 랭크 "+fmt(e.rank)+" · 파티 "+fmt(e.slots)+"슬롯");});
