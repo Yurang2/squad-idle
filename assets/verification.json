@@ -1,0 +1,399 @@
+{
+  "passed": true,
+  "total": 28,
+  "missing": [],
+  "assets": [
+    {
+      "key": "merc.warrior.idle",
+      "path": "assets/merc/warrior_idle.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 247706,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "merc.archer.idle",
+      "path": "assets/merc/archer_idle.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 241177,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "merc.mage.idle",
+      "path": "assets/merc/mage_idle.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 220371,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.slime",
+      "path": "assets/mon/slime.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 163726,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.goblin",
+      "path": "assets/mon/goblin.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 204652,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.mushroom",
+      "path": "assets/mon/mushroom.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 203163,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.boss_treant",
+      "path": "assets/mon/boss_treant.png",
+      "dimensions": [
+        640,
+        640
+      ],
+      "bytes": 401245,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "bg.forest",
+      "path": "assets/bg/forest.png",
+      "dimensions": [
+        1080,
+        760
+      ],
+      "bytes": 1116150,
+      "alphaRange": [
+        255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.weapon",
+      "path": "assets/icon/weapon.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 23767,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.hat",
+      "path": "assets/icon/hat.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 53886,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.gloves",
+      "path": "assets/icon/gloves.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 54643,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.shoes",
+      "path": "assets/icon/shoes.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 54232,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.skillbook",
+      "path": "assets/icon/skillbook.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 74753,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.gold",
+      "path": "assets/icon/gold.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 63917,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.coin",
+      "path": "assets/icon/coin.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 53826,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "merc.warrior.attack",
+      "path": "assets/merc/warrior_attack.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 222778,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "merc.archer.attack",
+      "path": "assets/merc/archer_attack.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 245252,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "merc.mage.attack",
+      "path": "assets/merc/mage_attack.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 233235,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.ice_bat",
+      "path": "assets/mon/ice_bat.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 200737,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.yeti",
+      "path": "assets/mon/yeti.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 184027,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.frost_wolf",
+      "path": "assets/mon/frost_wolf.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 245474,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.boss_ice_golem",
+      "path": "assets/mon/boss_ice_golem.png",
+      "dimensions": [
+        640,
+        640
+      ],
+      "bytes": 417853,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "bg.peak",
+      "path": "assets/bg/peak.png",
+      "dimensions": [
+        1080,
+        760
+      ],
+      "bytes": 1135241,
+      "alphaRange": [
+        255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.lava_slime",
+      "path": "assets/mon/lava_slime.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 199859,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.imp",
+      "path": "assets/mon/imp.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 213499,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.salamander",
+      "path": "assets/mon/salamander.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 208414,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "mon.boss_dragon",
+      "path": "assets/mon/boss_dragon.png",
+      "dimensions": [
+        640,
+        640
+      ],
+      "bytes": 389829,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "bg.volcano",
+      "path": "assets/bg/volcano.png",
+      "dimensions": [
+        1080,
+        760
+      ],
+      "bytes": 870853,
+      "alphaRange": [
+        255,
+        255
+      ],
+      "passed": true
+    }
+  ]
+}

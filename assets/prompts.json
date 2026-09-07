@@ -1,0 +1,170 @@
+﻿[
+  {
+    "key": "merc.warrior.idle",
+    "path": "assets/merc/warrior_idle.png",
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single game sprite: young knight in orange and gold armor, large shield and sword, idle standing pose facing RIGHT. Head approximately 45% of total height. Full body and equipment visible, centered with approximately 10% padding, feet near bottom with grounding shadow at bottom 5%. Clean bold rounded shapes, two-tone cel shading, warm upper-left highlights. Genuine transparent alpha background. Square 512x512 PNG.",
+    "size": 512
+  },
+  {
+    "key": "merc.archer.idle",
+    "path": "assets/merc/archer_idle.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Girl archer in green hood, chestnut hair, wooden bow, idle stance facing RIGHT. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG."
+  },
+  {
+    "key": "merc.mage.idle",
+    "path": "assets/merc/mage_idle.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Child mage with purple pointed wizard hat and purple robe, golden star staff, idle stance facing RIGHT. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG."
+  },
+  {
+    "key": "mon.slime",
+    "path": "assets/mon/slime.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single simple lime green jelly slime blob with vacant silly eyes looking LEFT. Entire body is one squat translucent gelatin dome resting on ground, no separate head or limbs, no clothes, no hat, no equipment. Glossy two-tone cel shading and thick dark brown contour. Centered full blob with 10% padding. Genuine transparent alpha background. 512x512 PNG."
+  },
+  {
+    "key": "mon.goblin",
+    "path": "assets/mon/goblin.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute green goblin with wooden club and brown loincloth, facing LEFT. Forest green and brown palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Only the described monster and equipment; no wizard outfits or extra accessories."
+  },
+  {
+    "key": "mon.mushroom",
+    "path": "assets/mon/mushroom.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Red spotted mushroom monster with angry eyebrows and stubby feet, facing LEFT. Forest green and brown palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Only the described monster and equipment; no wizard outfits or extra accessories."
+  },
+  {
+    "key": "mon.boss_treant",
+    "path": "assets/mon/boss_treant.png",
+    "size": 640,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Boss large tree spirit with a face in its trunk, branch arms, root feet and green leafy crown, facing LEFT. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 640x640 PNG. Only the described monster and equipment; no wizard outfits or extra accessories."
+  },
+  {
+    "key": "bg.forest",
+    "path": "assets/bg/forest.png",
+    "size": 1080,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Bright daytime woodland path, blue sky and large trees. Green brown palette. Environment background overrides transparent/full-body terms: entirely opaque landscape 1080x760. Horizon exactly 55% down; lower 45% fairly flat unobstructed walkable ground for sprites. Lava if present stays in distant upper half. No characters or icons."
+  },
+  {
+    "key": "icon.weapon",
+    "path": "assets/icon/weapon.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single sword, silver blade with orange and gold hilt. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.hat",
+    "path": "assets/icon/hat.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single orange and gold knight helmet. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.gloves",
+    "path": "assets/icon/gloves.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single orange and gold armored glove. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.shoes",
+    "path": "assets/icon/shoes.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single orange brown leather boot with golden trim. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.skillbook",
+    "path": "assets/icon/skillbook.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single sparkling purple magic book with gold star clasp. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.gold",
+    "path": "assets/icon/gold.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single glossy gold coin with embossed star. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "icon.coin",
+    "path": "assets/icon/coin.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Single glossy purple faceted gemstone, squad currency. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Single object centered FRONT VIEW, glossy equipment icon, no surrounding frame.Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 256x256 PNG."
+  },
+  {
+    "key": "merc.warrior.attack",
+    "path": "assets/merc/warrior_attack.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Young brown-haired knight wearing orange and gold armor and orange plume helmet with raised visor, large orange and gold shield, silver gold sword. Attack pose swinging sword RIGHT. Match idle knight design. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Edit the supplied idle sprite into this attack pose. Preserve exact character identity, hair, clothing, equipment design, proportions, rendering and palette from supplied reference. Only change pose and attack glow or sword motion. Do not add a background."
+  },
+  {
+    "key": "merc.archer.attack",
+    "path": "assets/merc/archer_attack.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Girl archer in green hood, chestnut hair, wooden bow. Attack pose drawing bowstring aiming RIGHT. Match idle archer design. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Edit the supplied idle sprite into this attack pose. Preserve exact character identity, hair, clothing, equipment design, proportions, rendering and palette from supplied reference. Only change pose and attack glow or sword motion. Do not add a background."
+  },
+  {
+    "key": "merc.mage.attack",
+    "path": "assets/merc/mage_attack.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Child mage with purple pointed wizard hat and purple robe, golden star staff. Attack pose raising glowing staff toward RIGHT. Match idle mage design. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Edit the supplied idle sprite into this attack pose. Preserve exact character identity, hair, clothing, equipment design, proportions, rendering and palette from supplied reference. Only change pose and attack glow or sword motion. Do not add a background."
+  },
+  {
+    "key": "mon.ice_bat",
+    "path": "assets/mon/ice_bat.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute ice bat with blue wings, facing LEFT. Sky blue and white palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Animal monster only, no clothing, weapons or accessories."
+  },
+  {
+    "key": "mon.yeti",
+    "path": "assets/mon/yeti.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Small cute yeti, upright bipedal abominable snowman with shaggy white fur, blue face hands and feet, two arms and exactly two legs standing upright, head approximately 45% of height, facing LEFT. Full body visible centered with 10% padding, feet near bottom. Glossy two-tone cel shading, thick dark brown outlines, sky blue and white palette. No clothing or accessories. Genuine transparent alpha background. 512x512 PNG."
+  },
+  {
+    "key": "mon.frost_wolf",
+    "path": "assets/mon/frost_wolf.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute sky blue frost wolf with icy fur tufts, facing LEFT. Sky blue and white palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Animal monster only, no clothing, weapons or accessories."
+  },
+  {
+    "key": "mon.boss_ice_golem",
+    "path": "assets/mon/boss_ice_golem.png",
+    "size": 640,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Boss ice golem with chunky crystal body, facing LEFT. Sky blue and white palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 640x640 PNG."
+  },
+  {
+    "key": "bg.peak",
+    "path": "assets/bg/peak.png",
+    "size": 1080,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Snow-covered mountain path, clear blue sky, ice crystals. Environment background overrides transparent/full-body terms: entirely opaque landscape 1080x760. Horizon exactly 55% down; lower 45% fairly flat unobstructed walkable ground for sprites. Lava if present stays in distant upper half. No characters or icons. Critical composition: the entire lower HALF of the image must be a continuous flat unobstructed standing platform. Ground rear edge is at y=0.50 of canvas height. No large foreground rocks, crystals, vegetation, rivers, fences or cliffs in lower half. All scenic details restricted to upper half. Recompose the supplied reference with substantially more flat ground in the lower half, keep mountain palette and style."
+  },
+  {
+    "key": "mon.lava_slime",
+    "path": "assets/mon/lava_slime.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute lava slime with orange glow and dark crust, facing LEFT. Red black and orange palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. Body is a single squat jelly dome, no separate head or limbs, no clothing, no weapons, no accessories."
+  },
+  {
+    "key": "mon.imp",
+    "path": "assets/mon/imp.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute red imp carrying trident, facing LEFT. Red and black palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG."
+  },
+  {
+    "key": "mon.salamander",
+    "path": "assets/mon/salamander.png",
+    "size": 512,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Cute fire lizard salamander with fiery tail, facing LEFT. Red black and orange palette. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 512x512 PNG. A four-legged lizard, no clothes or weapons."
+  },
+  {
+    "key": "mon.boss_dragon",
+    "path": "assets/mon/boss_dragon.png",
+    "size": 640,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Boss baby dragon with red scales and gold belly horns and wings, facing LEFT. Clean bold rounded shapes, thick dark-brown outlines, two-tone cel shading, warm upper-left glossy highlights. Head approximately 45% of total height. Full body and all equipment visible, centered, feet near bottom. Approximately 10% padding on all sides. Genuine transparent alpha background, no checkerboard pattern. Square 640x640 PNG."
+  },
+  {
+    "key": "bg.volcano",
+    "path": "assets/bg/volcano.png",
+    "size": 1080,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Volcanic landscape with lava river and orange sky, maintain bright cheerful colors. Environment background overrides transparent/full-body terms: entirely opaque landscape 1080x760. Horizon exactly 55% down; lower 45% fairly flat unobstructed walkable ground for sprites. Lava if present stays in distant upper half. No characters or icons. Critical composition: the entire lower HALF of the image must be a continuous flat unobstructed standing platform. Ground rear edge is at y=0.50 of canvas height. No large foreground rocks, crystals, vegetation, rivers, fences or cliffs in lower half. All scenic details restricted to upper half."
+  }
+]
