@@ -1,46 +1,98 @@
 [
   {
     "file": "tamer_front.png",
-    "bytes": 1429522,
+    "bytes": 703706,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 779602,
+    "facing": "front",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   },
   {
     "file": "tamer_side.png",
-    "bytes": 1372409,
+    "bytes": 582929,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 832625,
+    "facing": "right",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   },
   {
     "file": "tamer_capture.png",
-    "bytes": 1577330,
+    "bytes": 785084,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 743362,
+    "facing": "right",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   },
   {
     "file": "fox_companion.png",
-    "bytes": 1286710,
+    "bytes": 697605,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 692761,
+    "facing": "right",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   }
 ]

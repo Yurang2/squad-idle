@@ -1,35 +1,74 @@
 [
   {
     "file": "slime_pastel.png",
-    "bytes": 1353661,
+    "bytes": 528842,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 789527,
+    "facing": "left",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen; magenta key with 1px feather",
     "over_50KB": true
   },
   {
     "file": "fox_wild.png",
-    "bytes": 1377836,
+    "bytes": 557640,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 787418,
+    "facing": "left",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   },
   {
     "file": "lakebat.png",
-    "bytes": 1233010,
+    "bytes": 763775,
     "size": [
-      1254,
-      1254
+      1024,
+      1024
     ],
-    "mode": "RGB",
-    "real_transparency": false,
+    "mode": "RGBA",
+    "real_transparency": true,
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "corners_fully_transparent": true,
+    "magenta_pixels": 0,
+    "no_magenta": true,
+    "transparent_pixels": 678959,
+    "facing": "left",
+    "facing_visually_verified": true,
+    "export_method": "built-in imagegen alpha; edge cleanup",
     "over_50KB": true
   }
 ]
