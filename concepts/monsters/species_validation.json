@@ -1,0 +1,182 @@
+[
+  {
+    "id": "mistfox",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 22.82,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 24.91,
+    "bottom_padding_px": 152,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "lakebat",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 33.7,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 35.25,
+    "bottom_padding_px": 95,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "dewslime",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 27.79,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 28.77,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "reedheron",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 16.4,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 20.76,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "pondturtle",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 21.5,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 23.43,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "glowmoth",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 21.54,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 24.79,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "snowhare",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 25.33,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 28.8,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "ridgegoat",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 23.73,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 27.12,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "frostowl",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 23.79,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 25.95,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "icewolf",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 25.68,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 28.49,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "crystalbeetle",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 23.03,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 25.8,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "cloudram",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 30.34,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 33.26,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "emberlizard",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 20.75,
+    "strict_alpha255_percent": 0.01,
+    "occupied_percent": 23.17,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "cliffhawk",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 30.59,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 33.12,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "sandpangolin",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 15.75,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 17.23,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "duskcat",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 20.8,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 23.61,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "rockcrab",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 23.5,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 26.37,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  },
+  {
+    "id": "windserpent",
+    "opaque_alpha_threshold": 250,
+    "opaque_percent": 18.57,
+    "strict_alpha255_percent": 0.0,
+    "occupied_percent": 22.66,
+    "bottom_padding_px": 82,
+    "magenta_pixels": 0,
+    "transparent_corners": true
+  }
+]

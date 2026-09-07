@@ -1,0 +1,20 @@
+{
+  "mistfox": "assets/monsters/mistfox.png",
+  "lakebat": "assets/monsters/lakebat.png",
+  "dewslime": "assets/monsters/dewslime.png",
+  "reedheron": "assets/monsters/reedheron.png",
+  "pondturtle": "assets/monsters/pondturtle.png",
+  "glowmoth": "assets/monsters/glowmoth.png",
+  "snowhare": "assets/monsters/snowhare.png",
+  "ridgegoat": "assets/monsters/ridgegoat.png",
+  "frostowl": "assets/monsters/frostowl.png",
+  "icewolf": "assets/monsters/icewolf.png",
+  "crystalbeetle": "assets/monsters/crystalbeetle.png",
+  "cloudram": "assets/monsters/cloudram.png",
+  "emberlizard": "assets/monsters/emberlizard.png",
+  "cliffhawk": "assets/monsters/cliffhawk.png",
+  "sandpangolin": "assets/monsters/sandpangolin.png",
+  "duskcat": "assets/monsters/duskcat.png",
+  "rockcrab": "assets/monsters/rockcrab.png",
+  "windserpent": "assets/monsters/windserpent.png"
+}
