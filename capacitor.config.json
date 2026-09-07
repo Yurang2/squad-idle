@@ -1,0 +1,14 @@
+{
+  "appId": "com.dklee.squadidle",
+  "appName": "용병단",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": {
+      "backgroundColor": "#8FD3FF",
+      "launchShowDuration": 1000,
+      "androidScaleType": "CENTER_INSIDE",
+      "showSpinner": false
+    }
+  }
+}

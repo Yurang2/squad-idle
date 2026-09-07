@@ -89,7 +89,7 @@
     var content = item.kind === "skillBook" ? '<span class="item-card book-card"><span class="item-icon">' + UI.icon("skillbook", "▤") + '</span><b>' + mercName(item.owner) + '</b><small>스킬북 ×' + UI.fmt(item.count) + '</small></span>' : UI.itemCard(item);
     card.innerHTML = '<div class="flip-inner"><div class="card-back">◇</div><div class="card-front">' + content + '</div></div>';
     el("report-items").appendChild(card);
-    if (DATA.rarityOrder.indexOf(item.rarity) >= 2) { card.classList.add("rarity-upgrade"); UI.lootFlash(true); if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(30); }
+    if (DATA.rarityOrder.indexOf(item.rarity) >= 2) { card.classList.add("rarity-upgrade"); UI.lootFlash(true); Native.vibrate(30); }
   }
   function progress() { el("report-progress").textContent = UI.fmt(shown) + ' / ' + UI.fmt(report.items.length) + ' 공개 · 탭하면 모두 공개'; }
   function tick(now) {

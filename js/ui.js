@@ -192,6 +192,24 @@ var UI = (function () {
     if (!el("sheet").open) el("sheet").showModal();
     document.querySelectorAll("[data-tab]").forEach(function (button) { button.classList.toggle("selected", button.dataset.tab === name); });
   }
+  // DECISION: Android and DOM lifecycle notifications share an idempotent transition.
+  function setActive(active) {
+    if (!active) {
+      if (hiddenAt === null) { hiddenAt = Date.now(); Game.pause(); }
+    } else if (hiddenAt !== null) {
+      var elapsed = Math.max(0, Date.now() - hiddenAt);
+      hiddenAt = null;
+      Game.catchUp(elapsed); Game.resume();
+    }
+  }
+  function closeOverlay() {
+    var overlay = document.querySelector("#offline-report[open]") || document.querySelector("#fusion-reveal[open]") || document.querySelector("#sheet[open]");
+    if (!overlay) return false;
+    // DECISION: Closing a reward report collects it through the existing harvest action.
+    if (overlay.id === "offline-report") el("harvest-report").click();
+    else overlay.close();
+    return true;
+  }
   function init() {
     Game.on("update", update);
     Game.on("stageStart", function (state) { drawScene(state, true); });
@@ -215,17 +233,17 @@ var UI = (function () {
       document.querySelectorAll("[data-tab]").forEach(function (button) { button.classList.remove("selected"); });
     });
     document.addEventListener("visibilitychange", function () {
-      if (document.hidden) { hiddenAt = Date.now(); Game.pause(); }
-      else { if (hiddenAt !== null) Game.catchUp(Date.now() - hiddenAt); hiddenAt = null; Game.resume(); }
+      setActive(!document.hidden);
     });
-    window.addEventListener("pagehide", function () { hiddenAt = Date.now(); Game.pause(); });
+    window.addEventListener("pagehide", function () { setActive(false); });
     window.addEventListener("pageshow", function (event) {
-      if (event.persisted && !document.hidden) { if (hiddenAt !== null) Game.catchUp(Date.now() - hiddenAt); hiddenAt = null; Game.resume(); }
+      if (event.persisted && !document.hidden) setActive(true);
     });
     Game.init();
     if (!document.hidden) Game.resume();
     else hiddenAt = Date.now();
+    Native.init();
   }
-  return { fmt: fmt, init: init, openSheet: openSheet, toast: toast,
+  return { fmt: fmt, init: init, openSheet: openSheet, toast: toast, setActive: setActive, closeOverlay: closeOverlay,
     refreshSheet: function () { sheetSignature = ""; renderSheet(Game.getState()); } };
 })();

@@ -1,0 +1,19 @@
+{
+  "name": "squad-idle",
+  "version": "0.4.0",
+  "private": true,
+  "scripts": {
+    "build:www": "node scripts/build-www.js",
+    "android:assets": "node scripts/android-assets.js",
+    "android:sync": "npm run build:www && npm run android:assets && cap sync android",
+    "test": "node test/run.js"
+  },
+  "devDependencies": {
+    "@capacitor/core": "6.2.1",
+    "@capacitor/cli": "6.2.1",
+    "@capacitor/android": "6.2.1",
+    "@capacitor/haptics": "6.0.2",
+    "@capacitor/app": "6.0.3",
+    "@capacitor/splash-screen": "6.0.3"
+  }
+}

@@ -1,5 +1,28 @@
 # 변경 기록
 
+## 0.4.0 · P4 — 2026-09-07
+
+- `package.json`, `capacitor.config.json`: Capacitor 6 계열 6개만 devDependencies로 고정. 앱 ID `com.dklee.squadidle`, 이름 `용병단`, `webDir: www`, mixed content 금지, 스플래시 `#8FD3FF`. 게임의 정적 실행·클래식 스크립트·게임 수치·저장 형식은 유지했다.
+- `scripts/build-www.js`: Node 기본 모듈로 index/style/js/assets를 복사하며 contact sheet, prompts, generation log, Python 파일을 제외한다. 출력 경로/심볼릭 링크를 검증하고 매번 출력 폴더를 새로 만든다. manifest 28개 경로가 패키지 내부 실제 파일인지 검사한다.
+- `scripts/png.js`, `scripts/android-assets.js`: 추가 패키지 없는 PNG 디코딩/인코딩·축소, 5개 밀도별 둥근 하늘색 런처 아이콘·adaptive foreground·중앙 스플래시 로고 20개. 실제 Android 프로젝트가 있으면 res/launch theme와 MainActivity의 `android:screenOrientation="portrait"`를 설정한다. `--preview`는 별도 무시 폴더에만 출력한다.
+- `js/native.js`: 허용된 여섯 번째 전역 `Native`의 `init/isNative/vibrate`. Capacitor 주입 브리지의 Haptics/App 플러그인을 사용하고 브라우저 또는 지원하지 않는 기능에서는 안전하게 처리한다. `UI.setActive()`로 visibilitychange/pagehide/pageshow/appStateChange의 pause/resume/catchUp을 통합했다. `UI.closeOverlay()`는 원정 보고서→합성→시트 순서로 닫고, 없으면 App.minimizeApp을 호출한다. 드롭/합성/보고서 희귀 카드의 진동 경로를 통합했다.
+- `.gitignore`: www, node_modules, Android build 출력, 로컬 npm 캐시·리소스 미리보기 제외. `BUILD_ANDROID.md`에 JDK 17·Android Studio SDK 34·JAVA_HOME/ANDROID_HOME, 최초 생성 및 반복 빌드 두 명령, 예상 APK 위치와 실제 미완료 사항을 기록했다.
+
+### DECISION: 웹 독립성과 Android 준비
+
+- 사용자 P4 명시 요청에 따라 기존 npm 금지 규칙의 예외를 Android 개발 도구에만 적용했다. 요구한 JDK 17 / SDK 34에 맞춰 Capacitor 6.x를 선택했다. 번들러·웹 npm 런타임·새 게임 밸런스는 추가하지 않았다.
+- 별도 로고 파일이 없으므로 기존 `assets/icon/weapon.png`를 앱 로고로 재사용한다. Android 12+ 시스템 splash theme와 이전 Android용 중앙 bitmap을 함께 설정한다.
+- Android와 DOM의 중복 pause/resume 통지는 최초 숨김 시각을 유지하고 catchUp을 한 번만 호출한다. 보고서를 뒤로가기로 닫으면 기존 수확 버튼을 실행하여 미수확 보고서가 보이지 않는 채 전투가 정지하는 상황을 방지한다. 일반 브라우저 진동의 사용자 입력 조건은 유지한다.
+- 환경에서 생성하지 못한 Android 프로젝트를 수작업 템플릿으로 가장하지 않는다. 실제 `cap add android` 이후 리소스 생성기를 실행하도록 하고, 생성된 android/와 package-lock.json은 그 시점에 버전 관리한다.
+
+### 검증 및 빌드 결과
+
+- `node test/run.js`: **38 PASS**, 기존 장기 플레이 3개 시드의 5.50/5.10/5.72시간 클리어 결과 유지. 모든 js/scripts 파일별 `node --check`, `git diff --check` 통과, 작성 코드 600줄 이하.
+- `node scripts/check-native.js`: 브라우저/네이티브 진동 분기, 없는 플러그인/거부된 Promise, 중복 lifecycle의 61초 단일 catchUp, 세 종류 overlay 닫기와 minimize 모의 검증 통과. 실제 Android 플러그인 테스트는 아니다.
+- `node scripts/build-www.js`: manifest **28/28** 검증, index.html/style.css 바이트 보존 확인. 리소스 preview **20/20** PNG 디코딩 통과, 런처 아이콘 시각 확인.
+- Chrome 152에서 `FONT_FALLBACK=1`, `BROWSER_NO_SANDBOX=1`로 `node test/browser-art.js` 통과: 28개 에셋, 375px 레이아웃, 5개 시트, 애니메이션, 에셋 실패 폴백과 콘솔/런타임/네트워크 오류 0. 원격 폰트는 기존 검증과 동일하게 빈 CSS 응답으로 대체했다.
+- **빌드 차단 / APK 없음:** npm install이 registry.npmjs.org 접근 `EACCES`로 실패했다. `npx cap add android` / `npx cap sync`도 설치된 CLI가 없고 npm 조회가 차단되어 실행에 실패했다. 따라서 android/·Gradle wrapper·lockfile은 생성되지 않았으며 assembleDebug를 시작할 수 없었다. java 명령 없음, JAVA_HOME/ANDROID_HOME 미설정, 통상 설치 경로에 Android SDK 없음. SDK/JDK를 설치하지 않았고 재개 방법은 BUILD_ANDROID.md에 기록했다. Android 리소스 컴파일·세로 고정·실제 기기 연동 검증은 남아 있다.
+
 ## 0.2.0 · P2 — 2026-09-07
 
 - `js/data.js`: 장비 4슬롯·8티어·4등급 확정, 방어력 잠재 추가, 스테이지 6구간 드롭표와 카오스용 데이터 자리, `fusionCost()`·`sellPrice()`, 합성 상승 15%·재설정 20코인·인벤토리 60칸 상수.

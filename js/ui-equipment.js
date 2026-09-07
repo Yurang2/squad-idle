@@ -131,7 +131,7 @@
     card.style.setProperty("--drop-y", target.y + target.height / 2 - start.y + "px");
     el("app").appendChild(card);
     card.addEventListener("animationend", function (e) { if (e.target === card) card.remove(); });
-    if (ranks.indexOf(item.rarity) >= 2) { flash(false); if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(30); }
+    if (ranks.indexOf(item.rarity) >= 2) { flash(false); Native.vibrate(30); }
   }
   var reveal = document.createElement("dialog");
   reveal.id = "fusion-reveal";
@@ -144,7 +144,7 @@
     card.innerHTML = '<div class="flip-inner"><div class="card-back">◇</div><div class="card-front">' + itemCard(event.item) +
       '</div></div><p>' + (event.upgraded ? '✦ 등급 상승!' : slot(event.item.slot).name) + '</p>';
     el("reveal-cards").appendChild(card);
-    if (event.upgraded || ranks.indexOf(event.item.rarity) >= 2) flash(true);
+    if (event.upgraded || ranks.indexOf(event.item.rarity) >= 2) { flash(true); Native.vibrate(30); }
   }
   function revealTick(now) {
     if (!reveal.open) { revealFrame = null; return; }

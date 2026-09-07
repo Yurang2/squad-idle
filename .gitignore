@@ -1,2 +1,7 @@
 node_modules/
+www/
+android/build/
+android/app/build/
+.npm-cache/
+.android-preview/
 .claude/*.log
