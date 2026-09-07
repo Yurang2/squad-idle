@@ -1,0 +1,2576 @@
+{
+  "generator": "built-in image_gen",
+  "expected": 39,
+  "raw_count": 39,
+  "production_count": 39,
+  "passed_count": 39,
+  "opaque_definition": "alpha == 255; full canvas denominator",
+  "records": [
+    {
+      "name": "mistfox_2",
+      "target": "assets/monsters/mistfox_2.png",
+      "raw": "concepts/monsters/m4a_raw/mistfox_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 511,
+        "opaque_alpha255_pct": 0.0289,
+        "alpha128_plus_pct": 29.5255,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          32,
+          48,
+          1241,
+          1172
+        ],
+        "bottom_padding_px": 82,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 20.8707,
+        "alpha128_plus_pct": 21.9967,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          259,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/mistfox_2.png",
+        "source_bbox": [
+          35,
+          122,
+          1236,
+          1078
+        ],
+        "scale": 0.716203164029975,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "lakebat_2",
+      "target": "assets/monsters/lakebat_2.png",
+      "raw": "concepts/monsters/m4a_raw/lakebat_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 30.1288,
+        "alpha128_plus_pct": 30.6399,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          107,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/lakebat_2_key.png",
+        "source_bbox": [
+          70,
+          47,
+          1232,
+          1175
+        ],
+        "scale": 0.7402409638554217,
+        "keyed": true,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "dewslime_2",
+      "target": "assets/monsters/dewslime_2.png",
+      "raw": "concepts/monsters/m4a_raw/dewslime_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 27.6963,
+        "alpha128_plus_pct": 28.1076,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          218,
+          82,
+          805,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/dewslime_2_transparent.png",
+        "source_bbox": [
+          247,
+          20,
+          1062,
+          1214
+        ],
+        "scale": 0.7204020100502513,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "reedheron_2",
+      "target": "assets/monsters/reedheron_2.png",
+      "raw": "concepts/monsters/m4a_raw/reedheron_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 763,
+        "opaque_alpha255_pct": 0.0549,
+        "alpha128_plus_pct": 21.9405,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1188,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 16.9216,
+        "alpha128_plus_pct": 19.312,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          107,
+          20,
+          917,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/reedheron_2.png",
+        "source_bbox": [
+          146,
+          34,
+          1177,
+          1196
+        ],
+        "scale": 0.7931153184165233,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "pondturtle_2",
+      "target": "assets/monsters/pondturtle_2.png",
+      "raw": "concepts/monsters/m4a_raw/pondturtle_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 41,
+        "opaque_alpha255_pct": 0.0132,
+        "alpha128_plus_pct": 35.4506,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          29,
+          19,
+          1253,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 25.1425,
+        "alpha128_plus_pct": 26.3031,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          351,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/pondturtle_2.png",
+        "source_bbox": [
+          33,
+          230,
+          1242,
+          1061
+        ],
+        "scale": 0.7114640198511166,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "glowmoth_2",
+      "target": "assets/monsters/glowmoth_2.png",
+      "raw": "concepts/monsters/m4a_raw/glowmoth_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 737,
+        "opaque_alpha255_pct": 0.0183,
+        "alpha128_plus_pct": 30.8275,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          65,
+          13,
+          1230,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 21.164,
+        "alpha128_plus_pct": 22.6902,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          111,
+          85,
+          912,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/glowmoth_2.png",
+        "source_bbox": [
+          74,
+          22,
+          1200,
+          1231
+        ],
+        "scale": 0.7114640198511166,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "snowhare_2",
+      "target": "assets/monsters/snowhare_2.png",
+      "raw": "concepts/monsters/m4a_raw/snowhare_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 325,
+        "opaque_alpha255_pct": 0.0024,
+        "alpha128_plus_pct": 32.9329,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          17,
+          1224,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 24.4119,
+        "alpha128_plus_pct": 26.125,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          134,
+          91,
+          890,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/snowhare_2.png",
+        "source_bbox": [
+          127,
+          19,
+          1164,
+          1184
+        ],
+        "scale": 0.7383347639484978,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "ridgegoat_2",
+      "target": "assets/monsters/ridgegoat_2.png",
+      "raw": "concepts/monsters/m4a_raw/ridgegoat_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 1008,
+        "opaque_alpha255_pct": 0.0197,
+        "alpha128_plus_pct": 33.6414,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          19,
+          1226,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 25.6,
+        "alpha128_plus_pct": 27.5911,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          122,
+          82,
+          901,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/ridgegoat_2.png",
+        "source_bbox": [
+          129,
+          64,
+          1168,
+          1209
+        ],
+        "scale": 0.7512314410480349,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "frostowl_2",
+      "target": "assets/monsters/frostowl_2.png",
+      "raw": "concepts/monsters/m4a_raw/frostowl_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 361,
+        "opaque_alpha255_pct": 0.0174,
+        "alpha128_plus_pct": 36.1606,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          43,
+          0,
+          1240,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 25.1204,
+        "alpha128_plus_pct": 26.2811,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          186,
+          88,
+          837,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/frostowl_2.png",
+        "source_bbox": [
+          200,
+          10,
+          1124,
+          1230
+        ],
+        "scale": 0.7050491803278688,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "icewolf_2",
+      "target": "assets/monsters/icewolf_2.png",
+      "raw": "concepts/monsters/m4a_raw/icewolf_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 26.0381,
+        "alpha128_plus_pct": 26.9051,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          224,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/icewolf_2_transparent.png",
+        "source_bbox": [
+          44,
+          140,
+          1246,
+          1144
+        ],
+        "scale": 0.7156073211314475,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "crystalbeetle_2",
+      "target": "assets/monsters/crystalbeetle_2.png",
+      "raw": "concepts/monsters/m4a_raw/crystalbeetle_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 3932,
+        "opaque_alpha255_pct": 0.0043,
+        "alpha128_plus_pct": 33.5728,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1228,
+          1214
+        ],
+        "bottom_padding_px": 40,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.6087,
+        "alpha128_plus_pct": 25.3155,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          260,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/crystalbeetle_2.png",
+        "source_bbox": [
+          29,
+          181,
+          1225,
+          1129
+        ],
+        "scale": 0.7191973244147157,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "cloudram_2",
+      "target": "assets/monsters/cloudram_2.png",
+      "raw": "concepts/monsters/m4a_raw/cloudram_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 911,
+        "opaque_alpha255_pct": 0.0075,
+        "alpha128_plus_pct": 45.6312,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          19,
+          1253,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 34.8496,
+        "alpha128_plus_pct": 37.043,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          92,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/cloudram_2.png",
+        "source_bbox": [
+          83,
+          50,
+          1239,
+          1193
+        ],
+        "scale": 0.744083044982699,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "emberlizard_2",
+      "target": "assets/monsters/emberlizard_2.png",
+      "raw": "concepts/monsters/m4a_raw/emberlizard_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 43,
+        "opaque_alpha255_pct": 0.0238,
+        "alpha128_plus_pct": 28.0083,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1253,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 20.1439,
+        "alpha128_plus_pct": 21.1923,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          337,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/emberlizard_2.png",
+        "source_bbox": [
+          51,
+          226,
+          1243,
+          1065
+        ],
+        "scale": 0.7216107382550335,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "cliffhawk_2",
+      "target": "assets/monsters/cliffhawk_2.png",
+      "raw": "concepts/monsters/m4a_raw/cliffhawk_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 27.9394,
+        "alpha128_plus_pct": 28.9849,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          180,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/cliffhawk_2_transparent.png",
+        "source_bbox": [
+          44,
+          81,
+          1217,
+          1120
+        ],
+        "scale": 0.7332992327365728,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "sandpangolin_2",
+      "target": "assets/monsters/sandpangolin_2.png",
+      "raw": "concepts/monsters/m4a_raw/sandpangolin_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 17.1554,
+        "alpha128_plus_pct": 17.8319,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          30,
+          542,
+          993,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/sandpangolin_2_transparent.png",
+        "source_bbox": [
+          20,
+          639,
+          1245,
+          1152
+        ],
+        "scale": 0.7857632653061224,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "duskcat_2",
+      "target": "assets/monsters/duskcat_2.png",
+      "raw": "concepts/monsters/m4a_raw/duskcat_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 73,
+        "opaque_alpha255_pct": 0.0078,
+        "alpha128_plus_pct": 31.4221,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1239,
+          1182
+        ],
+        "bottom_padding_px": 72,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.446,
+        "alpha128_plus_pct": 24.7878,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          85,
+          205,
+          939,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/duskcat_2.png",
+        "source_bbox": [
+          64,
+          112,
+          1236,
+          1119
+        ],
+        "scale": 0.7339249146757679,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "rockcrab_2",
+      "target": "assets/monsters/rockcrab_2.png",
+      "raw": "concepts/monsters/m4a_raw/rockcrab_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 73,
+        "opaque_alpha255_pct": 0.0421,
+        "alpha128_plus_pct": 35.4236,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1237,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 24.583,
+        "alpha128_plus_pct": 26.0161,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          339,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/rockcrab_2.png",
+        "source_bbox": [
+          23,
+          235,
+          1233,
+          1087
+        ],
+        "scale": 0.7108760330578512,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "windserpent_2",
+      "target": "assets/monsters/windserpent_2.png",
+      "raw": "concepts/monsters/m4a_raw/windserpent_2.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 85,
+        "opaque_alpha255_pct": 0.0232,
+        "alpha128_plus_pct": 30.1695,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          12,
+          1238,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 21.2966,
+        "alpha128_plus_pct": 24.3439,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          83,
+          84,
+          940,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/windserpent_2.png",
+        "source_bbox": [
+          72,
+          20,
+          1207,
+          1159
+        ],
+        "scale": 0.7551887620719929,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "mistfox_3",
+      "target": "assets/monsters/mistfox_3.png",
+      "raw": "concepts/monsters/m4a_raw/mistfox_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.2294,
+        "alpha128_plus_pct": 24.3013,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          245,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/mistfox_3_transparent.png",
+        "source_bbox": [
+          14,
+          101,
+          1244,
+          1101
+        ],
+        "scale": 0.6993170731707317,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "lakebat_3",
+      "target": "assets/monsters/lakebat_3.png",
+      "raw": "concepts/monsters/m4a_raw/lakebat_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 26.4685,
+        "alpha128_plus_pct": 27.3229,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          144,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/lakebat_3_transparent.png",
+        "source_bbox": [
+          52,
+          24,
+          1242,
+          1128
+        ],
+        "scale": 0.7228235294117646,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "dewslime_3",
+      "target": "assets/monsters/dewslime_3.png",
+      "raw": "concepts/monsters/m4a_raw/dewslime_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 237,
+        "opaque_alpha255_pct": 0.0304,
+        "alpha128_plus_pct": 34.2526,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          33,
+          14,
+          1236,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 26.8651,
+        "alpha128_plus_pct": 27.3443,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          189,
+          82,
+          834,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/dewslime_3.png",
+        "source_bbox": [
+          211,
+          16,
+          1090,
+          1188
+        ],
+        "scale": 0.7339249146757679,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "reedheron_3",
+      "target": "assets/monsters/reedheron_3.png",
+      "raw": "concepts/monsters/m4a_raw/reedheron_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 1241,
+        "opaque_alpha255_pct": 0.0404,
+        "alpha128_plus_pct": 21.7259,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          16,
+          1230,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 16.1057,
+        "alpha128_plus_pct": 18.228,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          108,
+          22,
+          915,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/reedheron_3.png",
+        "source_bbox": [
+          107,
+          18,
+          1155,
+          1208
+        ],
+        "scale": 0.774453781512605,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "pondturtle_3",
+      "target": "assets/monsters/pondturtle_3.png",
+      "raw": "concepts/monsters/m4a_raw/pondturtle_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 36,
+        "opaque_alpha255_pct": 0.0217,
+        "alpha128_plus_pct": 33.0191,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          12,
+          21,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 22.5725,
+        "alpha128_plus_pct": 23.6532,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          406,
+          941,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/pondturtle_3.png",
+        "source_bbox": [
+          20,
+          283,
+          1250,
+          1051
+        ],
+        "scale": 0.6993170731707317,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "glowmoth_3",
+      "target": "assets/monsters/glowmoth_3.png",
+      "raw": "concepts/monsters/m4a_raw/glowmoth_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 20.8367,
+        "alpha128_plus_pct": 22.8084,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          83,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/glowmoth_3_transparent.png",
+        "source_bbox": [
+          33,
+          49,
+          1214,
+          1228
+        ],
+        "scale": 0.7283319220999153,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "snowhare_3",
+      "target": "assets/monsters/snowhare_3.png",
+      "raw": "concepts/monsters/m4a_raw/snowhare_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 142,
+        "opaque_alpha255_pct": 0.0037,
+        "alpha128_plus_pct": 31.2953,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1230,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.0231,
+        "alpha128_plus_pct": 25.1698,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          137,
+          86,
+          886,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/snowhare_3.png",
+        "source_bbox": [
+          132,
+          29,
+          1156,
+          1184
+        ],
+        "scale": 0.7447272727272727,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "ridgegoat_3",
+      "target": "assets/monsters/ridgegoat_3.png",
+      "raw": "concepts/monsters/m4a_raw/ridgegoat_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 329,
+        "opaque_alpha255_pct": 0.0221,
+        "alpha128_plus_pct": 29.28,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          51,
+          1206,
+          1198
+        ],
+        "bottom_padding_px": 56,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.8481,
+        "alpha128_plus_pct": 25.6901,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          116,
+          82,
+          908,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/ridgegoat_3.png",
+        "source_bbox": [
+          144,
+          61,
+          1162,
+          1167
+        ],
+        "scale": 0.7777215189873418,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "frostowl_3",
+      "target": "assets/monsters/frostowl_3.png",
+      "raw": "concepts/monsters/m4a_raw/frostowl_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 183,
+        "opaque_alpha255_pct": 0.011,
+        "alpha128_plus_pct": 31.8453,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          17,
+          1208,
+          1208
+        ],
+        "bottom_padding_px": 46,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.0,
+        "alpha128_plus_pct": 24.4867,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          189,
+          87,
+          834,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/frostowl_3.png",
+        "source_bbox": [
+          238,
+          21,
+          1129,
+          1206
+        ],
+        "scale": 0.7258734177215189,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "icewolf_3",
+      "target": "assets/monsters/icewolf_3.png",
+      "raw": "concepts/monsters/m4a_raw/icewolf_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 122,
+        "opaque_alpha255_pct": 0.004,
+        "alpha128_plus_pct": 33.1546,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1251,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.8329,
+        "alpha128_plus_pct": 25.325,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          240,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/icewolf_3.png",
+        "source_bbox": [
+          45,
+          155,
+          1235,
+          1126
+        ],
+        "scale": 0.7228235294117646,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "crystalbeetle_3",
+      "target": "assets/monsters/crystalbeetle_3.png",
+      "raw": "concepts/monsters/m4a_raw/crystalbeetle_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 1739,
+        "opaque_alpha255_pct": 0.0142,
+        "alpha128_plus_pct": 31.2088,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          45,
+          54,
+          1207,
+          1228
+        ],
+        "bottom_padding_px": 26,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 23.5905,
+        "alpha128_plus_pct": 25.2398,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          231,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/crystalbeetle_3.png",
+        "source_bbox": [
+          50,
+          165,
+          1204,
+          1119
+        ],
+        "scale": 0.745372616984402,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "cloudram_3",
+      "target": "assets/monsters/cloudram_3.png",
+      "raw": "concepts/monsters/m4a_raw/cloudram_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 301,
+        "opaque_alpha255_pct": 0.0148,
+        "alpha128_plus_pct": 39.8025,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          49,
+          21,
+          1206,
+          1208
+        ],
+        "bottom_padding_px": 46,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 31.8419,
+        "alpha128_plus_pct": 33.5114,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          99,
+          82,
+          924,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/cloudram_3.png",
+        "source_bbox": [
+          105,
+          58,
+          1195,
+          1195
+        ],
+        "scale": 0.7565171503957784,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "emberlizard_3",
+      "target": "assets/monsters/emberlizard_3.png",
+      "raw": "concepts/monsters/m4a_raw/emberlizard_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 49,
+        "opaque_alpha255_pct": 0.0235,
+        "alpha128_plus_pct": 26.4217,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          19,
+          1253,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 19.1381,
+        "alpha128_plus_pct": 20.3082,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          320,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/emberlizard_3.png",
+        "source_bbox": [
+          59,
+          257,
+          1241,
+          1112
+        ],
+        "scale": 0.7277157360406091,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "cliffhawk_3",
+      "target": "assets/monsters/cliffhawk_3.png",
+      "raw": "concepts/monsters/m4a_raw/cliffhawk_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 29.301,
+        "alpha128_plus_pct": 30.8449,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          98,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/cliffhawk_3_transparent.png",
+        "source_bbox": [
+          53,
+          28,
+          1209,
+          1162
+        ],
+        "scale": 0.744083044982699,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "sandpangolin_3",
+      "target": "assets/monsters/sandpangolin_3.png",
+      "raw": "concepts/monsters/m4a_raw/sandpangolin_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 35,
+        "opaque_alpha255_pct": 0.0249,
+        "alpha128_plus_pct": 18.2723,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          23,
+          19,
+          1236,
+          1228
+        ],
+        "bottom_padding_px": 26,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 16.3196,
+        "alpha128_plus_pct": 17.0905,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          30,
+          536,
+          993,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/sandpangolin_3.png",
+        "source_bbox": [
+          27,
+          391,
+          1229,
+          901
+        ],
+        "scale": 0.8007986688851914,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "duskcat_3",
+      "target": "assets/monsters/duskcat_3.png",
+      "raw": "concepts/monsters/m4a_raw/duskcat_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": true,
+        "magenta_pixels": 93,
+        "opaque_alpha255_pct": 0.0082,
+        "alpha128_plus_pct": 30.9495,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          20,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 21.1646,
+        "alpha128_plus_pct": 22.6902,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          83,
+          264,
+          940,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/duskcat_3.png",
+        "source_bbox": [
+          29,
+          197,
+          1241,
+          1152
+        ],
+        "scale": 0.7097029702970297,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "rockcrab_3",
+      "target": "assets/monsters/rockcrab_3.png",
+      "raw": "concepts/monsters/m4a_raw/rockcrab_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 211,
+        "opaque_alpha255_pct": 0.0258,
+        "alpha128_plus_pct": 36.5575,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          21,
+          1230,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 26.3855,
+        "alpha128_plus_pct": 28.1744,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          278,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/rockcrab_3.png",
+        "source_bbox": [
+          45,
+          182,
+          1226,
+          1098
+        ],
+        "scale": 0.7283319220999153,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "windserpent_3",
+      "target": "assets/monsters/windserpent_3.png",
+      "raw": "concepts/monsters/m4a_raw/windserpent_3.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 138,
+        "opaque_alpha255_pct": 0.0265,
+        "alpha128_plus_pct": 35.4634,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          17,
+          1253,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1024,
+          1024
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 22.3377,
+        "alpha128_plus_pct": 25.2686,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          82,
+          131,
+          942,
+          942
+        ],
+        "bottom_padding_px": 82,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/windserpent_3.png",
+        "source_bbox": [
+          26,
+          20,
+          1240,
+          1176
+        ],
+        "scale": 0.7085337726523888,
+        "keyed": false,
+        "bottom_padding_px": 82,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "lake_heron_lord",
+      "target": "assets/bosses/lake_heron_lord.png",
+      "raw": "concepts/monsters/m4a_raw/lake_heron_lord.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 1392,
+        "opaque_alpha255_pct": 0.0229,
+        "alpha128_plus_pct": 28.6641,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1218,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1280,
+          1280
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 17.4525,
+        "alpha128_plus_pct": 20.4686,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          129,
+          105,
+          1151,
+          1178
+        ],
+        "bottom_padding_px": 102,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/lake_heron_lord.png",
+        "source_bbox": [
+          40,
+          12,
+          1195,
+          1220
+        ],
+        "scale": 0.890066225165563,
+        "keyed": false,
+        "bottom_padding_px": 102,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "ridge_goat_king",
+      "target": "assets/bosses/ridge_goat_king.png",
+      "raw": "concepts/monsters/m4a_raw/ridge_goat_king.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 1398,
+        "opaque_alpha255_pct": 0.0088,
+        "alpha128_plus_pct": 43.0165,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          15,
+          1246,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1280,
+          1280
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 29.3185,
+        "alpha128_plus_pct": 32.5277,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          132,
+          105,
+          1147,
+          1178
+        ],
+        "bottom_padding_px": 102,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_raw/ridge_goat_king.png",
+        "source_bbox": [
+          105,
+          22,
+          1233,
+          1216
+        ],
+        "scale": 0.9005025125628141,
+        "keyed": false,
+        "bottom_padding_px": 102,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    },
+    {
+      "name": "cliff_hawk_sovereign",
+      "target": "assets/bosses/cliff_hawk_sovereign.png",
+      "raw": "concepts/monsters/m4a_raw/cliff_hawk_sovereign.png",
+      "raw_checks": {
+        "exists": true,
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "size_pass": false,
+        "transparent_corners": false,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 100.0,
+        "alpha128_plus_pct": 100.0,
+        "opaque_15_to_50_pass": false,
+        "alpha_bbox": [
+          0,
+          0,
+          1254,
+          1254
+        ],
+        "bottom_padding_px": 0,
+        "pass": false
+      },
+      "production_checks": {
+        "exists": true,
+        "size": [
+          1280,
+          1280
+        ],
+        "mode": "RGBA",
+        "size_pass": true,
+        "transparent_corners": true,
+        "magenta_pixels": 0,
+        "opaque_alpha255_pct": 29.6993,
+        "alpha128_plus_pct": 31.1917,
+        "opaque_15_to_50_pass": true,
+        "alpha_bbox": [
+          102,
+          150,
+          1177,
+          1178
+        ],
+        "bottom_padding_px": 102,
+        "pass": true,
+        "padding_pass": true
+      },
+      "processing": {
+        "source": "concepts/monsters/m4a_regenerated/cliff_hawk_sovereign_transparent.png",
+        "source_bbox": [
+          29,
+          39,
+          1234,
+          1193
+        ],
+        "scale": 0.8922821576763486,
+        "keyed": false,
+        "bottom_padding_px": 102,
+        "facing": "left",
+        "resize": "premultiplied RGBa LANCZOS",
+        "defringe_output_px": 1
+      }
+    }
+  ],
+  "manifest_paths_verified": 57,
+  "sheets": {
+    "evolution_sheet.png": {
+      "size": [
+        1440,
+        8110
+      ],
+      "mode": "RGB",
+      "verified": true
+    },
+    "boss_sheet.png": {
+      "size": [
+        1920,
+        840
+      ],
+      "mode": "RGB",
+      "verified": true
+    }
+  },
+  "failures": [],
+  "visual_review": {
+    "all_18_rows": true,
+    "all_3_bosses": true,
+    "left_facing": true,
+    "sheet_labels": true
+  },
+  "code_checks": {
+    "javascript_syntax": "PASS: every js/*.js checked individually",
+    "unmodified_test_suite": "FAIL: test/run.js:31 assumes legacy string manifest",
+    "in_memory_stage1_assertion_adaptation": "43 PASS; on-disk tests unchanged"
+  }
+}

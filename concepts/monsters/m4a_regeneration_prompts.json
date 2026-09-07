@@ -1,0 +1,78 @@
+{
+  "generator": "built-in image_gen",
+  "records": [
+    {
+      "name": "lakebat_2",
+      "reference": "concepts/monsters/m4a_raw/lakebat_2.png",
+      "transparent_attempt": "concepts/monsters/m4a_regenerated/lakebat_2_transparent.png",
+      "transparent_attempt_result": "RGB checkerboard; rejected",
+      "prompt": "Use case: background-extraction. Edit target is the referenced lakebat_2 design. Preserve the exact same single LEFT-facing pastel white peach bat and huge lavender wings, all anatomy, colors and pose. Change ONLY the background: use a perfectly flat solid saturated #FF00FF magenta chroma-key background everywhere outside the creature and between limbs. NO transparency, NO checkerboard, NO white background, NO shadow. Opaque creature interior, no magenta reflection or spill onto creature. Full body all wing tips contained in square frame, small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/lakebat_2_key.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-9f5b71cc-b758-4a37-b97e-ac47aa10f135.png",
+      "transparent_attempt_prompt": "Use case: background-extraction. Edit target: referenced lakebat_2 raw design. Reproduce the exact same single left-facing pastel peach-white bat, anatomy, huge lavender wing membranes and pose, full body and all wing tips. Remove the baked checkerboard completely. Output a genuine transparent RGBA background with alpha zero outside the creature, solid opaque creature interior, smooth antialiased edges. No checkerboard pattern, no backdrop, no ground shadow, no text. Do not redesign. Square image. Save output for project inside D:/Git/Inv/squad-idle/concepts/monsters/m4a_regenerated/ if possible."
+    },
+    {
+      "name": "dewslime_2",
+      "reference": "concepts/monsters/m4a_raw/dewslime_2.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced dewslime_2 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/dewslime_2_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-668f6443-aacf-4e49-81ab-8d041d97d93c.png"
+    },
+    {
+      "name": "icewolf_2",
+      "reference": "concepts/monsters/m4a_raw/icewolf_2.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced icewolf_2 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/icewolf_2_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-745dd766-f0fd-4afc-a825-2789f847e582.png"
+    },
+    {
+      "name": "cliffhawk_2",
+      "reference": "concepts/monsters/m4a_raw/cliffhawk_2.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced cliffhawk_2 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/cliffhawk_2_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-61e31c00-235d-4c1b-b2f9-c7653d07e4af.png"
+    },
+    {
+      "name": "sandpangolin_2",
+      "reference": "concepts/monsters/m4a_raw/sandpangolin_2.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced sandpangolin_2 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/sandpangolin_2_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-873d946b-dc08-4dca-920b-daac910def35.png"
+    },
+    {
+      "name": "mistfox_3",
+      "reference": "concepts/monsters/m4a_raw/mistfox_3.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced mistfox_3 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/mistfox_3_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-03a9b1c1-dc70-4b96-959b-04249c8df4d9.png"
+    },
+    {
+      "name": "lakebat_3",
+      "reference": "concepts/monsters/m4a_raw/lakebat_3.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced lakebat_3 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/lakebat_3_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-ceb7b14d-c28a-409a-ad85-1303a1c9b92c.png"
+    },
+    {
+      "name": "glowmoth_3",
+      "reference": "concepts/monsters/m4a_raw/glowmoth_3.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced glowmoth_3 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/glowmoth_3_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-319aa09b-b51a-42f1-9c62-45a7733cee36.png"
+    },
+    {
+      "name": "cliffhawk_3",
+      "reference": "concepts/monsters/m4a_raw/cliffhawk_3.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced cliffhawk_3 raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/cliffhawk_3_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-2b6f1a51-3c5a-4f66-bf60-59c01cea3a4e.png"
+    },
+    {
+      "name": "cliff_hawk_sovereign",
+      "reference": "concepts/monsters/m4a_raw/cliff_hawk_sovereign.png",
+      "prompt": "Use case: background-extraction. Edit target: referenced cliff_hawk_sovereign raw design. Keep the EXACT same creature design, colors, anatomy, markings and LEFT-facing pose. Remove only the background. Genuine transparent RGBA alpha-zero background; no checkerboard, no white backdrop, no ground or shadow. Solid opaque creature interior with smooth antialiased contour. Preserve pastel-dawn field guide style, no black outlines. Full body including all tips in a square with small margin. No text.",
+      "output": "concepts/monsters/m4a_regenerated/cliff_hawk_sovereign_transparent.png",
+      "generated_source": "C:\\Users\\dklee\\.codex\\generated_images\\01a07cdd-acf4-77a0-bbbb-efc0d3446842\\exec-a80a70de-5384-4743-bfed-6c9d9c32b90c.png"
+    }
+  ]
+}
