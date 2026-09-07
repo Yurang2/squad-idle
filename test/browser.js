@@ -21,12 +21,13 @@ async function main() {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "m1-browser-"));
   const artifacts = fs.mkdtempSync(path.join(os.tmpdir(), "m1-screenshots-"));
   const server = http.createServer((req, res) => {
-    const pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+    let pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+    pathname=pathname.replace(/^\/squad-idle(?=\/)/, "");
     const file = path.resolve(root, "." + (pathname === "/" ? "/index.html" : pathname));
     if (!file.startsWith(root + path.sep)) { res.writeHead(403); res.end(); return; }
     fs.readFile(file, (error, data) => {
       if (error) { res.writeHead(404); res.end(); return; }
-      const types = { ".html": "text/html", ".css": "text/css", ".js": "application/javascript" };
+      const types = { ".html": "text/html", ".css": "text/css", ".js": "application/javascript", ".webmanifest": "application/manifest+json", ".png": "image/png" };
       res.setHeader("Content-Type", (types[path.extname(file)] || "application/octet-stream") + "; charset=utf-8");
       res.end(data);
     });
@@ -95,6 +96,11 @@ async function main() {
       if (await evaluate("document.readyState === 'complete' && typeof UI !== 'undefined'")) break;
       await delay(100);
     }
+    if(process.env.BROWSER_M4==='1'){
+      await require('./browser-m4')({evaluate,command,screenshot,delay,url});
+      const errors=events.filter(e=>e.method==='Runtime.exceptionThrown'||(e.method==='Runtime.consoleAPICalled'&&e.params.type==='error')||(e.method==='Log.entryAdded'&&e.params.entry.level==='error'));
+      assert.deepEqual(errors,[]);console.log('PASS zero console/runtime/asset errors');console.log('Screenshots: '+artifacts);return;
+    }
     await evaluate("Game.pause();Game.reset();window.captureCount=0;window.captureTime=0;Game.on('capture',()=>{captureCount++;captureTime=performance.now();});window.poseTimes=[];new MutationObserver(()=>poseTimes.push({at:performance.now(),href:document.getElementById('tamer-image').getAttribute('href')})).observe(document.getElementById('tamer-image'),{attributes:true,attributeFilter:['href']});window.freshStarted=performance.now();Game.resume()");
     for(let i=0;i<1800;i++) {
       if(await evaluate("captureCount>0"))break;
@@ -139,7 +145,7 @@ async function main() {
     await delay(500); await screenshot("375-dex");
     console.log("PASS roster detail, party toggles and all 18 dex states/silhouettes");
     await evaluate("document.getElementById('close-sheet').click();UI.openSheet('settings');document.getElementById('export-save').click()");
-    assert.equal(await evaluate("JSON.parse(document.getElementById('save-json').value).schemaVersion"),6);
+    assert.equal(await evaluate("JSON.parse(document.getElementById('save-json').value).schemaVersion"),7);
     await evaluate("document.getElementById('save-json').value='bad';document.getElementById('import-save').click()");
     assert.ok(await evaluate("document.getElementById('import-status').textContent.includes('유효한')"));
     await evaluate("document.getElementById('close-sheet').click();Game.catchUp(3600000)");
@@ -152,7 +158,7 @@ async function main() {
     assert.ok(await evaluate("Game.validateSave(Game.save())"));
     await evaluate("Game.save()");await command("Page.reload");await delay(300);await evaluate("Game.pause()");
     assert.ok(await evaluate("Game.getState().roster.length>3 && Game.validateSave(Game.save())"));
-    console.log("PASS offline report/harvest, settings, lifecycle, reload and schema-6 persistence");
+    console.log("PASS offline report/harvest, settings, lifecycle, reload and schema-7 persistence");
     await evaluate(`(()=>{const d=JSON.parse(Game.save());d.state.tamerXP=DATA.rankXP[9];d.state.roster.forEach((m,i)=>m.party=i<5?i:null);Game.load(JSON.stringify(d));Game.selectStage(0);})()`);
     assert.equal(await evaluate("document.querySelectorAll('#party-layer .unit').length"),5);
     await screenshot("375-five-party");

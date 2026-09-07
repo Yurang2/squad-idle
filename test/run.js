@@ -4,14 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
-const files = ["data", "data-monsters", "data-progression", "data-camp", "battle", "game", "game-monsters", "game-progression", "game-camp", "game-expedition", "game-save"];
-function runtime() {
-  const storage = new Map(), timers = new Map(); let nextTimer = 1;
-  const c = vm.createContext({ console, Date, setInterval: (f, ms) => { const id = nextTimer++; timers.set(id, { f, ms }); return id; },
-    clearInterval: id => timers.delete(id), localStorage: { getItem: k => storage.get(k), setItem: (k, v) => storage.set(k, v) } });
-  files.forEach(f => vm.runInContext(fs.readFileSync(path.join(root, "js", f + ".js"), "utf8"), c, { filename: f + ".js" }));
-  return { ...c, storage, timers };
-}
+const {runtime,files}=require('./runtime');
 const plain = v => JSON.parse(JSON.stringify(v));
 let passed = 0;
 function test(name, fn) { fn(); console.log("PASS " + name); passed++; }
@@ -28,7 +21,7 @@ test("18 exact species and manifest paths exist, one skill per species, no equip
   assert.equal(Object.keys(DATA.species).length, 18);
   assert.deepEqual(Object.keys(DATA.species).sort(), Object.keys(manifest).sort());
   for (const s of Object.values(DATA.species)) {
-    assert.equal(s.art, manifest[s.id]); assert.ok(fs.statSync(path.join(root, s.art)).size > 10000);
+    assert.equal(s.art, manifest[s.id][1]); assert.ok(fs.statSync(path.join(root, s.art)).size > 10000);
     assert.ok(s.baseStats.hp > 0 && s.growth > 0 && s.catchRate > 0 && s.catchRate <= 1 && s.campJob);
     assert.ok(["hit", "heal", "shield", "dot"].includes(s.skill.effect.type));
   }
@@ -151,7 +144,7 @@ test("rarity/potential helper supplies 1–3 valid traits and stat multipliers",
 });
 test("save/load/export/import preserves roster, HP, cooldowns, XP, dex and RNG", () => {
   Game.reset(123); ticks(Game, 99); const before = Game.getState(), json = Game.exportSave();
-  assert.equal(JSON.parse(json).schemaVersion, 6); assert.ok(Game.validateSave(json));
+  assert.equal(JSON.parse(json).schemaVersion, DATA.schemaVersion); assert.ok(Game.validateSave(json));
   ticks(Game, 400); assert.equal(Game.load(json), true); assert.deepEqual(Game.getState(), before);
   assert.equal(Game.importSave(json), true); assert.deepEqual(Game.getState(), before);
   const draws = Array.from({ length: 8 }, () => Game.rng()); Game.load(json);
@@ -166,7 +159,7 @@ test("v3 and malformed imports rejected atomically, fresh init replaces old sche
   badEdits.forEach(fn => { const d = JSON.parse(json); fn(d.state); assert.equal(Game.load(JSON.stringify(d)), false); assert.deepEqual(Game.getState(), before); });
   assert.equal(Game.load('{"schemaVersion":3,"state":{}}'), false);
   const c = runtime(); c.storage.set("squad_v1", '{"schemaVersion":3,"state":{}}'); c.Game.init();
-  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 6);
+  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, DATA.schemaVersion);
 });
 test("offline rewards use 70% gold/XP, eight-hour cap, 50% capture probability, one-time harvest", () => {
   Game.reset(); const before = Game.getState(); const report = Game.catchUp(3600000);
@@ -205,4 +198,5 @@ test("10Hz timer and idempotent pause/resume, four namespaces and DOM-free logic
 });
 require("./m2.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
 require("./m3.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
+require("./m4.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
 console.log("\n" + passed + " PASS");

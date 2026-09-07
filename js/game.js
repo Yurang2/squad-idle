@@ -1,19 +1,20 @@
 "use strict";
 var Game = (function () {
   var state, listeners = {}, timer = null, autosave = null, catchingUp = false, savedAt = 0;
-  var storageKey = "squad_v1", monsters, expedition, validator, progression, camp;
+  var storageKey = "squad_v1", monsters, expedition, validator, progression, camp, onboarding;
   function on(event, fn) {
     if (!listeners[event]) listeners[event] = [];
     listeners[event].push(fn);
     return function () { listeners[event] = listeners[event].filter(function (f) { return f !== fn; }); };
   }
   function emit(event, payload) {
+    if (onboarding) onboarding.observe(event, payload);
     if (!catchingUp) (listeners[event] || []).forEach(function (fn) { fn(payload); });
   }
   function fresh(seed) {
     return { schemaVersion: DATA.schemaVersion, rngSeed: (seed === undefined ? DATA.defaultSeed : seed) >>> 0,
       gold: 0, coins: 0, materials: { enhanceStone: 0, wood: 0, stone: 0, essence: 0 }, accessories: [], nextAccessoryUid: 1,
-      camp: freshCamp(),
+      camp: freshCamp(), onboarding: {completedSteps:[],triggeredSteps:[]}, sound: {volume:.35,muted:false},
       tamerXP: 0, roster: ["dewslime", "mistfox"].map(function (id, i) {
         return { uid: "monster-" + (i + 1), speciesId: id, rarity: "rare", level: 1, xp: 0,
           traits: [], enhance: 0, evo: 1, party: i, camp: null, locked: false, accessory: null };
@@ -131,7 +132,7 @@ var Game = (function () {
   }
   function migrate(data) {
     // DECISION: v1–v3 equipment/mercenary saves cannot represent monster identities; explicitly start fresh.
-    if (!data || ![4, 5, 6].includes(data.schemaVersion) || !data.state || data.state.schemaVersion !== data.schemaVersion) throw new Error("몬스터 조련단은 새 저장 형식을 사용합니다.");
+    if (!data || ![4, 5, 6, 7].includes(data.schemaVersion) || !data.state || data.state.schemaVersion !== data.schemaVersion) throw new Error("몬스터 조련단은 새 저장 형식을 사용합니다.");
     if (data.schemaVersion === 4) {
       var s = data.state;
       s.schemaVersion = data.schemaVersion = 5;
@@ -152,6 +153,11 @@ var Game = (function () {
         v5.pendingReport.campOutput = {wood:0,stone:0,enhanceStone:0,gold:0};
       }
       // DECISION: Frozen v5 bags retain their exact rewards; no retroactive camp output.
+    }
+    if (data.schemaVersion === 6) {
+      data.schemaVersion = data.state.schemaVersion = 7;
+      data.state.onboarding = {completedSteps:[],triggeredSteps:[]};
+      data.state.sound = {volume:.35,muted:false};
     }
     return data;
   }
@@ -197,6 +203,7 @@ var Game = (function () {
     registerExpedition: function (factory) { expedition = factory(host()); Object.assign(Game, expedition.api); delete Game.registerExpedition; },
     registerProgression: function (factory) { progression = factory(host()); Object.assign(Game, progression.api); delete Game.registerProgression; },
     registerCamp: function (factory) { camp = factory(host()); Object.assign(Game, camp.api); delete Game.registerCamp; },
+    registerOnboarding: function (factory) { onboarding = factory(host()); Object.assign(Game, onboarding.api); delete Game.registerOnboarding; },
     registerValidation: function (factory) { validator = factory(host()); delete Game.registerValidation; }
   };
 })();

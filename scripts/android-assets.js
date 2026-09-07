@@ -8,8 +8,8 @@ const main = path.join(root, "android/app/src/main");
 const res = preview ? path.join(root, ".android-preview/res") : path.join(main, "res");
 const manifest = path.join(main, "AndroidManifest.xml");
 if (!preview && !fs.existsSync(manifest)) throw new Error("Run npm install, npm run build:www and npx cap add android first.");
-const source = png.read(path.join(root, "assets/icon/weapon.png"));
-// DECISION: The existing weapon emblem is the app logo; no new art or fonts required.
+const source = png.read(path.join(root, "assets/camp/campfire.png"));
+// DECISION: The existing campfire is the app logo; no new art or fonts required.
 function render(size, logoSize, rounded) {
   const data = Buffer.alloc(size * size * 4), left = (size - logoSize) / 2, radius = size * 0.22;
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
@@ -17,7 +17,7 @@ function render(size, logoSize, rounded) {
     const dx = Math.max(radius - x - 0.5, x + 0.5 - (size - radius), 0);
     const dy = Math.max(radius - y - 0.5, y + 0.5 - (size - radius), 0);
     const background = rounded && dx * dx + dy * dy <= radius * radius;
-    if (background) { data[i] = 143; data[i + 1] = 211; data[i + 2] = 255; data[i + 3] = 255; }
+    if (background) { data[i] = 254; data[i + 1] = 244; data[i + 2] = 231; data[i + 3] = 255; }
     if (x < left || y < left || x >= left + logoSize || y >= left + logoSize) continue;
     // Area averaging preserves the transparent edge at launcher-icon sizes.
     let r = 0, g = 0, b = 0, a = 0;
@@ -29,9 +29,9 @@ function render(size, logoSize, rounded) {
     }
     if (!a) continue;
     const alpha = a / 16;
-    data[i] = background ? r / 16 + 143 * (1 - alpha) : r / a;
-    data[i + 1] = background ? g / 16 + 211 * (1 - alpha) : g / a;
-    data[i + 2] = background ? b / 16 + 255 * (1 - alpha) : b / a;
+    data[i] = background ? r / 16 + 254 * (1 - alpha) : r / a;
+    data[i + 1] = background ? g / 16 + 244 * (1 - alpha) : g / a;
+    data[i + 2] = background ? b / 16 + 231 * (1 - alpha) : b / a;
     data[i + 3] = background ? 255 : alpha * 255;
   }
   return data;
@@ -48,7 +48,7 @@ for (const [density, scale] of Object.entries({ mdpi: 1, hdpi: 1.5, xhdpi: 2, xx
   bitmap(`mipmap-${density}/ic_launcher_foreground.png`, 108 * scale, 60 * scale, false);
   bitmap(`drawable-${density}/splash_logo.png`, 288 * scale, 144 * scale, false);
 }
-write("values/native_colors.xml", '<resources><color name="native_sky">#8FD3FF</color></resources>\n');
+write("values/native_colors.xml", '<resources><color name="native_sky">#FEF4E7</color></resources>\n');
 const adaptive = '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/native_sky"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>\n';
 write("mipmap-anydpi-v26/ic_launcher.xml", adaptive); write("mipmap-anydpi-v26/ic_launcher_round.xml", adaptive);
 write("drawable/splash.xml", '<layer-list xmlns:android="http://schemas.android.com/apk/res/android"><item android:drawable="@color/native_sky"/><item><bitmap android:src="@drawable/splash_logo" android:gravity="center"/></item></layer-list>\n');

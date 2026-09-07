@@ -8,7 +8,7 @@ if (fs.existsSync(out) && fs.lstatSync(out).isSymbolicLink()) throw new Error("w
 if (path.dirname(out) !== root || path.basename(out) !== "www") throw new Error("Unsafe output path");
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out);
-for (const name of ["index.html", "style.css", "js", "assets"]) {
+for (const name of ["index.html", "style.css", "manifest.webmanifest", "sw.js", "sw-shell.js", "js", "assets"]) {
   fs.cpSync(path.join(root, name), path.join(out, name), {
     recursive: true,
     filter(source) {
@@ -25,7 +25,12 @@ for (const name of characters) {
   if (fs.lstatSync(source).isSymbolicLink()) throw new Error("Symlink in character assets");
   fs.copyFileSync(source, path.join(out, "concepts/character", name));
 }
-const manifest = JSON.parse(fs.readFileSync(path.join(out, "assets/monsters/manifest.json"), "utf8"));
+const stages = JSON.parse(fs.readFileSync(path.join(out, "assets/monsters/manifest.json"), "utf8"));
+const bosses = JSON.parse(fs.readFileSync(path.join(out, "assets/bosses/manifest.json"), "utf8"));
+const manifest = Object.assign({}, bosses);
+for (const [id, arts] of Object.entries(stages)) {
+  for (const [stage, value] of Object.entries(arts)) manifest[id + ':' + stage] = value;
+}
 for (const [key, value] of Object.entries(manifest)) {
   if (typeof value !== "string") throw new Error("Invalid manifest path: " + key);
   const file = path.resolve(out, value);

@@ -29,7 +29,8 @@
   UI.showCamp=function(visible){
     UI.campVisible=visible;el('app').classList.toggle('camp-open',visible);el('camp-screen').hidden=!visible;
     document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('selected',b.dataset.tab===(visible?'camp':'adventure'));});
-    if(visible){Game.collect();UI.updateCamp(Game.getState());requestAnimationFrame(UI.centerCamp);}
+    Sfx.setCamp(visible);
+    if(visible){Game.visitTab("camp");Game.collect();UI.updateCamp(Game.getState());requestAnimationFrame(UI.centerCamp);}
   };
   UI.updateCamp=function(s){
     el('camp-materials').innerHTML=Object.keys(DATA.camp.materials).map(function(k){return '<span>'+UI.icon(k)+'<span>'+label(k)+'<b>'+UI.fmt(s.materials[k])+'</b></span></span>';}).join('');
@@ -40,16 +41,16 @@
     el('collect-camp').disabled=s.pendingReport!==null || !Object.values(accrued).some(function(n){return n>=1;});
     var idle=Game.idleMonsters();
     el('camp-scroll').setAttribute('aria-label','가로로 둘러보는 캠프 · 쉬는 동료 '+UI.fmt(idle.length)+' · 일하는 동료 '+UI.fmt(s.roster.filter(function(m){return m.camp!==null;}).length));
-    var next=JSON.stringify([s.camp.levels,s.roster.map(function(m){return [m.uid,m.speciesId,m.camp,m.party];}),idle.map(function(m){return m.uid;})]);
+    var next=JSON.stringify([s.camp.levels,s.roster.map(function(m){return [m.uid,m.speciesId,m.evo,m.camp,m.party];}),idle.map(function(m){return m.uid;})]);
     if(signature===next)return;signature=next;
     el('camp-stations').innerHTML=Object.keys(DATA.camp.facilities).map(function(id){var f=DATA.camp.facilities[id];return '<button class="camp-station" data-facility="'+id+'" style="left:'+f.x+'%;top:'+f.y+'%" aria-label="'+f.name+' Lv. '+UI.fmt(s.camp.levels[id])+'"><img src="'+f.art+'" alt="'+f.name+'"><span>'+f.name+' <small>Lv. '+UI.fmt(s.camp.levels[id])+'</small></span></button>';}).join('');
     el('camp-stations').querySelectorAll('[data-facility]').forEach(function(b){b.onclick=function(){openFacility(b.dataset.facility);};});
     var placed=s.roster.filter(function(m){return m.camp!==null;});
     el('camp-residents').innerHTML=placed.map(function(m){var f=DATA.camp.facilities[m.camp],i=placed.filter(function(n){return n.camp===m.camp;}).findIndex(function(n){return n.uid===m.uid;});
-      return '<button class="camp-resident assigned" data-resident="'+m.camp+'" style="left:calc('+f.x+'% + '+((i%3-1)*36)+'px);top:calc('+f.y+'% + '+(85+Math.floor(i/3)*18)+'px)" aria-label="'+DATA.species[m.speciesId].name+' · '+f.name+' 배치 중"><img src="'+DATA.species[m.speciesId].art+'" alt=""></button>';
+      return '<button class="camp-resident assigned" data-resident="'+m.camp+'" style="left:calc('+f.x+'% + '+((i%3-1)*36)+'px);top:calc('+f.y+'% + '+(85+Math.floor(i/3)*18)+'px)" aria-label="'+DATA.species[m.speciesId].name+' · '+f.name+' 배치 중">'+UI.monsterImage(m)+'</button>';
     }).join('')+idle.map(function(m,i){
       // DECISION: Decorative paths derive from roster order, without consuming gameplay RNG.
-      return '<span class="camp-resident wandering" style="left:'+(8+(i*17)%58)+'%;top:'+(34+(i*13)%37)+'%;--walk:'+(75+(i%4)*24)+'px;--duration:'+(26+i%7*4)+'s;animation-delay:-'+(i%11)+'s"><img src="'+DATA.species[m.speciesId].art+'" alt="'+DATA.species[m.speciesId].name+' · 쉬는 중"></span>';
+      return '<span class="camp-resident wandering" style="left:'+(8+(i*17)%58)+'%;top:'+(34+(i*13)%37)+'%;--walk:'+(75+(i%4)*24)+'px;--duration:'+(26+i%7*4)+'s;animation-delay:-'+(i%11)+'s">'+UI.monsterImage(m,DATA.species[m.speciesId].name+' · 쉬는 중')+'</span>';
     }).join('');
     el('camp-residents').querySelectorAll('[data-resident]').forEach(function(b){b.onclick=function(){openFacility(b.dataset.resident);};});
   };
@@ -58,7 +59,7 @@
     el('sheet-title').textContent=f.name+' · Lv. '+UI.fmt(level);
     if(picking){
       var idle=Game.idleMonsters().sort(function(a,b){return Number(Game.campJob(b,facility).match)-Number(Game.campJob(a,facility).match);});
-      content.innerHTML='<button id="camp-pick-back" class="back-button">시설로 돌아가기</button><p class="detail-note">쉬는 동료를 선택하세요. ✦ 직업이 맞으면 생산량 ×'+UI.fmt(2)+'<br>파티에서 해제한 동료는 다음 전투부터 배치할 수 있습니다.</p><div class="camp-picker">'+idle.map(function(m){var j=Game.campJob(m,facility);return '<button data-assign="'+m.uid+'"><img src="'+DATA.species[m.speciesId].art+'" alt=""><span><strong>'+DATA.species[m.speciesId].name+'</strong><small>Lv. '+UI.fmt(m.level)+' · '+DATA.species[m.speciesId].campJob+(j.match?' <b class="job-match">✦</b>':'')+'</small><small>'+label(j.resource)+' '+UI.fmt(j.rateTenths/10)+'/시간</small></span></button>';}).join('')+'</div>'+(idle.length?'':'<p class="detail-note">배치할 동료가 없습니다. 탐험에서 새 동료를 만나 보세요.</p>');
+      content.innerHTML='<button id="camp-pick-back" class="back-button">시설로 돌아가기</button><p class="detail-note">쉬는 동료를 선택하세요. ✦ 직업이 맞으면 생산량 ×'+UI.fmt(2)+'<br>파티에서 해제한 동료는 다음 전투부터 배치할 수 있습니다.</p><div class="camp-picker">'+idle.map(function(m){var j=Game.campJob(m,facility);return '<button data-assign="'+m.uid+'">'+UI.monsterImage(m)+'<span><strong>'+DATA.species[m.speciesId].name+'</strong><small>Lv. '+UI.fmt(m.level)+' · '+DATA.species[m.speciesId].campJob+(j.match?' <b class="job-match">✦</b>':'')+'</small><small>'+label(j.resource)+' '+UI.fmt(j.rateTenths/10)+'/시간</small></span></button>';}).join('')+'</div>'+(idle.length?'':'<p class="detail-note">배치할 동료가 없습니다. 탐험에서 새 동료를 만나 보세요.</p>');
       el('camp-pick-back').onclick=function(){picking=false;UI.refreshSheet();};
       content.querySelectorAll('[data-assign]').forEach(function(b){b.onclick=function(){picking=false;if(Game.assign(b.dataset.assign,facility))UI.toast('동료가 일을 시작합니다.');UI.refreshSheet();};});return;
     }
@@ -68,7 +69,7 @@
       '<button id="build-facility"'+(!Game.canBuild(facility)?' disabled':'')+'>'+(cost?'즉시 업그레이드':'완성된 시설')+'</button>'+(cost&&facility!=='campfire'&&level>=s.camp.levels.campfire?'<p>모닥불을 먼저 Lv. '+UI.fmt(level+1)+'로 올려 주세요.</p>':cost&&!Game.canBuild(facility)?'<p>재료를 더 모아 주세요.</p>':'')+'</section>'+
       '<h3>함께 일하는 동료 · '+UI.fmt(assigned.length)+' / '+UI.fmt(Game.campSlots(facility))+'</h3><div class="camp-slots">'+Array.from({length:Game.campSlots(facility)},function(_,i){var m=assigned[i];
         if(!m)return '<button data-empty-slot="'+i+'" class="empty-slot">'+UI.icon('paw')+'<span>동료 배치</span></button>';
-        var j=Game.campJob(m,facility);return '<button data-unassign="'+m.uid+'"><img src="'+DATA.species[m.speciesId].art+'" alt=""><strong>'+DATA.species[m.speciesId].name+(j.match?' <b class="job-match">✦</b>':'')+'</strong><small>'+label(j.resource)+' '+UI.fmt(j.rateTenths/10)+'/시간</small><small>눌러서 배치 해제</small></button>';
+        var j=Game.campJob(m,facility);return '<button data-unassign="'+m.uid+'">'+UI.monsterImage(m)+'<strong>'+DATA.species[m.speciesId].name+(j.match?' <b class="job-match">✦</b>':'')+'</strong><small>'+label(j.resource)+' '+UI.fmt(j.rateTenths/10)+'/시간</small><small>눌러서 배치 해제</small></button>';
       }).join('')+'</div><p class="detail-note">레벨이 높을수록 더 많이 생산합니다. 직업 일치 ✦ ×'+UI.fmt(2)+'<br>배치 중인 동료는 편성·진화·방생에서 보호됩니다.</p>';
     el('build-facility').onclick=function(){if(Game.build(facility))UI.toast(f.name+' Lv. '+UI.fmt(level+1));};
     content.querySelectorAll('[data-empty-slot]').forEach(function(b){b.onclick=function(){picking=true;UI.refreshSheet();};});

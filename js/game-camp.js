@@ -33,7 +33,7 @@ Game.registerCamp(function (host) {
     var s=host.state(), m=s.roster.find(function(m){return m.uid===uid;});
     if(s.pendingReport || !m || !Object.hasOwn(DATA.camp.facilities,id) || !available(m,s) ||
       s.roster.filter(function(m){return m.camp===id;}).length>=slots(id))return false;
-    m.camp=id; host.changed(); return true;
+    m.camp=id; if(id==="garden")host.emit("gardenAssigned",{uid:uid}); host.changed(); return true;
   }
   function unassign(uid) {
     var s=host.state(),m=s.roster.find(function(m){return m.uid===uid;});

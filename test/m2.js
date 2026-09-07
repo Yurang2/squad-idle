@@ -70,7 +70,7 @@ module.exports = function ({test,runtime,plain,ticks,edit,add,DATA,Game}) {
     delete d.state.materials;delete d.state.accessories;delete d.state.nextAccessoryUid;delete d.state.coins;
     d.state.roster.forEach(m=>{delete m.locked;delete m.accessory;delete m.evo;delete m.enhance;});
     const battle=plain(d.state.battle);assert.equal(Game.load(JSON.stringify(d)),true);
-    const s=Game.getState();assert.equal(s.schemaVersion,6);assert.equal(s.materials.enhanceStone,0);assert.equal(s.accessories.length,0);
+    const s=Game.getState();assert.equal(s.schemaVersion,DATA.schemaVersion);assert.equal(s.materials.enhanceStone,0);assert.equal(s.accessories.length,0);
     assert.deepEqual(plain(s.battle),battle);assert.equal(s.roster[0].traits.length,0);assert.ok(Game.validateSave(Game.save()));
     const json=Game.save();assert.equal(Game.load(json),true);assert.deepEqual(Game.getState(),s);
   });

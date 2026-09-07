@@ -1,57 +1,51 @@
-"use strict";
-
-module.exports = function ({ context, assert }) {
-  for (const seed of [271828, 7919, 42]) {
-    const c = context(); c.Game.reset(seed);
-    c.Game.toggleSkill("warrior", "taunt"); c.Game.toggleSkill("warrior", "regen");
-    let cleared = false, ticks = 0, fusions = 0, sessions = 1, fails = 0, farmUntil = 0, frontier = 0;
-    c.Game.on("stageFail", () => { fails++; });
-    c.Game.on("stageClear", e => { if (e.stageIndex === 29) cleared = true; });
-    function manage() {
-      const s = c.Game.getState();
-      // Approximate improvements using flat stat CP plus weighted potentials, with no free gear or XP.
-      function score(item, merc) {
-        if (!item) return 0;
-        const base = c.DATA.mercenaryStats(merc.id, merc.level);
-        let total = Object.entries(item.base).reduce((n, [key, value]) => n + value * (c.DATA.cpWeights[key] || 0), 0);
-        for (const p of item.potentials) {
-          const key = p.id.endsWith("Pct") ? p.id.slice(0, -3) : p.id;
-          total += p.value * (c.DATA.cpWeights[key] || 0) * (p.id.endsWith("Pct") ? base[key] || 0 : 1);
-        }
-        return total;
-      }
-      for (const merc of s.mercenaries.filter(m => m.unlocked)) {
-        for (const slot of c.DATA.equipmentSlots) {
-          const inventory = c.Game.getState().inventory;
-          const candidates = inventory.filter(i => i.slot === slot.id && (!i.equippedBy || i.equippedBy === merc.id));
-          candidates.sort((a, b) => score(b, merc) - score(a, merc));
-          if (candidates[0] && candidates[0].equippedBy !== merc.id) c.Game.equip(candidates[0].uid, merc.id);
-        }
-        const skills = c.DATA.skills.filter(d => d.owner === merc.id && merc.skills.includes(d.id));
-        skills.sort((a, b) => merc.skillLevels[a.id] - merc.skillLevels[b.id]);
-        skills.forEach(skill => c.Game.levelSkill(skill.id));
-      }
-      fusions += c.Game.autoFuse().length;
+﻿"use strict";
+const assert=require('node:assert/strict');
+const {runtime}=require('./runtime');
+// Public actions only: no grants, edited saves, replaced RNG or stat injections.
+function simulate(seed){
+  const {Game:g,DATA:d}=runtime();g.reset(seed);
+  let ticks=0,cleared=false,fails=0,farmUntil=0,frontier=0,evolutions=0,enhancements=0,assignments=0,sessions=1;
+  const bosses={};
+  g.on('stageFail',()=>fails++);
+  g.on('stageClear',e=>{if(d.stages[e.stageIndex].boss && bosses[e.stageIndex]===undefined)bosses[e.stageIndex]=(ticks+1)/36000;if(e.stageIndex===29)cleared=true;});
+  function cp(m){const stats=g.monsterStats(m);return Object.keys(d.cpWeights).reduce((sum,k)=>sum+stats[k]*d.cpWeights[k],0);}
+  function manage(){
+    g.collect();
+    // Release workers before evaluating evolution/party so camp cannot trap valuable duplicates.
+    g.getState().roster.filter(m=>m.camp!==null).forEach(m=>g.unassign(m.uid));
+    evolutions+=g.autoEvolve().length;
+    let roster=g.getState().roster;
+    const best=roster.slice().sort((a,b)=>cp(b)-cp(a)||Number(a.uid.slice(8))-Number(b.uid.slice(8))).slice(0,g.partySlots());
+    // Temporarily retain the last current member until a replacement is assigned.
+    roster.filter(m=>m.party!==null && !best.some(b=>b.uid===m.uid)).forEach(m=>g.toggleParty(m.uid));
+    best.forEach(m=>{if(g.getState().roster.find(r=>r.uid===m.uid).party===null)g.toggleParty(m.uid);});
+    roster=g.getState().roster;
+    roster.filter(m=>m.party!==null && !best.some(b=>b.uid===m.uid)).forEach(m=>g.toggleParty(m.uid));
+    best.forEach(m=>{if(g.getState().roster.find(r=>r.uid===m.uid).party===null)g.toggleParty(m.uid);});
+    ['campfire','workshop','garden','pen','altar','storehouse'].forEach(id=>{while(g.canBuild(id))g.build(id);});
+    g.getState().roster.filter(m=>m.party!==null).sort((a,b)=>a.enhance-b.enhance||cp(b)-cp(a)).forEach(m=>{if(g.enhance(m.uid))enhancements++;});
+    for(const id of ['garden','workshop','campfire','pen','altar','storehouse']){
+      const idle=g.idleMonsters().sort((a,b)=>Number(g.campJob(b,id).match)-Number(g.campJob(a,id).match)||cp(a)-cp(b));
+      idle.slice(0,g.campSlots(id)).forEach(m=>{if(g.assign(m.uid,id))assignments++;});
     }
-    // Every 10 seconds: equip, fuse spare items and spend books. Every hour: save/load a session.
-    for (; ticks < 6 * 36000 && !cleared; ticks++) {
-      c.Game.step();
-      if (ticks % 100 === 0) {
-        manage();
-        const state = c.Game.getState();
-        if (farmUntil && ticks >= farmUntil) {
-          c.Game.setMode("challenge"); c.Game.selectStage(frontier); farmUntil = 0; fails = 0;
-        } else if (!farmUntil && fails >= 2 && state.currentStage > 0) {
-          frontier = state.currentStage;
-          c.Game.setMode("repeat"); c.Game.selectStage(Math.max(0, frontier - 3)); farmUntil = ticks + 6000; fails = 0;
-        }
-      }
-      if (ticks && ticks % 36000 === 0) { c.Game.save(); assert.equal(c.Game.load(), true); sessions++; }
-    }
-    const s = c.Game.getState();
-    console.log(`     Seed ${seed}: ${(ticks / 36000).toFixed(2)}h, stage ${s.currentStage + 1}, levels ${s.mercenaries.map(m => m.level)}, ${fusions} fusions, ${sessions} sessions`);
-    assert.ok(cleared, `seed ${seed}: 3-10 did not clear within six hours`);
-    assert.ok(fusions > 0);
-    assert.ok(s.mercenaries.some(m => Object.values(m.skillLevels).some(level => level > 1)));
+    g.releaseDuplicates();
   }
-};
+  for(;ticks<8*36000 && !cleared;ticks++){
+    g.step();
+    if(ticks%100===0){
+      manage();const s=g.getState();
+      if(farmUntil && ticks>=farmUntil){g.setMode('challenge');g.selectStage(frontier);farmUntil=0;fails=0;}
+      else if(!farmUntil && fails>=2 && s.currentStage>0){frontier=s.currentStage;g.setMode('repeat');g.selectStage(Math.max(0,frontier-3));farmUntil=ticks+6000;fails=0;}
+    }
+    if(ticks && ticks%36000===0){const before=g.getState();assert.ok(g.load(g.save()));assert.deepEqual(g.getState(),before);sessions++;}
+  }
+  const s=g.getState(),result={seed,hours:Number((ticks/36000).toFixed(4)),bosses,stage:d.stages[s.currentStage].id,
+    levels:s.roster.filter(m=>m.party!==null).map(m=>m.level),evolutions,enhancements,assignments,sessions,cp:g.getCP()};
+  console.log('     '+JSON.stringify(result));
+  assert.ok(cleared,`seed ${seed}: 3-10 did not clear within eight hours`);
+  assert.ok(evolutions>0 && enhancements>0 && assignments>0,'all monster progression systems exercised');
+  return result;
+}
+function run(){return [271828,7919,42].map(simulate);}
+module.exports=run;
+if(require.main===module)run();

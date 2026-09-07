@@ -98,7 +98,7 @@ module.exports=function({test,runtime,plain,ticks,edit,add,DATA,Game,Battle}) {
     Game.reset();ticks(Game,40);Game.catchUp(3*3600000);const d=JSON.parse(Game.save());d.schemaVersion=d.state.schemaVersion=5;
     delete d.state.camp;for(const k of ['wood','stone','essence']){delete d.state.materials[k];delete d.state.pendingReport.materials[k];}
     delete d.state.pendingReport.campOutput;const old=plain(d.state);assert.equal(Game.load(JSON.stringify(d)),true);
-    const s=Game.getState();assert.equal(s.schemaVersion,6);assert.deepEqual(plain(s.roster),old.roster);assert.equal(s.rngSeed,old.rngSeed);
+    const s=Game.getState();assert.equal(s.schemaVersion,DATA.schemaVersion);assert.deepEqual(plain(s.roster),old.roster);assert.equal(s.rngSeed,old.rngSeed);
     assert.equal(s.gold,old.gold);assert.equal(s.coins,old.coins);assert.equal(s.pendingReport.gold,old.pendingReport.gold);
     assert.equal(s.materials.wood,0);assert.deepEqual(plain(s.pendingReport.campOutput),{wood:0,stone:0,enhanceStone:0,gold:0});
     assert.ok(Game.validateSave(Game.save()));Game.harvest();assert.ok(Game.validateSave(Game.save()));

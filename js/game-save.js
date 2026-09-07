@@ -25,11 +25,17 @@ Game.registerValidation(function (host) {
     });
   }
   function validate(s) {
-    if (!s || s.schemaVersion !== 6 || !natural(s.gold) || !natural(s.coins) || !s.materials || !Object.keys(DATA.camp.materials).every(function(k){return natural(s.materials[k]);}) ||
+    if (!s || s.schemaVersion !== DATA.schemaVersion || !natural(s.gold) || !natural(s.coins) || !s.materials || !Object.keys(DATA.camp.materials).every(function(k){return natural(s.materials[k]);}) ||
       !natural(s.nextAccessoryUid) || s.nextAccessoryUid < 1 || !Array.isArray(s.accessories) || s.accessories.length > DATA.accessory.cap ||
       !s.accessories.every(accessory) || !natural(s.tamerXP) || !natural(s.rngSeed) || s.rngSeed > 4294967295 ||
       !stage(s.currentStage) || !["repeat", "challenge"].includes(s.mode) || !natural(s.nextMonsterUid) || s.nextMonsterUid < 3 ||
       !natural(s.transitionTicks) || s.transitionTicks > DATA.resultTicks) return false;
+    var o=s.onboarding, sound=s.sound;
+    if(!o || !Array.isArray(o.completedSteps) || !Array.isArray(o.triggeredSteps) ||
+      o.completedSteps.length>6 || !o.completedSteps.every(function(n,i){return n===i+1;}) ||
+      !unique(o.triggeredSteps) || !o.triggeredSteps.every(function(n){return Number.isInteger(n)&&n>=1&&n<=6;}) ||
+      !o.completedSteps.every(function(n){return o.triggeredSteps.includes(n);}) ||
+      !sound || typeof sound.muted!=='boolean' || !finite(sound.volume) || sound.volume>1)return false;
     if (!Array.isArray(s.unlockedStages) || !unique(s.unlockedStages) || !s.unlockedStages.includes(0) ||
       !s.unlockedStages.includes(s.currentStage) || !s.unlockedStages.every(stage) || !Array.isArray(s.clearedStages) ||
       !unique(s.clearedStages) || !s.clearedStages.every(function (i) { return stage(i) && s.unlockedStages.includes(i); })) return false;

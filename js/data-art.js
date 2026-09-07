@@ -1,0 +1,100 @@
+"use strict";
+// DECISION: Inline both manifests so static and offline starts need no metadata fetch.
+DATA.monsterArt = {
+  "mistfox": {
+    "1": "assets/monsters/mistfox.png",
+    "2": "assets/monsters/mistfox_2.png",
+    "3": "assets/monsters/mistfox_3.png"
+  },
+  "lakebat": {
+    "1": "assets/monsters/lakebat.png",
+    "2": "assets/monsters/lakebat_2.png",
+    "3": "assets/monsters/lakebat_3.png"
+  },
+  "dewslime": {
+    "1": "assets/monsters/dewslime.png",
+    "2": "assets/monsters/dewslime_2.png",
+    "3": "assets/monsters/dewslime_3.png"
+  },
+  "reedheron": {
+    "1": "assets/monsters/reedheron.png",
+    "2": "assets/monsters/reedheron_2.png",
+    "3": "assets/monsters/reedheron_3.png"
+  },
+  "pondturtle": {
+    "1": "assets/monsters/pondturtle.png",
+    "2": "assets/monsters/pondturtle_2.png",
+    "3": "assets/monsters/pondturtle_3.png"
+  },
+  "glowmoth": {
+    "1": "assets/monsters/glowmoth.png",
+    "2": "assets/monsters/glowmoth_2.png",
+    "3": "assets/monsters/glowmoth_3.png"
+  },
+  "snowhare": {
+    "1": "assets/monsters/snowhare.png",
+    "2": "assets/monsters/snowhare_2.png",
+    "3": "assets/monsters/snowhare_3.png"
+  },
+  "ridgegoat": {
+    "1": "assets/monsters/ridgegoat.png",
+    "2": "assets/monsters/ridgegoat_2.png",
+    "3": "assets/monsters/ridgegoat_3.png"
+  },
+  "frostowl": {
+    "1": "assets/monsters/frostowl.png",
+    "2": "assets/monsters/frostowl_2.png",
+    "3": "assets/monsters/frostowl_3.png"
+  },
+  "icewolf": {
+    "1": "assets/monsters/icewolf.png",
+    "2": "assets/monsters/icewolf_2.png",
+    "3": "assets/monsters/icewolf_3.png"
+  },
+  "crystalbeetle": {
+    "1": "assets/monsters/crystalbeetle.png",
+    "2": "assets/monsters/crystalbeetle_2.png",
+    "3": "assets/monsters/crystalbeetle_3.png"
+  },
+  "cloudram": {
+    "1": "assets/monsters/cloudram.png",
+    "2": "assets/monsters/cloudram_2.png",
+    "3": "assets/monsters/cloudram_3.png"
+  },
+  "emberlizard": {
+    "1": "assets/monsters/emberlizard.png",
+    "2": "assets/monsters/emberlizard_2.png",
+    "3": "assets/monsters/emberlizard_3.png"
+  },
+  "cliffhawk": {
+    "1": "assets/monsters/cliffhawk.png",
+    "2": "assets/monsters/cliffhawk_2.png",
+    "3": "assets/monsters/cliffhawk_3.png"
+  },
+  "sandpangolin": {
+    "1": "assets/monsters/sandpangolin.png",
+    "2": "assets/monsters/sandpangolin_2.png",
+    "3": "assets/monsters/sandpangolin_3.png"
+  },
+  "duskcat": {
+    "1": "assets/monsters/duskcat.png",
+    "2": "assets/monsters/duskcat_2.png",
+    "3": "assets/monsters/duskcat_3.png"
+  },
+  "rockcrab": {
+    "1": "assets/monsters/rockcrab.png",
+    "2": "assets/monsters/rockcrab_2.png",
+    "3": "assets/monsters/rockcrab_3.png"
+  },
+  "windserpent": {
+    "1": "assets/monsters/windserpent.png",
+    "2": "assets/monsters/windserpent_2.png",
+    "3": "assets/monsters/windserpent_3.png"
+  }
+};
+DATA.bossArt = {
+  "lake_heron_lord": "assets/bosses/lake_heron_lord.png",
+  "ridge_goat_king": "assets/bosses/ridge_goat_king.png",
+  "cliff_hawk_sovereign": "assets/bosses/cliff_hawk_sovereign.png"
+};
+DATA.regionBossArt = ["lake_heron_lord", "ridge_goat_king", "cliff_hawk_sovereign"];

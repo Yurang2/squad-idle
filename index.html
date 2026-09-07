@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#FEF4E7">
   <title>몬스터 조련단 · 안개 너머의 인연</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 8h8l2 12H6zM9 8V5a3 3 0 0 1 6 0v3' fill='%23F2C57A' stroke='%237B6C6D'/%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -52,6 +54,7 @@
   <dialog id="offline-report" aria-labelledby="report-title"><div class="report-inner"><i data-icon="lantern"></i><p class="eyebrow">다시 만나는 새벽</p><h2 id="report-title">밤새 잡아온 자루</h2><p id="report-time"></p><div id="report-rewards"></div><div id="report-monsters" class="roster-grid"></div><button id="harvest-report" class="primary">모두 수확하기</button></div></dialog>
   <script src="js/data.js"></script>
   <script src="js/data-monsters.js"></script>
+  <script src="js/data-art.js"></script>
   <script src="js/data-progression.js"></script>
   <script src="js/data-camp.js"></script>
   <script src="js/battle.js"></script>
@@ -61,6 +64,8 @@
   <script src="js/game-camp.js"></script>
   <script src="js/game-expedition.js"></script>
   <script src="js/game-save.js"></script>
+  <script src="js/game-onboarding.js"></script>
+  <script src="js/audio.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/ui-art.js"></script>
   <script src="js/ui-monsters.js"></script>
@@ -68,6 +73,9 @@
   <script src="js/ui-expedition.js"></script>
   <script src="js/ui-camp.js"></script>
   <script src="js/native.js"></script>
+  <script src="js/ui-onboarding.js"></script>
+  <script src="js/ui-sound.js"></script>
+  <script src="js/pwa.js"></script>
   <script>UI.init();</script>
 </body>
 </html>

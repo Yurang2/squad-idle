@@ -1,11 +1,11 @@
 {
   "appId": "com.dklee.squadidle",
-  "appName": "용병단",
+  "appName": "몬스터 조련단",
   "webDir": "www",
   "android": { "allowMixedContent": false },
   "plugins": {
     "SplashScreen": {
-      "backgroundColor": "#8FD3FF",
+      "backgroundColor": "#FEF4E7",
       "launchShowDuration": 1000,
       "androidScaleType": "CENTER_INSIDE",
       "showSpinner": false

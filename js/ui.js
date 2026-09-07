@@ -28,13 +28,13 @@ var UI = (function () {
     return [{ x:250,y:226 },{ x:315,y:195 },{ x:308,y:284 }][index];
   }
   function drawUnit(unit, index, count) {
-    var p = position(unit, index, count), size = unit.boss ? 105 : unit.side === "party" ? 62 : 72;
-    size *= unit.evo === 3 ? 1.3 : unit.evo === 2 ? 1.15 : 1;
+    var p = position(unit, index, count), size = unit.boss ? 72 * 1.4 : unit.side === "party" ? 62 : 72;
     var group = svgNode("g", { id: "sprite-" + unit.id, transform: "translate(" + p.x + " " + p.y + ")",
       "data-x":p.x,"data-y":p.y, class:"unit " + unit.side });
     group.appendChild(svgNode("ellipse", { cx:0,cy:0,rx:size*.29,ry:4,fill:"#DCCFD8",opacity:.6 }));
-    var body = svgNode("g", { class:"unit-body" }), art = svgNode("g", { class:unit.evo > 1 ? "evolved-rim" : "", transform:unit.side === "party" ? "scale(-1 1)" : "scale(1 1)" });
-    art.appendChild(svgNode("image", { href:DATA.species[unit.speciesId].art,x:-size/2,y:-size*.92,width:size,height:size }));
+    var body = svgNode("g", { class:"unit-body" }), art = svgNode("g", { transform:unit.side === "party" ? "scale(-1 1)" : "scale(1 1)" });
+    art.appendChild(svgNode("image", { href:UI.monsterArt(unit),x:-size/2,y:-size*.92,width:size,height:size }));
+    UI.bindMonsterArt(art.firstChild,unit);
     body.appendChild(art); group.appendChild(body);
     group.appendChild(svgNode("rect", { x:-20,y:7,width:40,height:3,rx:1.5,fill:"#FEF4E7" }));
     group.appendChild(svgNode("rect", { x:-20,y:7,width:40*unit.hp/unit.maxHp,height:3,rx:1.5,
@@ -90,7 +90,7 @@ var UI = (function () {
       sprite.querySelector(".hp-fill").setAttribute("width",40*u.hp/u.maxHp); sprite.classList.toggle("fallen",u.hp<=0); sprite.classList.toggle("captured",!!u.captured);
     });
     el("squad-strip").innerHTML=state.roster.filter(function(m){return m.party!==null;}).sort(function(a,b){return a.party-b.party;}).map(function(m){
-      return '<div class="squad-member"><img src="'+DATA.species[m.speciesId].art+'" alt="'+DATA.species[m.speciesId].name+'"><span><small>Lv. '+fmt(m.level)+'</small></span></div>';
+      return '<div class="squad-member">'+UI.monsterImage(m,DATA.species[m.speciesId].name)+'<span><small>Lv. '+fmt(m.level)+'</small></span></div>';
     }).join("")+ '<span class="squad-member"><span>파티<small>'+fmt(state.roster.filter(function(m){return m.party!==null;}).length)+' / '+fmt(Game.partySlots())+'</small></span></span>';
     if(UI.campVisible)UI.updateCamp(state);
     if(activeSheet)renderSheet(state);
@@ -111,9 +111,11 @@ var UI = (function () {
     }
     activeSheet=name; UI.selectedMonster=null; UI.monsterView=null; sheetSignature=""; renderSheet(Game.getState());
     if(!el("sheet").open)el("sheet").showModal();
+    Game.visitTab(name);
     document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab===(name==="facility"?"camp":name));});
   }
   function setActive(active) {
+    if(typeof Sfx!=="undefined")Sfx.setActive(active);
     if(!active) { if(hiddenAt===null) { hiddenAt=Date.now(); Game.pause(); } }
     else if(hiddenAt!==null) { var elapsed=Math.max(0,Date.now()-hiddenAt); hiddenAt=null; Game.catchUp(elapsed); Game.resume(); }
   }
@@ -124,7 +126,7 @@ var UI = (function () {
   }
   function init() {
     document.querySelectorAll("[data-icon]").forEach(function(n){n.innerHTML=UI.icon(n.dataset.icon);});
-    UI.initArt(); UI.initExpedition(); UI.initProgression(); UI.initCamp();
+    UI.initArt(); UI.initExpedition(); UI.initProgression(); UI.initCamp(); UI.initOnboarding(); UI.initSound();
     Game.on("update",update); Game.on("stageStart",function(s){drawScene(s,true);});
     Game.on("wave",function(){drawScene(Game.getState(),false);}); Game.on("hit",hit); Game.on("unitDeath",death);
     Game.on("rankUp",function(e){toast("조련사 랭크 "+fmt(e.rank)+" · 파티 "+fmt(e.slots)+"슬롯");});
@@ -142,7 +144,9 @@ var UI = (function () {
     document.addEventListener("visibilitychange",function(){setActive(!document.hidden);});
     window.addEventListener("pagehide",function(){setActive(false);});
     window.addEventListener("pageshow",function(e){if(e.persisted&&!document.hidden)setActive(true);});
-    Game.init(); if(!document.hidden)Game.resume(); else hiddenAt=Date.now(); UI.native.init();
+    Game.init();
+    // DECISION: Hold only the fresh introduction until acknowledgement; the first capture otherwise occurs at tick one.
+    if(!document.hidden){if(Game.onboardingStep()!==1)Game.resume();}else hiddenAt=Date.now(); UI.native.init();
     // Deep link: #camp / #monsters / #dex / #settings opens that tab on load (review screenshots, share links).
     var deep=(location.hash||"").replace("#",""); if(["camp","monsters","dex","settings"].indexOf(deep)>=0)openSheet(deep);
   }

@@ -1,12 +1,12 @@
 "use strict";
 
 var DATA = {
-  version: "0.7.0 · M3", schemaVersion: 6,
+  version: "0.8.0 · M4", schemaVersion: 7,
   tickMs: 100, autosaveMs: 3000, catchUpMaxMs: 60000, statsWindowMs: 300000,
   resultTicks: 15, defaultSeed: 271828, rosterCap: 40, maxLevel: 100,
   offline: { thresholdMs: 60000, maxMs: 28800000, efficiency: 0.7, captureRate: 0.5, fallbackKillsPerSec: 0.1 },
-  // DECISION: Keep region-1 species rates .80–.92; 55s active-combat cooldown yields 60.61s/capture over 20 fresh five-minute seeds.
-  capture: { threshold: 0.3, cooldown: 55 },
+  // DECISION: M4's longer battles use a 60s cooldown to retain the 60–90s capture cadence.
+  capture: { threshold: 0.3, cooldown: 60 },
   evolution: { max: 3, bumpRate: 0.15, multiplier: 1.6 },
   enhancement: { max: 10, perStage: 0.06, dropRate: 0.06 },
   accessory: { cap: 40, dropRate: 0.05, rerollCost: 20, base: { hp: 8, atk: 1, def: 1 }, lines: [1, 2, 3, 3] },
@@ -33,7 +33,8 @@ var DATA = {
   },
   roles: { tank: "탱커", dps: "딜러", support: "서포터" },
   elements: { water: "물", wind: "바람", light: "빛", earth: "대지", ice: "얼음", fire: "불" },
-  balance: { enemyHp: 42, enemyHpGrowth: 1.12, enemyAtk: 3, enemyAtkGrowth: 1.10,
+  // DECISION: M4 raises only exponential growth constants; first-stage stats and formula shapes stay intact.
+  balance: { enemyHp: 42, enemyHpGrowth: 1.18, enemyAtk: 3, enemyAtkGrowth: 1.14,
     enemyDef: 1, enemyDefGrowth: 1.08, defenseConstant: 20, goldBase: 5, goldGrowth: 1.2,
     xpBase: 30, xpGrowth: 1.12, xpPerKill: 3, bossXpMultiplier: 5 },
   cpWeights: { hp: 0.2, atk: 5, def: 2, attackSpeed: 20, critChance: 100, critDamage: 10 },

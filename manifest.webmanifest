@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "몬스터 조련단",
+  "short_name": "몬스터 조련단",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FEF4E7",
+  "background_color": "#FEF4E7",
+  "icons": [
+    { "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

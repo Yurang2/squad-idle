@@ -1,6 +1,26 @@
 "use strict";
 (function () {
   var captureFrame=0, cardFrame=0;
+  var failedArt={};
+  UI.monsterArt=function(m){
+    var id=m.speciesId, stages=DATA.monsterArt[id] || {}, base=stages[1] || DATA.species[id].art;
+    var key=m.boss?DATA.regionBossArt[DATA.regions.findIndex(function(r){return r.id===DATA.species[id].region;})]:null;
+    var src=(key?DATA.bossArt[key]:stages[m.evo || 1]) || base;
+    return failedArt[src]?base:src;
+  };
+  UI.bindMonsterArt=function(node,m){
+    var base=(DATA.monsterArt[m.speciesId] || {})[1] || DATA.species[m.speciesId].art;
+    node.dataset.fallback=base;
+    node.addEventListener('error',function(){UI.artFallback(node);});
+  };
+  UI.artFallback=function(node){
+    var attr=node.tagName.toLowerCase()==='image'?'href':'src', src=node.getAttribute(attr), base=node.dataset.fallback;
+    if(!base || src===base)return;
+    failedArt[src]=true;node.setAttribute(attr,base);
+  };
+  UI.monsterImage=function(m,alt,css){
+    return '<img class="'+(css || '')+'" src="'+UI.monsterArt(m)+'" data-fallback="'+DATA.species[m.speciesId].art+'" alt="'+(alt || '')+'">';
+  };
   UI.icon=function(name) {
     var paths={
       camp:'<path d="m3 20 9-16 9 16H3zm9-16v16m-5 0 5-8 5 8"/>',
@@ -41,6 +61,7 @@
     if(kind==="pose")captureFrame=requestAnimationFrame(frame); else cardFrame=requestAnimationFrame(frame);
   }
   UI.initArt=function() {
+    document.addEventListener('error',function(e){if(e.target.dataset && e.target.dataset.fallback)UI.artFallback(e.target);},true);
     Object.values(DATA.assets).forEach(function(src){var img=new Image();img.src=src;});
     Game.on("captureAttempt",function() {
       cancelAnimationFrame(captureFrame);
