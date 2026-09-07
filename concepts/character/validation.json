@@ -1,0 +1,46 @@
+[
+  {
+    "file": "tamer_front.png",
+    "bytes": 1429522,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  },
+  {
+    "file": "tamer_side.png",
+    "bytes": 1372409,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  },
+  {
+    "file": "tamer_capture.png",
+    "bytes": 1577330,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  },
+  {
+    "file": "fox_companion.png",
+    "bytes": 1286710,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "file": "slime_pastel.png",
+    "bytes": 1353661,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  },
+  {
+    "file": "fox_wild.png",
+    "bytes": 1377836,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  },
+  {
+    "file": "lakebat.png",
+    "bytes": 1233010,
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGB",
+    "real_transparency": false,
+    "over_50KB": true
+  }
+]
