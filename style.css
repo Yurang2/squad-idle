@@ -49,7 +49,7 @@ h1 { font-size: 17px; font-weight: 800; letter-spacing: -.6px; }
 .locked-label { fill: #d5dfc9; font-size: 9px; }
 .hp-fill { transition: width .1s linear; }
 .fallen { visibility: hidden; }
-.unit-body { transform-box: fill-box; transform-origin: center; }
+.unit-body { transform-box: fill-box; transform-origin: center; animation: breathe 3s ease-in-out infinite; }
 .lunge-right { animation: lunge-right .25s ease-out; }
 .lunge-left { animation: lunge-left .25s ease-out; }
 .hit-flash { animation: hit-flash .24s ease-out; }
@@ -226,3 +226,42 @@ dialog[open] { animation: sheet-in .22s ease-out; }
 @keyframes potential-in { 0%, 20% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 @media (max-width: 350px) { dialog { padding-inline: 12px; } .inventory-grid { gap: 4px; } .flip-inner { width: 65px; height: 90px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; transition-duration: .01s !important; } #toast.visible { animation-duration: 3.4s !important; } }
+/* P3: report harvest, skill loadouts and portable saves. */
+.difficulty-toggle { grid-column: 1 / -1; display: flex; gap: 8px; }
+.difficulty-toggle[hidden] { display: none; }
+.difficulty-toggle button, .skill-selector button { flex: 1; border: 1px solid #637355; border-radius: 8px; }
+.difficulty-toggle .active, .skill-selector .active { background: #536246; color: #fff3c3; }
+.skill-selector, .active-skills, .save-buttons { display: flex; gap: 8px; }
+.skill-books { margin: 16px 0 12px; color: #d5bd86; }
+.active-skills span { flex: 1; min-width: 0; background: #111c15; padding: 10px 4px; border-radius: 6px; text-align: center; font-size: 11px; }
+.skill-card { margin-top: 12px; padding: 14px; border: 1px solid #536148; border-radius: 12px; background: #142018; }
+.equipped-skill { border-color: #c5ae72; }
+.skill-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; text-align: left; background: transparent; }
+.skill-toggle strong { font-size: 16px; color: #e4ce9b; }
+.skill-toggle b, .skill-card small { font-size: 11px; color: #aebd9d; }
+.skill-card p { font-size: 12px; line-height: 1.6; color: #c3cdb9; margin: 8px 0; }
+.skill-level { display: block; width: 100%; margin-top: 12px; border-radius: 6px; background: #33442c; }
+.save-controls { margin-top: 20px; }
+.save-controls p { font-size: 12px; line-height: 1.6; color: #b3c0a5; }
+.save-buttons button { flex: 1; border: 1px solid #74845e; border-radius: 8px; font-size: 12px; }
+#save-editor label { display: block; margin: 16px 0 8px; font-size: 12px; }
+#save-json { display: block; width: 100%; min-width: 0; max-width: 100%; padding: 10px; border: 1px solid #6b785b; border-radius: 6px; color: #d6dfce; background: #0e1711; font: 12px monospace; resize: vertical; overflow-wrap: anywhere; }
+#save-editor > button { margin-top: 10px; width: 100%; background: #405536; border-radius: 6px; }
+#offline-report { margin: auto; width: 100%; max-width: 480px; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; padding: 32px 20px 0; text-align: center; background: radial-gradient(ellipse at top, #39432a, #101b16 60%); }
+#offline-report::after { content: ''; position: fixed; inset: 0; border: 6px solid transparent; pointer-events: none; z-index: 10; }
+.report-heading h2 { margin: 14px 0; font-size: 30px; color: #ead3a3; }
+#report-duration { font-size: 13px; line-height: 1.7; color: #b9c6a8; }
+.report-gold { padding: 26px 0 14px; }
+.report-gold span { display: block; font-size: 12px; color: #bba978; }
+.report-gold strong { display: block; margin-top: 10px; font-size: 44px; color: #f2d18a; font-variant-numeric: tabular-nums; }
+#report-stats, #report-progress { font-size: 11px; color: #b6c2a5; margin-bottom: 18px; }
+#report-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 8px; padding: 8px 0 24px; }
+.book-card { border: 1px solid #a8be8e; color: #bdcea9; }
+.harvest-footer { position: sticky; bottom: 0; background: #101b16ed; padding: 12px 0 max(20px, env(safe-area-inset-bottom)); }
+.harvest-footer p { font-size: 10px; color: #a4b395; margin-bottom: 10px; }
+#harvest-report { width: 100%; min-height: 58px; border-radius: 12px; font-size: 18px; background: #c4ab71; color: #1a2417; font-weight: 700; }
+.skill-label { fill: #f2db99; stroke: #152419; stroke-width: 3px; paint-order: stroke; font-size: 12px; font-weight: 700; animation: skill-rise 1s ease-out both; }
+@keyframes skill-rise { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+@keyframes breathe { 50% { transform: translateY(-1px) scaleY(1.015); } }
+.fallen .unit-body { animation: none; }
+@media (prefers-reduced-motion: reduce) { .unit-body { animation: none; } }

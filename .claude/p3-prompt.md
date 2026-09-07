@@ -20,3 +20,6 @@ You are implementing phase **P3** of the game in `GAME_DESIGN.md` (sections 6 �
 - Browser: setting `savedAt` back by 3 hours in localStorage and reloading shows the 원정 보고서 overlay with gold count-up and item flips; tapping 수확 applies rewards; skills fire visibly in battle (a small label above the unit); chaos toggle appears only after 3-10; export/import works; no console errors; no horizontal scroll at 375px.
 
 Do not add Capacitor/build tooling (P4). Do not ask questions; decide and record.
+
+
+NOTE: another agent is concurrently generating images under assets/ — never read, write, or delete anything in assets/. Append your CHANGELOG section with a single atomic write (read the file right before writing).

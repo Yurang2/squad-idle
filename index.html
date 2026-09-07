@@ -47,6 +47,7 @@
       <div class="harvest-row"><span>이번 원정의 발걸음</span><span><b id="gold-rate">0</b> 골드/초 <span class="rate-divider">·</span> <b id="kill-rate">0</b> 처치/초</span></div>
     </section>
     <section class="stage-controls" aria-label="스테이지 선택과 전투 모드">
+      <div id="difficulty-toggle" class="difficulty-toggle" role="group" aria-label="원정 난이도" hidden><button data-difficulty="normal" aria-pressed="true">일반</button><button data-difficulty="chaos" aria-pressed="false">카오스</button></div>
       <div class="stage-navigation"><button id="previous-stage" aria-label="이전 스테이지">‹</button><div><span>스테이지</span><strong id="selected-stage">1-1</strong></div><button id="next-stage" aria-label="다음 스테이지">›</button></div>
       <div class="mode-toggle" role="group" aria-label="전투 모드"><button id="repeat-mode" aria-pressed="false">↻ 반복</button><button id="challenge-mode" class="active" aria-pressed="true">도전 →</button></div>
       <p id="mode-hint">클리어하면 다음 스테이지로 나아갑니다</p>
@@ -65,7 +66,9 @@
   <script src="js/battle.js"></script>
   <script src="js/game.js"></script>
   <script src="js/game-equipment.js"></script>
+  <script src="js/game-expedition.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/ui-equipment.js"></script>
+  <script src="js/ui-expedition.js"></script>
 </body>
 </html>

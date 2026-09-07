@@ -114,7 +114,7 @@ async function main() {
     await evaluate("document.getElementById('close-sheet').click()");
     for (const tab of ["equipment", "fusion", "skills"]) {
       await evaluate("document.querySelector('[data-tab=" + tab + "]').click()");
-      const selector = { equipment: ".inventory-grid", fusion: ".fusion-table", skills: ".placeholder" }[tab];
+      const selector = { equipment: ".inventory-grid", fusion: ".fusion-table", skills: ".skill-card" }[tab];
       assert.ok(await evaluate("document.getElementById('sheet').open && !!document.querySelector('" + selector + "')"));
       await evaluate("document.getElementById('close-sheet').click()");
     }
@@ -149,6 +149,8 @@ async function main() {
     console.log("PASS repeat, arrows, 320px no overflow and desktop 480px maximum width");
 
     await require("./browser-equipment")({ evaluate, command, screenshot, delay });
+
+    await require("./browser-p3")({ evaluate, command, screenshot, delay, events });
 
     await evaluate("Game.pause();Game.save()");
     const before = await evaluate("({gold:Game.getState().gold,seed:Game.getState().rngSeed})");

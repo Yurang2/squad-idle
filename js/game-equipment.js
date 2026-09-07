@@ -11,7 +11,11 @@ Game.registerEquipment(function (host) {
     for (var i = 0; i < weights.length; i++) { draw -= weights[i]; if (draw < 0) return i; }
     return weights.length - 1;
   }
-  function table(stageIndex) { return DATA.dropTables.find(function (t) { return stageIndex >= t.min && stageIndex <= t.max; }); }
+  function table(stageIndex, difficulty) {
+    if (stageIndex < 0 || stageIndex >= DATA.stages.length) return null;
+    return (difficulty || host.state().difficulty) === "chaos" ? DATA.chaosDropTable :
+      DATA.dropTables.find(function (t) { return stageIndex >= t.min && stageIndex <= t.max; });
+  }
   function potentials(rarity) {
     var rank = rarities.indexOf(rarity);
     var result = [];
@@ -36,7 +40,7 @@ Game.registerEquipment(function (host) {
       base: baseStats(slot, tier, rarity), potentials: potentials(rarity), locked: false, equippedBy: null };
   }
   function rollItem(stageIndex, options) {
-    var band = Number.isInteger(stageIndex) && table(stageIndex);
+    var band = Number.isInteger(stageIndex) && table(stageIndex, options && options.difficulty);
     var forced = options && options.forcedTier;
     if (!band || (forced !== undefined && (!Number.isInteger(forced) || forced < 1 || forced > 8))) return null;
     var tiers = Object.keys(band.tierWeights);
@@ -54,6 +58,8 @@ Game.registerEquipment(function (host) {
     ["hp", "atk", "def", "attackSpeed"].forEach(function (key) { result[key] *= 1 + (sums[key + "Pct"] || 0); });
     result.critChance = Math.min(1, result.critChance + (sums.critChance || 0));
     result.critDamage += sums.critDamage || 0;
+    // DECISION: Any equipped invincibility line enables one fixed 2% roll per incoming hit.
+    result.invincibleOnHit = (sums.invincibleOnHit || 0) > 0;
     return result;
   }
   function bonus(id) {
@@ -82,6 +88,11 @@ Game.registerEquipment(function (host) {
     var chance = event.type === "boss" ? band.bossChance : Math.min(1, band.chance * (1 + bonus("dropPct")));
     if (Game.rng() >= chance) return;
     var item = rollItem(state.currentStage, { forcedTier: event.type === "boss" ? band.guaranteedTier : undefined });
+    receive(item, event.id);
+    if (persist) host.save();
+  }
+  function receive(item, enemyId) {
+    var state = host.state();
     var sold = null;
     if (state.inventory.length >= DATA.inventoryCap) {
       state.overflow++;
@@ -92,10 +103,9 @@ Game.registerEquipment(function (host) {
       state.gold += DATA.sellPrice(sold.tier, sold.rarity);
     }
     if (sold !== item) state.inventory.push(item);
-    host.emit("itemDrop", Object.assign(copy(item), { enemyId: event.id, autoSold: sold === item }));
+    host.emit("itemDrop", Object.assign(copy(item), { enemyId: enemyId, autoSold: sold === item }));
     if (sold) host.emit("inventoryFull", { overflow: state.overflow, sold: copy(sold), incoming: copy(item),
       gold: DATA.sellPrice(sold.tier, sold.rarity), kept: sold !== item });
-    if (persist) host.save();
   }
   function equip(uid, mercenaryId) {
     var item = find(uid);
@@ -218,7 +228,7 @@ Game.registerEquipment(function (host) {
       return i.equippedBy === null || state.mercenaries.some(function (m) { return m.id === i.equippedBy && m.equipment[i.slot] === i.uid; });
     });
   }
-  return { stats: stats, bonus: bonus, drop: drop, validate: validate,
+  return { stats: stats, bonus: bonus, drop: drop, validate: validate, receive: receive, table: table,
     api: { rollItem: rollItem, equip: equip, unequip: unequip, fuse: function (uids) { return fuse(uids, false); },
       autoFuse: autoFuse, sell: sell, toggleLock: toggleLock, rerollPotentials: rerollPotentials } };
 });

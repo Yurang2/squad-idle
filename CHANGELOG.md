@@ -55,3 +55,41 @@
 - `js/`의 각 파일에 `node --check` 실행: 통과. 모든 작성 파일 600줄 미만.
 - `node test/run.js`: **17 PASS**, 종료 코드 0.
 - 브라우저 연결 도구에 사용 가능한 브라우저가 없었음. 설치된 Chrome의 임시 headless 프로필로 검증을 시도했으나 현재 실행 환경에서 renderer `Target crashed`/GPU 프로세스 오류가 발생하여 실제 화면·콘솔 오류 0 검증은 완료하지 못함. 순수 로직 검증과 구분하여 기록.
+
+## Art assets — 2026-09-07
+
+- Generated all 28 PNGs listed in ASSET_SPEC.md using the built-in ChatGPT image_gen tool, with separate calls per asset and the required common style prefix. No HTTP API keys, package installations, or Blender were used.
+- Added assets/merc (6), assets/mon (12), assets/bg (3), and assets/icon (7), plus assets/manifest.json and the standalone checkerboard review grid assets/contact_sheet.html.
+- Attack poses were generated from their corresponding idle image references. Regenerated the slime to remove an unwanted outfit, the yeti to stand upright, and the peak background to expand its flat ground area.
+- Transparency path: native generated alpha preserved for all 25 mercenary, monster, and icon files. No magenta removal was necessary. Preinstalled Pillow 12.1.0 normalized dimensions and padding; backgrounds are opaque RGB 1080x760. Icons are centered; sprite bottoms align at approximately 95% canvas height.
+- Recorded final prompts in assets/prompts.json and source paths, processing methods, and sizes in assets/generation_log.jsonl. assets/prepare_asset.py provides the local normalization helper; assets/verify_assets.py checks files and writes assets/verification.json.
+- Verification: 28/28 PNGs exist at the exact requested paths, match specified dimensions, exceed 10 KB, and pass alpha/opacity checks. Manifest keys and contact-sheet references are valid. JavaScript syntax checks passed. This art task did not change game code.
+- Missing or ungenerated assets: none.
+
+## 0.3.0 · P3 — 2026-09-07
+
+- `js/game-expedition.js`: `Game.harvest()`, `toggleSkill()`, `levelSkill()`, `setDifficulty()`, `exportSave()`·`importSave()`. 원정 보고서 생성·미수확 저장·수확 트랜잭션, 직업별 스킬북, 스킬 배치/성장, 독립 카오스 진행도, v2→v3 마이그레이션과 P3 저장 검증을 추가했다.
+- `js/data.js`·`js/battle.js`: 용병별 스킬 4개와 기본 슬롯 3개, 우선순위/쿨타임, 도발·방어·강타·재생·연사·확정 치명타·독·회피·파티 회복·광역기·부활·흡수막 구현. 피격 무적과 카오스 HP/ATK 배율, 스킬 발동 이벤트를 적용했다.
+- `js/game.js`·`js/game-equipment.js`: 기존 공개 함수 유지. `catchUp()`의 60초 이상 복귀는 수확 전용 보고서로 전환하고 스테이지/난이도별 최근 5분 통계를 보존한다. 장비 수령 함수를 분리해 P2 포화 처리 그대로 재사용한다. `schemaVersion: 3`, v1→v2→v3 연쇄 변환, 비파괴 `validateSave()`, 선택적 JSON 인자를 받는 `load()`와 허용된 다섯 번째 전역 `Cloud` 스텁을 추가했다. Cloud의 세 메서드는 비동기로 `Error('v2')`를 던지며 통신하지 않는다.
+- `js/ui-expedition.js`·기존 UI·`style.css`·`index.html`: 전체 화면 원정 보고서, 1초 골드 카운트업 후 200ms 간격 카드 뒤집기, 전체 공개/수확, 유니크 이상 강한 플래시, 스킬 카드/슬롯/책 소비, 전투 스킬 이름, 카오스 토글, JSON textarea·복사/선택 대체·검증 후 확인/적용, 호흡 애니메이션을 추가했다. 진동은 실제 사용자 입력 이후에만 호출한다.
+- `test/p3.js`, `test/long-run.js`, `test/browser-p3.js` 추가. 기존 로직/브라우저 테스트와 독립 밸런스 스크립트의 로딩 순서를 갱신했다. P1 무스킬 기준 검증은 유지하고 P3로 변경된 버전·복귀·무적 기대값만 수정했다.
+
+### DECISION: 원정·스킬·카오스·저장
+
+- 60초 미만은 기존 결정적 전투 빨리감기, 그 이상은 최대 24시간 × 효율 70%. 처치 수는 소수 기대값으로 보관하고 골드/XP는 정수 내림하며 부동소수점 오차를 보정한다. 도전 중 나가도 마지막으로 실행한 스테이지를 반복 원정 대상으로 삼으며 오프라인 최초 클리어/해금/코인은 지급하지 않는다.
+- 해당 스테이지의 실측 표본이 없으면 초당 0.1처치와 적 골드(카오스/장비 골드 보너스 포함)를 쓴다. 보스 스테이지는 전체 6마리 중 보스 1마리 비율로 확정 드롭과 XP 배수를 반영한다. 이미 측정된 골드 수익에는 장비 보너스를 중복 적용하지 않는다.
+- 장비 추첨은 보고서당 최대 500회. 초과 처치는 각 추첨 확률에 대표 처치 수를 곱해 반영하되 확률 100%, 장비 500개가 상한이다. 스킬북은 인벤토리를 쓰지 않고 직업별 기대량을 확률 반올림한 최대 3개 묶음 카드로 보관한다. 온라인은 처치당 별도 3% 추첨으로 세 직업 중 하나를 균등 지급하고 즉시 저장한다.
+- 미수확 보고서는 생성 결과와 RNG/UID를 함께 저장하며 재접속 시 재추첨하지 않는다. 수확 전에는 전투와 추가 원정 시간 누적을 멈춘다. 수확은 한 번만 가능하며 모든 보상을 적용한 뒤 저장하고 현재 스테이지 전투를 새로 시작한다. 장비함 포화 시 잠금/장착 보호·최저 티어 레어 판매·대체 환전은 P2 규칙 그대로다.
+- 스킬 슬롯 순서가 우선순위이며 해제 후 다시 탭하면 마지막 슬롯에 들어간다. 용병은 틱당 준비된 스킬 하나를 쓰고, 없으면 공격 대기시간에 따라 기본 공격한다. 회복은 부상자가 있을 때, 부활은 쓰러진 동료가 있을 때만 사용한다. 장착 변경은 이미 흐른 쿨타임을 초기화하지 않는다.
+- 스킬북 비용은 현재 스킬 레벨(1→2는 1권, 9→10은 9권), 최대 10레벨. 후반 진행 목표에 맞춰 효과 성장 배율은 `1 + 0.5 × (level - 1)`로 정했다. 도발은 지속시간, 부활은 쿨타임에 배율을 적용하며 부활 HP는 항상 30%, 전투당 한 번이다. 다른 피해/회복/방어/흡수 효과는 위력에 적용한다. P1 적 성장 곡선과 P2 장비 기본값/드롭 확률은 유지한다.
+- `invincibleOnHit` 잠재가 하나라도 장착되어 있으면 피격마다 고정 2% 확률로 해당 타격부터 1초간 무적. 기존 잠재 수치의 저장/재설정 범위는 호환을 위해 보존하지만 중첩으로 발동 확률을 늘리지 않는다.
+- 일반 3-10 실제 클리어 후 카오스 해금. 난이도별 진행도와 마지막 선택 스테이지를 분리한다. 카오스 HP는 일반 적의 반올림된 HP ×8, ATK ×5, 골드 ×4, 최초 클리어 코인 ×3이며 보스도 T5~8 카오스 표를 사용한다. 카오스 상점은 추가하지 않는다.
+- v2의 혼합 스테이지 통계는 이관 시 비워 보수적인 원정 추정치를 사용한다. 기존 용병/장비/진행도/전투 HP와 공격 대기는 보존한다. JSON 가져오기는 전체 검증 후 확인을 받고 교체하며, 가져온 시각부터 저장한다. 가져오기 자체는 과거 시각으로 추가 보상을 생성하지 않지만 미수확 보고서는 그대로 복원한다.
+
+### 검증
+
+- 모든 `js/*.js`를 파일별 `node --check`로 확인(Windows glob 미확장 대응), `node test/run.js`: **37 PASS**, 종료 코드 0. 각 코드/테스트 파일 600줄 미만, 변경 코드의 `git diff --check` 통과.
+- 로직: 70% 보고서 수식·60초 경계·24시간 상한·미수확 재접속/중복 수확 방지·스킬북 3% 경계/즉시 저장·12개 효과·쿨타임/우선순위·저장 후에도 전투당 한 번 부활·30개 카오스 스테이지 배율/해금·마이그레이션·JSON 왕복·손상된 효과/슬롯/보고서의 원자적 거부를 검증했다.
+- 장기 진행: 10초마다 장비 평가/장착·자동 합성·스킬북 사용, 두 번 실패하면 세 스테이지 아래에서 10분 반복 후 재도전, 매시간 저장/로드. 무료 장비/XP 없이 시드 **271828 / 7919 / 42**가 각각 **5.50 / 5.10 / 5.72시간**에 일반 3-10 클리어(각 6개 세션, 합성 248 / 209 / 234회). 모두 6시간 제한 통과.
+- Chrome 152: 기존 P1/P2 회귀와 P3 브라우저 검증 통과. savedAt을 3시간 전으로 저장한 재로딩에서 카운트업·200ms 뒤집기·강한 플래시·탭 공개·수확/포화 판매, 61초 숨김 후 visibilitychange 복귀, 전투 스킬 이름/슬롯 변경, 3-10 전후 카오스 토글, JSON 복사/잘못된 입력 거부/확인 후 왕복을 확인했다. 375px 가로 넘침 없음, 콘솔·런타임 오류 0. 실행은 기존 격리 headless 프로필에서 `BROWSER_NO_SANDBOX=1`, `BROWSER_FAST=1` 사용; P2 120초 전투는 1,200틱 재생, P3 연출은 실제 프레임으로 검증했다.
+- 동시 작업의 `assets/` 파일에는 접근하지 않았다. 변경 이력은 직전 내용을 다시 읽어 단일 원자적 교체로 이 절을 덧붙였다.

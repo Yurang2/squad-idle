@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 
 module.exports = async function ({ evaluate, command, screenshot, delay }) {
   await command("Emulation.setDeviceMetricsOverride", { width: 375, height: 844, deviceScaleFactor: 1, mobile: true });
-  await evaluate(`Game.reset(); window.p2Drops = []; window.p2Animations = [];
+  await evaluate(`Game.reset(); Game.setMode("repeat"); window.p2Drops = []; window.p2Animations = [];
     window.p2Off = Game.on('itemDrop', item => {
       p2Drops.push(item);
       requestAnimationFrame(() => {

@@ -16,7 +16,7 @@
   function lines(options) {
     return '<ul class="potential-lines">' + options.map(function (p) {
       var definition = DATA.potentialPool.find(function (d) { return d.id === p.id; });
-      return '<li><span>' + definition.name + (p.id === "invincibleOnHit" ? ' (효과 준비 중)' : '') + '</span><b>+' + UI.fmt(p.value * 100) + '%</b></li>';
+      return '<li><span>' + definition.name + '</span><b>' + (p.id === "invincibleOnHit" ? UI.fmt(DATA.invincibleChance * 100) : '+' + UI.fmt(p.value * 100)) + '%</b></li>';
     }).join("") + '</ul>';
   }
   function badge() { el("equipment-badge").hidden = unread === 0; el("equipment-badge").textContent = UI.fmt(unread); }
@@ -104,13 +104,14 @@
     cpFrame = requestAnimationFrame(frame);
   };
   function flash(strong) {
-    var scene = document.querySelector(".battle-scene");
+    var scene = document.querySelector("#offline-report[open]") || document.querySelector(".battle-scene");
     scene.classList.remove("loot-flash", "loot-flash-strong");
     void scene.offsetWidth;
     scene.classList.add(strong ? "loot-flash-strong" : "loot-flash");
   }
   function drop(item) {
     if (!item.autoSold && currentSheet !== "equipment") { unread++; badge(); }
+    if (item.enemyId === null) return; // Already revealed in the expedition report.
     var source = el("sprite-" + item.enemyId);
     var svg = el("battle-svg");
     var point = svg.createSVGPoint();
@@ -126,7 +127,7 @@
     card.style.setProperty("--drop-y", target.y + target.height / 2 - start.y + "px");
     el("app").appendChild(card);
     card.addEventListener("animationend", function (e) { if (e.target === card) card.remove(); });
-    if (ranks.indexOf(item.rarity) >= 2) { flash(false); navigator.vibrate?.(30); }
+    if (ranks.indexOf(item.rarity) >= 2) { flash(false); if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(30); }
   }
   var reveal = document.createElement("dialog");
   reveal.id = "fusion-reveal";
@@ -208,5 +209,6 @@
   Game.on("stageStart", function (state) {
     if (state.inventory.length === 0) { unread = 0; selected = null; preview = null; badge(); }
   });
-  UI.init();
+  UI.itemCard = itemCard;
+  UI.lootFlash = flash;
 })();

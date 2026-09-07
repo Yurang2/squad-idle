@@ -14,7 +14,7 @@ function context() {
     setInterval: (fn, ms) => { intervals.set(++timerId, { fn, ms }); return timerId; },
     clearInterval: id => intervals.delete(id)
   });
-  for (const file of ["data", "battle", "game", "game-equipment"]) {
+  for (const file of ["data", "battle", "game", "game-equipment", "game-expedition"]) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, "../js/" + file + ".js"), "utf8"), sandbox, { filename: file + ".js" });
   }
   return { ...sandbox, storage, intervals };
@@ -95,8 +95,9 @@ test("balance: unupgraded level-1 warrior clears 1-1 through 1-5 and fails 1-6",
     assert.equal(sim.status, stage < 5 ? "clear" : "fail", "stage " + (stage + 1));
   }
 });
-test("natural challenge progression first fails at 1-6, then gains XP on retry", () => {
+test("P1 baseline without active skills first fails at 1-6, then gains XP on retry", () => {
   const c = context();
+  c.DATA.defaultSkills.warrior = []; c.Game.reset();
   let failure;
   c.Game.on("stageFail", e => { failure = e; });
   for (let i = 0; i < 2400 && !failure; i++) c.Game.step();
@@ -184,13 +185,14 @@ test("failure restores squad HP and retries the same stage without currency pena
   assert.ok(state.battle.units.every(u => u.hp === u.maxHp));
   assert.ok(state.gold >= before);
 });
-test("catchUp is deterministic, capped at 600 ticks and ignores the remainder", () => {
+test("catchUp below 60 seconds preserves deterministic fast-forward", () => {
   const a = context(); const b = context();
-  assert.equal(a.Game.catchUp(86400000), 600);
-  for (let i = 0; i < 600; i++) b.Game.step();
+  assert.equal(a.Game.catchUp(59999), 599);
+  for (let i = 0; i < 599; i++) b.Game.step();
   assert.deepEqual(plain(a.Game.getState()), plain(b.Game.getState()));
   assert.equal(a.Game.catchUp(-1), 0);
   assert.equal(a.Game.catchUp(NaN), 0);
+  assert.equal(a.Game.catchUp(Infinity), 0);
   assert.equal(a.Game.catchUp(99), 0);
 });
 test("XP raises level and CP; the rolling five-minute window expires kills", () => {
@@ -232,9 +234,9 @@ test("runtime installs only 100ms combat and 3s autosave timers; pause clears bo
   assert.deepEqual([...c.intervals.values()].map(t => t.ms), [100, 3000]);
   c.Game.pause();
   assert.equal(c.intervals.size, 0);
-  assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 2);
+  assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 3);
 });
-test("all 30 stages and equipment data are defined; P3 skills stay empty", () => {
+test("all 30 stages, equipment data and P3 default skills are defined", () => {
   const c = context();
   assert.equal(c.DATA.stages.length, 30);
   assert.equal(c.DATA.equipmentTiers.length, 8);
@@ -246,10 +248,10 @@ test("all 30 stages and equipment data are defined; P3 skills stay empty", () =>
     stage.waves.forEach((wave, n) => assert.ok(stage.boss && n === 2 ? wave.length === 1 : wave.length >= 2 && wave.length <= 4));
   });
   assert.equal(c.Game.getState().inventory.length, 0);
-  assert.ok(c.Game.getState().battle.units.every(u => u.skills.length === 3 && u.skills.every(s => s === null)));
+  assert.ok(c.Game.getState().battle.units.every(u => u.skills.length === 3 && u.skills.every(s => c.DATA.skills.some(d => d.id === s))));
 });
 function setState(c, state) {
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: 2, savedAt: Date.now(), state }));
+  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
   assert.equal(c.Game.load(), true);
 }
 function itemsOf(c, count, slot = "weapon", tier = 1, rarity = "rare") {
@@ -400,7 +402,7 @@ test("P2: schema v1 migration and populated v2 round-trip; bad equipment saves r
   legacy.mercenaries.forEach(m => { delete m.equipment; });
   c.storage.set("squad_v1", JSON.stringify({ schemaVersion: 1, savedAt: Date.now(), state: legacy }));
   assert.equal(c.Game.load(), true);
-  assert.equal(c.Game.getState().schemaVersion, 2);
+  assert.equal(c.Game.getState().schemaVersion, 3);
   assert.deepEqual(plain(c.Game.getState().inventory), []);
   const item = itemsOf(c, 1)[0]; stock(c, [item]); c.Game.equip(item.uid, "warrior");
   c.Game.save(); const before = plain(c.Game.getState());
@@ -408,7 +410,7 @@ test("P2: schema v1 migration and populated v2 round-trip; bad equipment saves r
   for (const corrupt of [s => { s.inventory.push(s.inventory[0]); }, s => { s.inventory[0].base.atk = 999; },
     s => { s.mercenaries[0].equipment.weapon = null; }, s => { s.inventory[0].potentials[0].value = 500; }]) {
     const state = plain(before); corrupt(state);
-    c.storage.set("squad_v1", JSON.stringify({ schemaVersion: 2, savedAt: Date.now(), state }));
+    c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
     assert.equal(c.Game.load(), false); assert.deepEqual(plain(c.Game.getState()), before);
   }
 });
@@ -434,7 +436,7 @@ test("P2: inventory cap sells lowest eligible rare; fully protected bag monetize
   assert.equal(c.Game.getState().overflow, events.length);
   assert.equal(c.Game.getState().inventory.length, 60);
 });
-test("P2: all combat potentials apply, gold/drop bonuses work and invincibility stays inert", () => {
+test("P2: all combat potentials apply, gold/drop bonuses work and invincibility is enabled", () => {
   const c = context();
   const items = c.DATA.equipmentSlots.map(s => itemsOf(c, 1, s.id, 1, "legendary")[0]);
   items[0].potentials = [{ id: "atkPct", value: .2 }, { id: "hpPct", value: .25 }, { id: "defPct", value: .25 }];
@@ -450,16 +452,16 @@ test("P2: all combat potentials apply, gold/drop bonuses work and invincibility 
       critChance: flat + .12, critDamage: flat + .4 })[key];
     assert.ok(Math.abs(stats[key] - expected) < 1e-10, key);
   }
-  assert.equal(stats.invincibleOnHit, undefined);
+  assert.equal(stats.invincibleOnHit, true);
   const save = JSON.parse(c.Game.save());
-  save.state.battle.enemies[0].hp = 1;
+  save.state.battle.enemies[0].hp = 1; save.state.battle.units[0].skills = [];
   setState(c, save.state);
   c.Game.rng = () => .085; // Above 8%, below the equipped 8.96% drop threshold.
   c.Game.step();
   assert.equal(c.Game.getState().gold, 7);
   assert.equal(c.Game.getState().inventory.length, 5);
   const plainGame = context();
-  const plainState = plainGame.Game.getState(); plainState.battle.enemies[0].hp = 1; setState(plainGame, plainState);
+  const plainState = plainGame.Game.getState(); plainState.battle.enemies[0].hp = 1; plainState.battle.units[0].skills = []; setState(plainGame, plainState);
   plainGame.Game.rng = () => .085;
   plainGame.Game.step();
   assert.equal(plainGame.Game.getState().inventory.length, 0);
@@ -480,4 +482,5 @@ test("P2: transferring gear clears old owner, and changing gear never revives a 
   c.Game.unequip("warrior", "hat");
   assert.equal(c.Game.getState().battle.units[0].hp, 0);
 });
+require("./p3")({ test, context, plain, setState, fixture, untilResult, assert });
 console.log("\n" + passed + " tests passed.");

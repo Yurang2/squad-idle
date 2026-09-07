@@ -9,6 +9,7 @@ var Game = (function () {
   var savedAt = 0;
   var storageKey = "squad_v1";
   var equipment;
+  var expedition;
 
   function on(event, fn) {
     if (!listeners[event]) listeners[event] = [];
@@ -23,9 +24,12 @@ var Game = (function () {
     return { schemaVersion: DATA.schemaVersion, rngSeed: (seed === undefined ? DATA.defaultSeed : seed) >>> 0,
       gold: 0, squadCoins: 0, mercenaries: DATA.mercenaries.map(function (m) {
         return { id: m.id, level: 1, xp: 0, unlocked: m.unlockStage === null,
+          skills: DATA.defaultSkills[m.id].slice(), skillLevels: Object.fromEntries(DATA.skills.filter(function (s) { return s.owner === m.id; }).map(function (s) { return [s.id, 1]; })),
           equipment: { weapon: null, hat: null, gloves: null, shoes: null } };
       }), unlockedStages: [0], clearedStages: [], currentStage: 0, mode: "challenge",
       stats: { goldPerSec: 0, killsPerSec: 0, elapsedMs: 0, samples: [] },
+      difficulty: "normal", chaosUnlockedStages: [0], chaosClearedStages: [], normalStage: 0, chaosStage: 0,
+      skillBooks: { warrior: 0, archer: 0, mage: 0 }, pendingReport: null, stageStats: {},
       inventory: [], overflow: 0, nextItemUid: 1, battle: null, transitionTicks: 0 };
   }
   function rng() {
@@ -51,7 +55,7 @@ var Game = (function () {
     stats.killsPerSec = stats.samples.length / seconds;
   }
   function grantKill(event) {
-    var gold = Math.round(DATA.goldPerKill(state.currentStage) * (1 + (equipment ? equipment.bonus("goldPct") : 0)));
+    var gold = Math.round(DATA.goldPerKill(state.currentStage) * (state.difficulty === "chaos" ? DATA.chaos.gold : 1) * (1 + (equipment ? equipment.bonus("goldPct") : 0)));
     state.gold += gold;
     state.stats.samples.push({ at: state.stats.elapsedMs, gold: gold });
     state.mercenaries.forEach(function (merc) {
@@ -68,17 +72,21 @@ var Game = (function () {
         emit("levelUp", { id: merc.id, level: merc.level });
       }
     });
-    if (equipment) equipment.drop(event, !catchingUp);
+    if (equipment) equipment.drop(event, false);
+    if (expedition) expedition.bookDrop();
+    if (!catchingUp) save();
   }
   function handleBattle(event, payload) {
     if (event === "kill") grantKill(payload);
     if (event === "stageClear") {
       var index = payload.stageIndex;
-      if (!state.clearedStages.includes(index)) {
-        state.clearedStages.push(index);
-        state.squadCoins += DATA.stages[index].firstClearCoins;
+      var clears = state.difficulty === "chaos" ? state.chaosClearedStages : state.clearedStages;
+      var unlocks = state.difficulty === "chaos" ? state.chaosUnlockedStages : state.unlockedStages;
+      if (!clears.includes(index)) {
+        clears.push(index);
+        state.squadCoins += DATA.stages[index].firstClearCoins * (state.difficulty === "chaos" ? DATA.chaos.firstClearCoins : 1);
       } else if (DATA.stages[index].boss) state.squadCoins += DATA.balance.bossRepeatCoins;
-      if (index < DATA.stages.length - 1 && !state.unlockedStages.includes(index + 1)) state.unlockedStages.push(index + 1);
+      if (index < DATA.stages.length - 1 && !unlocks.includes(index + 1)) unlocks.push(index + 1);
       state.mercenaries.forEach(function (merc) {
         var definition = DATA.mercenaries.find(function (m) { return m.id === merc.id; });
         if (!merc.unlocked && state.clearedStages.includes(definition.unlockStage)) {
@@ -91,14 +99,21 @@ var Game = (function () {
     emit(event, payload);
   }
   function beginStage() {
+    var key = state.difficulty + ":" + state.currentStage;
+    if (state.statsKey !== key) {
+      if (state.statsKey) state.stageStats[state.statsKey] = state.stats;
+      state.stats = state.stageStats[key] || { goldPerSec: 0, killsPerSec: 0, elapsedMs: 0, samples: [] };
+      state.statsKey = key;
+    }
     state.battle = Battle.start(state.currentStage, state.mercenaries.filter(function (m) { return m.unlocked; }).map(function (m) {
       return Object.assign({}, m, { stats: mercenaryStats(m.id) });
-    }));
+    }), null, state.difficulty);
     state.transitionTicks = 0;
     emit("stageStart", getState());
     emit("wave", { wave: 1, total: 3, stageIndex: state.currentStage });
   }
   function step() {
+    if (state.pendingReport) return;
     state.stats.elapsedMs += DATA.tickMs;
     if (state.battle.status === "fighting") {
       Battle.tick(state.battle, handleBattle);
@@ -114,9 +129,10 @@ var Game = (function () {
       }
     }
     updateStats();
-    emit("update", getState());
+    if (!catchingUp && listeners.update && listeners.update.length) emit("update", getState());
   }
   function catchUp(elapsedMs) {
+    if (expedition && (state.pendingReport || (Number.isFinite(elapsedMs) && elapsedMs >= DATA.offline.thresholdMs))) return expedition.report(elapsedMs);
     var ticks = Number.isFinite(elapsedMs) ? Math.floor(Math.max(0, Math.min(elapsedMs, DATA.catchUpMaxMs)) / DATA.tickMs) : 0;
     catchingUp = true;
     try { for (var i = 0; i < ticks; i += 1) step(); }
@@ -127,7 +143,8 @@ var Game = (function () {
     return ticks;
   }
   function selectStage(index) {
-    if (!Number.isInteger(index) || !state.unlockedStages.includes(index)) return false;
+    var unlocks = state.difficulty === "chaos" ? state.chaosUnlockedStages : state.unlockedStages;
+    if (state.pendingReport || !Number.isInteger(index) || !unlocks.includes(index)) return false;
     state.currentStage = index;
     beginStage();
     save();
@@ -142,7 +159,8 @@ var Game = (function () {
     return true;
   }
   function save() {
-    var json = JSON.stringify({ schemaVersion: DATA.schemaVersion, savedAt: Date.now(), state: state });
+    savedAt = Date.now();
+    var json = JSON.stringify({ schemaVersion: DATA.schemaVersion, savedAt: savedAt, state: state });
     try {
       if (typeof localStorage !== "undefined") localStorage.setItem(storageKey, json);
       emit("saved", {});
@@ -157,6 +175,7 @@ var Game = (function () {
       data.state.nextItemUid = 1;
       data.state.mercenaries.forEach(function (m) { m.equipment = { weapon: null, hat: null, gloves: null, shoes: null }; });
     }
+    if (data && data.schemaVersion === 2 && data.state && data.state.schemaVersion === 2 && expedition) expedition.migrate(data);
     if (!data || data.schemaVersion !== DATA.schemaVersion) throw new Error("지원하지 않는 저장 버전");
     return data;
   }
@@ -168,13 +187,14 @@ var Game = (function () {
       !natural(candidate.rngSeed) || candidate.rngSeed > 4294967295 || !stage(candidate.currentStage) ||
       !["repeat", "challenge"].includes(candidate.mode) || !natural(candidate.transitionTicks) || candidate.transitionTicks > DATA.resultTicks) return false;
     if (!Array.isArray(candidate.unlockedStages) || !candidate.unlockedStages.includes(0) ||
-      !candidate.unlockedStages.includes(candidate.currentStage) || !candidate.unlockedStages.every(stage) ||
+      !(candidate.difficulty === "chaos" ? candidate.chaosUnlockedStages : candidate.unlockedStages).includes(candidate.currentStage) || !candidate.unlockedStages.every(stage) ||
       !Array.isArray(candidate.clearedStages) || !candidate.clearedStages.every(stage)) return false;
     if (!Array.isArray(candidate.mercenaries) || candidate.mercenaries.length !== 3 || !candidate.mercenaries.every(function (m, i) {
       return m.id === DATA.mercenaries[i].id && natural(m.level) && m.level >= 1 && m.level <= 10000 &&
         natural(m.xp) && m.xp < DATA.xpToNext(m.level) && typeof m.unlocked === "boolean";
     }) || !candidate.mercenaries[0].unlocked) return false;
     if (!equipment || !equipment.validate(candidate)) return false;
+    if (!expedition || !expedition.validate(candidate)) return false;
     var stats = candidate.stats;
     if (!stats || !finite(stats.goldPerSec) || !finite(stats.killsPerSec) || !natural(stats.elapsedMs) ||
       !Array.isArray(stats.samples) || !stats.samples.every(function (s) { return natural(s.at) && s.at <= stats.elapsedMs && natural(s.gold); })) return false;
@@ -196,16 +216,23 @@ var Game = (function () {
       Array.isArray(sim.enemies) && sim.enemies.length === DATA.stages[sim.stageIndex].waves[sim.waveIndex].length &&
       sim.enemies.every(function (u, i) { return unit(u, "enemy", i); });
   }
-  function load() {
+  function validateSave(source) {
     try {
-      var json = typeof localStorage !== "undefined" ? localStorage.getItem(storageKey) : null;
+      var data = migrate(JSON.parse(source));
+      return validate(data.state) && Number.isFinite(data.savedAt) && data.savedAt >= 0;
+    } catch (error) { return false; }
+  }
+  function load(source) {
+    try {
+      var json = source === undefined ? (typeof localStorage !== "undefined" ? localStorage.getItem(storageKey) : null) : source;
       if (!json) return false;
       var data = migrate(JSON.parse(json));
-      if (!validate(data.state) || !Number.isFinite(data.savedAt)) throw new Error("손상된 저장 데이터");
+      if (!validate(data.state) || !Number.isFinite(data.savedAt) || data.savedAt < 0) throw new Error("손상된 저장 데이터");
       state = data.state;
       savedAt = data.savedAt;
       emit("stageStart", getState());
       emit("update", getState());
+      if (state.pendingReport) emit("offlineReport", getState().pendingReport);
       return true;
     } catch (error) { emit("storageError", { message: "저장을 읽지 못했습니다. 현재 게임을 유지합니다." }); return false; }
   }
@@ -235,12 +262,25 @@ var Game = (function () {
   beginStage();
   return { on: on, rng: rng, getState: getState, getCP: getCP, step: step, catchUp: catchUp,
     mercenaryStats: mercenaryStats,
+    registerExpedition: function (factory) {
+      expedition = factory({ state: function () { return state; }, emit: emit, save: save, beginStage: beginStage,
+        equipment: function () { return equipment; }, changed: function () { save(); emit("update", getState()); } });
+      Object.assign(Game, expedition.api);
+      delete Game.registerExpedition;
+    },
     registerEquipment: function (factory) {
       equipment = factory({ state: function () { return state; }, emit: emit, save: save,
         changed: function () { save(); emit("equipmentChange", getState()); emit("update", getState()); } });
       Object.assign(Game, equipment.api);
       delete Game.registerEquipment;
     },
-    selectStage: selectStage, setMode: setMode, save: save, load: load, reset: reset,
+    selectStage: selectStage, setMode: setMode, save: save, load: load, validateSave: validateSave, reset: reset,
     init: init, pause: pause, resume: resume };
 })();
+
+// v2 network interface only. No requests, credentials, telemetry, or score submission in v1.
+var Cloud = {
+  save: async function () { throw new Error("v2"); },
+  load: async function () { throw new Error("v2"); },
+  submitScore: async function () { throw new Error("v2"); }
+};

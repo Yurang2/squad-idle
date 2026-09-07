@@ -43,6 +43,9 @@ var UI = (function () {
     group.appendChild(svgNode("ellipse", { cx: 0, cy: 4, rx: unit.type === "boss" ? 40 : 25, ry: 7, fill: "#07110d", opacity: ".4" }));
     var body = svgNode("g", { class: "unit-body", transform: unit.type === "boss" ? "scale(1.2)" : "scale(1)" });
     body.innerHTML = figure(unit.type, color);
+    body.addEventListener("animationend", function (event) {
+      if (event.target === body) body.classList.remove("lunge-left", "lunge-right", "hit-flash");
+    });
     group.appendChild(body);
     if (!locked) {
       group.appendChild(svgNode("rect", { x: -22, y: 13, width: 44, height: 4, rx: 2, fill: "#07130e" }));
@@ -90,7 +93,7 @@ var UI = (function () {
     ghost.addEventListener("animationend", function (e) { if (e.target === ghost) ghost.remove(); });
   }
   function toast(message) {
-    var surface = document.querySelector("#fusion-reveal[open]") || document.querySelector("#sheet[open]") || el("app");
+    var surface = document.querySelector("#offline-report[open]") || document.querySelector("#fusion-reveal[open]") || document.querySelector("#sheet[open]") || el("app");
     surface.appendChild(el("toast"));
     el("toast").textContent = message;
     animate(el("toast"), "visible");
@@ -111,9 +114,11 @@ var UI = (function () {
     el("timer").classList.toggle("urgent", remaining <= 10);
     el("time-fill").style.width = (remaining / stage.timeLimit * 100) + "%";
     el("wave-label").textContent = stage.boss && state.battle.waveIndex === 2 ? "보스 · " + stage.bossName : "웨이브 " + fmt(state.battle.waveIndex + 1) + " / " + fmt(stage.waves.length);
-    el("selected-stage").textContent = stageLabel(state.currentStage);
-    el("previous-stage").disabled = !state.unlockedStages.includes(state.currentStage - 1);
-    el("next-stage").disabled = !state.unlockedStages.includes(state.currentStage + 1);
+    el("selected-stage").textContent = (state.difficulty === "chaos" ? "카오스 " : "") + stageLabel(state.currentStage);
+    var unlocks = state.difficulty === "chaos" ? state.chaosUnlockedStages : state.unlockedStages;
+    el("previous-stage").disabled = !unlocks.includes(state.currentStage - 1);
+    el("next-stage").disabled = !unlocks.includes(state.currentStage + 1);
+    if (UI.updateExpedition) UI.updateExpedition(state);
     ["repeat", "challenge"].forEach(function (mode) {
       el(mode + "-mode").classList.toggle("active", state.mode === mode);
       el(mode + "-mode").setAttribute("aria-pressed", String(state.mode === mode));
@@ -128,7 +133,10 @@ var UI = (function () {
       "<span>↻</span><strong>" + (remaining <= 0 ? "시간 초과" : "용병단 전멸") + "</strong><small>체력을 회복하고 다시 도전합니다</small>";
     state.battle.units.concat(state.battle.enemies).forEach(function (unit) {
       var sprite = el("sprite-" + unit.id);
-      if (sprite && sprite.querySelector(".hp-fill")) sprite.querySelector(".hp-fill").setAttribute("width", 44 * unit.hp / unit.maxHp);
+      if (sprite && sprite.querySelector(".hp-fill")) {
+        sprite.querySelector(".hp-fill").setAttribute("width", 44 * unit.hp / unit.maxHp);
+        sprite.classList.toggle("fallen", unit.hp <= 0);
+      }
     });
     el("squad-strip").innerHTML = state.mercenaries.map(function (merc, index) {
       var definition = DATA.mercenaries[index];
@@ -151,13 +159,14 @@ var UI = (function () {
   }
   function renderSheet(state) {
     if (!activeSheet) return;
-    var signature = activeSheet + (activeSheet === "mercenaries" ? JSON.stringify([state.mercenaries, state.inventory]) :
+    var signature = activeSheet + (activeSheet === "skills" ? JSON.stringify([state.mercenaries, state.skillBooks]) : activeSheet === "mercenaries" ? JSON.stringify([state.mercenaries, state.inventory]) :
       UI.equipmentSignature ? UI.equipmentSignature(activeSheet, state) : "");
     if (signature === sheetSignature) return;
     sheetSignature = signature;
     el("sheet-title").textContent = titles[activeSheet];
     if (activeSheet === "mercenaries") el("sheet-content").innerHTML = mercenaryCards(state);
     else if (activeSheet === "equipment" || activeSheet === "fusion") UI.renderEquipmentSheet(activeSheet, state);
+    else if (activeSheet === "skills") UI.renderSkills(state);
     else if (activeSheet === "settings") {
       el("sheet-content").innerHTML = '<p class="sheet-intro">진행 상황은 자동으로 저장됩니다.</p><dl class="settings-info"><div><dt>버전</dt><dd>' + DATA.version + '</dd></div><div><dt>저장 형식 · schemaVersion</dt><dd>' + fmt(state.schemaVersion) + '</dd></div><div><dt>자동 저장 간격</dt><dd>' + fmt(DATA.autosaveMs / 1000) + '초</dd></div></dl><div class="reset-panel"><h3>새로운 원정</h3><p>모든 용병의 성장과 보유 재화를 초기화합니다.</p><button id="reset-game" class="danger-button">게임 초기화</button></div>';
       el("reset-game").addEventListener("click", function () {
@@ -167,6 +176,7 @@ var UI = (function () {
           toast("새로운 원정이 시작되었습니다");
         }
       });
+      UI.renderSaveControls();
     } else el("sheet-content").innerHTML = '<div class="placeholder"><span>◇</span><h3>준비 중</h3><p>지금은 용병단과 첫 원정을 떠나 보세요.</p><small>이 기능은 이후 업데이트에서 열립니다.</small></div>';
   }
   function openSheet(name) {

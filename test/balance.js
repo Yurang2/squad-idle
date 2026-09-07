@@ -6,7 +6,7 @@ const vm = require("node:vm");
 const results = [];
 for (const seed of [271828, ...Array.from({ length: Number(process.env.BALANCE_SEEDS || 20) - 1 }, (_, n) => (n + 1) * 7919)]) {
   const c = vm.createContext({});
-  for (const file of ["data", "battle", "game", "game-equipment"]) {
+  for (const file of ["data", "battle", "game", "game-equipment", "game-expedition"]) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, "../js/" + file + ".js"), "utf8"), c);
   }
   if (process.env.EQUIPMENT_SCALE) c.DATA.equipmentSlots.forEach(s => {

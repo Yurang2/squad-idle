@@ -1,8 +1,30 @@
 "use strict";
 
 var DATA = {
-  version: "0.2.0 · P2",
-  schemaVersion: 2,
+  version: "0.3.0 · P3",
+  schemaVersion: 3,
+  offline: { thresholdMs: 60000, maxMs: 86400000, efficiency: 0.7, fallbackKillsPerSec: 0.1, maxRolls: 500 },
+  chaos: { hp: 8, atk: 5, gold: 4, firstClearCoins: 3 },
+  skillBookChance: 0.03,
+  invincibleChance: 0.02,
+  invincibleDuration: 1,
+  skillBookCost: function (level) { return level; },
+  defaultSkills: { warrior: ["taunt", "guard", "smash"], archer: ["volley", "snipe", "poison"], mage: ["heal", "meteor", "resurrect"] },
+  // DECISION: Slot order is priority. Power/duration scales 50% per level; revival scales its cooldown instead.
+  skills: [
+    { id: "taunt", owner: "warrior", name: "도발", desc: "4초간 적의 공격을 자신에게 집중시킵니다.", cooldown: 12, effect: { type: "taunt", duration: 4 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "guard", owner: "warrior", name: "방어태세", desc: "5초간 방어력이 100% 증가합니다.", cooldown: 12, effect: { type: "guard", duration: 5, power: 1 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "smash", owner: "warrior", name: "강타", desc: "공격력 300%의 일격을 가합니다.", cooldown: 6, effect: { type: "hit", power: 3 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "regen", owner: "warrior", name: "재생", desc: "5초간 매초 최대 HP의 4%를 회복합니다.", cooldown: 14, effect: { type: "regen", duration: 5, power: 0.04 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "volley", owner: "archer", name: "연사", desc: "공격력 90%로 세 번 연속 공격합니다.", cooldown: 5, effect: { type: "multi", power: 0.9, hits: 3 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "snipe", owner: "archer", name: "저격", desc: "공격력 200%의 확정 치명타를 가합니다.", cooldown: 9, effect: { type: "crit", power: 2 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "poison", owner: "archer", name: "독화살", desc: "일격 후 6초간 매초 공격력 45%의 독 피해를 줍니다.", cooldown: 10, effect: { type: "dot", power: 0.45, duration: 6 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "dodge", owner: "archer", name: "회피", desc: "4초간 50% 확률로 적의 공격을 회피합니다.", cooldown: 12, effect: { type: "dodge", power: 0.5, duration: 4 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "heal", owner: "mage", name: "힐", desc: "모든 생존 동료의 최대 HP를 25% 회복합니다.", cooldown: 8, effect: { type: "heal", power: 0.25 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "meteor", owner: "mage", name: "메테오", desc: "모든 적에게 공격력 250%의 피해를 줍니다.", cooldown: 10, effect: { type: "aoe", power: 2.5 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "resurrect", owner: "mage", name: "천국의 문", desc: "전투당 한 번, 쓰러진 동료 한 명을 HP 30%로 부활시킵니다.", cooldown: 45, effect: { type: "resurrect", power: 0.3 }, levelScale: 0.5, maxLevel: 10 },
+    { id: "shield", owner: "mage", name: "마나실드", desc: "6초간 최대 HP의 40%만큼 피해를 흡수합니다.", cooldown: 12, effect: { type: "shield", duration: 6, power: 0.4 }, levelScale: 0.5, maxLevel: 10 }
+  ],
   tickMs: 100,
   autosaveMs: 3000,
   catchUpMaxMs: 60000,
@@ -73,7 +95,7 @@ var DATA = {
     { min: 20, max: 28, chance: 0.08, tierWeights: { 3: 60, 4: 32, 5: 8 }, rarityWeights: [68, 25, 6, 1] },
     { min: 29, max: 29, chance: 0.08, bossChance: 1, guaranteedTier: 4, tierWeights: { 4: 100 }, rarityWeights: [45, 39, 13, 3] }
   ],
-  // P3 data placeholder only: no chaos mode is accessible in P2.
+  // DECISION: Chaos bosses use the same T5–8 table without a normal-mode forced tier.
   chaosDropTable: { chance: 0.08, bossChance: 1, tierWeights: { 5: 55, 6: 30, 7: 12, 8: 3 }, rarityWeights: [40, 40, 16, 4] },
   fusionCost: function (tier) { return 100 * 2 ** (tier - 1); },
   sellPrice: function (tier, rarity) { return 20 * 2 ** (tier - 1) * DATA.sellMultipliers[rarity]; },
