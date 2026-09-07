@@ -1,0 +1,22 @@
+You are implementing phase **P3** of the game in `GAME_DESIGN.md` (sections 6 스킬, 8 오프라인 원정, 4 카오스 모드, 10 저장). Read `GAME_DESIGN.md`, `AGENTS.md`, and `CHANGELOG.md` first. P1 and P2 are done, reviewed, and browser-verified: keep their structure and public function names. Follow every rule in `AGENTS.md`.
+
+## P3 scope — the "오프라인 보상 수확" hook plus skills, chaos, export. Implement ALL of it.
+
+1. **오프라인 원정 보고서** (replaces P1's `catchUp` behavior):
+   - On `init()` (and on return from `visibilitychange` hidden ≥ 60s), compute elapsed since `savedAt`, cap 24h. If elapsed < 60s keep the old fast-forward behavior.
+   - Expected rates come from the rolling stats (`goldPerSec`, `killsPerSec`) of the **repeat stage** the player left running; if stats are empty, derive from the stage's enemy gold and a conservative kill rate. Offline efficiency 70%.
+   - Rewards: gold = rate × elapsed × 0.7; kills = killsPerSec × elapsed × 0.7; drops rolled per kill using the P2 drop table for that stage (cap the number of item rolls at 500 per report for performance; scale probability if more kills). Mercenary XP too.
+   - Emit `offlineReport {elapsedMs, gold, kills, xp, items[]}`. Apply rewards only when the player taps "수확" (so they see the report), but persist a pending report in the save so closing the app doesn't lose it.
+   - **UI**: full-screen overlay "원정 보고서": "N시간 M분 동안 용병단이 싸웠습니다", gold count-up animation, then item cards flipped one by one with 200ms stagger (tap anywhere to skip to all-revealed), unique+ gets the strong flash from P2. Big [수확하기] button. Inventory-full handling reuses P2 rules.
+2. **스킬**: per-mercenary 4 skills in `DATA` (warrior: 도발, 방어태세, 강타, 재생 / archer: 연사, 저격, 독화살, 회피 / mage: 힐, 메테오, 천국의 문(부활, long cd), 마나실드), each `{id, owner, name, desc, cooldown, effect, levelScale, maxLevel 10}`. 3 active slots per mercenary chosen by player (defaults set). Battle: on each tick a unit uses the highest-priority ready skill else basic attack; implement effects in `battle.js` (taunt/aggro, temporary def buff, big hit, heal-over-time, multi-hit, crit-guaranteed hit, DoT, dodge buff, party heal, AoE, resurrect one dead ally with 30% HP, shield absorb). Now also apply the P2 potential `invincibleOnHit` (2% chance, 1s). **스킬북** drop item (separate from equipment, 3% drop, stored as counts per mercenary class) levels a skill by 1 per book with cost rising by level. Skill tab UI: mercenary selector, 4 skill cards with level/desc/cooldown, tap to toggle into one of 3 slots, [레벨업 (스킬북 n)].
+3. **카오스 모드**: unlocked when stage 3-10 is cleared. A mode toggle in the stage selector (일반/카오스). Chaos stages are the same 30 with enemy HP ×8, ATK ×5, gold ×4, and a chaos drop table (tiers 5–8 weighted up). Chaos first-clear grants squad coins ×3. No chaos shop (v2).
+4. **저장**: `schemaVersion: 3` with migration from v2 (and chained from v1). 설정 tab: [세이브 내보내기] shows the JSON in a textarea with a 복사 button (use `navigator.clipboard` with fallback select), [세이브 불러오기] textarea + 적용 button with validation and confirm; [초기화] stays. Add an empty `Cloud` stub object in `js/game.js` exports: `{ save: async () => {throw new Error('v2')}, load, submitScore }` documented for v2 — this is the one allowed 5th global.
+5. **Balance & polish**: make sure a full run 1-1 → 3-10 is achievable over several sessions with equipment + skills (write a headless simulation test that plays optimally-ish: auto-equip best items, auto-fuse, and asserts 3-10 clears within 6 simulated hours of battle time). Add subtle idle animations (breathing) to sprites if cheap.
+6. **Tests**: keep all passing; add offline report math (rates × time × 0.7, 24h cap, pending report persists through save/load), skill cooldown/priority, resurrect once per battle, chaos multipliers and unlock, v2→v3 migration and v1→v3 chained, export/import round trip, the long-run simulation above.
+7. `CHANGELOG.md` — "0.3.0 · P3" section with DECISION: notes.
+
+## Definition of done
+- `node --check js/*.js` clean, `node test/run.js` exit 0.
+- Browser: setting `savedAt` back by 3 hours in localStorage and reloading shows the 원정 보고서 overlay with gold count-up and item flips; tapping 수확 applies rewards; skills fire visibly in battle (a small label above the unit); chaos toggle appears only after 3-10; export/import works; no console errors; no horizontal scroll at 375px.
+
+Do not add Capacitor/build tooling (P4). Do not ask questions; decide and record.

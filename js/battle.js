@@ -19,7 +19,7 @@ var Battle = (function () {
   function start(stageIndex, squad, emit) {
     var sim = { stageIndex: stageIndex, ticks: 0, waveIndex: 0, status: "fighting", enemies: [],
       units: squad.map(function (merc) {
-        var stats = DATA.mercenaryStats(merc.id, merc.level);
+        var stats = merc.stats || DATA.mercenaryStats(merc.id, merc.level);
         return Object.assign({ id: merc.id, side: "mercenary", type: merc.id,
           position: DATA.mercenaries.find(function (m) { return m.id === merc.id; }).position,
           maxHp: stats.hp, cooldown: 0, skills: [null, null, null] }, stats);

@@ -35,6 +35,7 @@ async function main() {
   await once(server, "listening");
   const browser = spawn(browserPath, ["--headless=new", "--remote-debugging-port=0", "--user-data-dir=" + profile,
     "--no-first-run", "--no-default-browser-check", "--disable-gpu", "--in-process-gpu",
+    ...(process.env.BROWSER_NO_SANDBOX === "1" ? ["--no-sandbox"] : []),
     ...(process.env.BROWSER_SINGLE_PROCESS === "1" ? ["--single-process"] : []),
     "about:blank"], { stdio: ["ignore", "ignore", "pipe"], windowsHide: true });
   let browserLog = "";
@@ -46,7 +47,7 @@ async function main() {
     assert.ok(fs.existsSync(portFile), "Browser did not start its debugging endpoint");
     const endpoint = fs.readFileSync(portFile, "utf8").trim().split(/\r?\n/);
     socket = new WebSocket("ws://127.0.0.1:" + endpoint[0] + endpoint[1]);
-    await once(socket, "open");
+    await Promise.race([once(socket, "open"), delay(10000).then(() => { if (socket.readyState !== WebSocket.OPEN) throw new Error("Browser WebSocket did not open"); })]);
     let id = 0;
     let sessionId;
     const pending = new Map();
@@ -113,7 +114,8 @@ async function main() {
     await evaluate("document.getElementById('close-sheet').click()");
     for (const tab of ["equipment", "fusion", "skills"]) {
       await evaluate("document.querySelector('[data-tab=" + tab + "]').click()");
-      assert.ok(await evaluate("document.getElementById('sheet').open && document.getElementById('sheet-content').textContent.includes('준비 중')"));
+      const selector = { equipment: ".inventory-grid", fusion: ".fusion-table", skills: ".placeholder" }[tab];
+      assert.ok(await evaluate("document.getElementById('sheet').open && !!document.querySelector('" + selector + "')"));
       await evaluate("document.getElementById('close-sheet').click()");
     }
     await evaluate("document.querySelector('[data-tab=settings]').click()");
@@ -126,6 +128,7 @@ async function main() {
     await evaluate("document.getElementById('close-sheet').click()");
     console.log("PASS mercenary cards, equipment slots, placeholders, settings and reset confirmation");
 
+    if (process.env.BROWSER_FAST === "1") await evaluate("while(Game.getState().currentStage === 0) Game.step()");
     for (let i = 0; i < 240; i++) {
       if (await evaluate("Game.getState().currentStage === 1")) break;
       await delay(100);
@@ -145,12 +148,14 @@ async function main() {
     assert.equal(await evaluate("document.getElementById('app').getBoundingClientRect().width"), 480);
     console.log("PASS repeat, arrows, 320px no overflow and desktop 480px maximum width");
 
+    await require("./browser-equipment")({ evaluate, command, screenshot, delay });
+
     await evaluate("Game.pause();Game.save()");
     const before = await evaluate("({gold:Game.getState().gold,seed:Game.getState().rngSeed})");
     await command("Page.reload");
     await delay(250);
     assert.ok(await evaluate("Game.getState().gold >= " + before.gold));
-    assert.equal(await evaluate("Game.getState().mode"), "repeat");
+    assert.equal(await evaluate("Game.getState().mode"), "challenge");
     await evaluate("Game.pause()");
     const errors = events.filter(e => e.method === "Runtime.exceptionThrown" ||
       (e.method === "Runtime.consoleAPICalled" && e.params.type === "error") ||
@@ -159,6 +164,7 @@ async function main() {
     console.log("PASS reload persistence; zero browser console/runtime errors");
     console.log("Screenshots: " + artifacts);
   } catch (error) {
+    console.log("Screenshots: " + artifacts);
     console.error(browserLog.slice(-2500));
     throw error;
   } finally {

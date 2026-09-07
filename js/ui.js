@@ -90,6 +90,8 @@ var UI = (function () {
     ghost.addEventListener("animationend", function (e) { if (e.target === ghost) ghost.remove(); });
   }
   function toast(message) {
+    var surface = document.querySelector("#fusion-reveal[open]") || document.querySelector("#sheet[open]") || el("app");
+    surface.appendChild(el("toast"));
     el("toast").textContent = message;
     animate(el("toast"), "visible");
   }
@@ -97,7 +99,8 @@ var UI = (function () {
     latestState = state;
     var stage = DATA.stages[state.currentStage];
     var remaining = Math.max(0, stage.timeLimit - state.battle.ticks / 10);
-    el("cp").textContent = fmt(Game.getCP());
+    if (UI.updateCP) UI.updateCP(Game.getCP());
+    else el("cp").textContent = fmt(Game.getCP());
     el("gold").textContent = fmt(state.gold);
     el("coins").textContent = fmt(state.squadCoins);
     el("region-name").textContent = DATA.regions[stage.region].name;
@@ -133,26 +136,28 @@ var UI = (function () {
       return '<div class="squad-member ' + (merc.unlocked ? "" : "not-recruited") + '"><span class="member-dot" style="background:' + definition.color + '"></span><span>' + definition.name + '</span><small>' +
         (merc.unlocked ? (unit && unit.hp <= 0 ? "전투 불능" : "Lv. " + fmt(merc.level)) : stageLabel(definition.unlockStage) + " 해금") + "</small></div>";
     }).join("");
-    if (activeSheet === "mercenaries") renderSheet(state);
+    if (activeSheet) renderSheet(state);
   }
   function mercenaryCards(state) {
     return '<p class="sheet-intro">함께 싸우고, 함께 성장합니다.</p>' + state.mercenaries.map(function (merc, index) {
       var def = DATA.mercenaries[index];
-      var stats = DATA.mercenaryStats(merc.id, merc.level);
+      var stats = Game.mercenaryStats(merc.id);
       return '<article class="merc-card ' + (merc.unlocked ? "" : "locked-card") + '"><div class="merc-card-heading"><svg viewBox="-42 -88 96 104" aria-hidden="true">' + figure(merc.id, def.color) + '</svg><div><p>' + def.role + '</p><h3>' + def.name + '</h3></div><strong>' + (merc.unlocked ? 'Lv. ' + fmt(merc.level) : '미합류') + '</strong></div>' +
         (merc.unlocked ? '<div class="xp-label"><span>경험치</span><span>' + fmt(merc.xp) + ' / ' + fmt(DATA.xpToNext(merc.level)) + '</span></div><div class="xp-track"><div style="width:' + (merc.xp / DATA.xpToNext(merc.level) * 100) + '%"></div></div>' : '<p class="unlock-note">' + stageLabel(def.unlockStage) + ' 클리어 시 합류</p>') +
         '<dl class="merc-stats"><div><dt>HP</dt><dd>' + fmt(stats.hp) + '</dd></div><div><dt>공격력</dt><dd>' + fmt(stats.atk) + '</dd></div><div><dt>방어력</dt><dd>' + fmt(stats.def) + '</dd></div><div><dt>공격속도</dt><dd>' + fmt(stats.attackSpeed) + '/초</dd></div><div><dt>치명타 확률</dt><dd>' + fmt(stats.critChance * 100) + '%</dd></div><div><dt>치명타 피해</dt><dd>' + fmt(stats.critDamage * 100) + '%</dd></div></dl><div class="equipment-slots">' + DATA.equipmentSlots.map(function (slot) {
-          return '<div class="equipment-slot" aria-label="' + slot.name + ' 빈 슬롯"><span>' + slot.icon + '</span><small>' + slot.name + '</small><em>비어 있음</em></div>';
+          return UI.equipmentSlot(merc, slot, state);
         }).join("") + '</div></article>';
     }).join("");
   }
   function renderSheet(state) {
     if (!activeSheet) return;
-    var signature = activeSheet + (activeSheet === "mercenaries" ? JSON.stringify(state.mercenaries) : "");
+    var signature = activeSheet + (activeSheet === "mercenaries" ? JSON.stringify([state.mercenaries, state.inventory]) :
+      UI.equipmentSignature ? UI.equipmentSignature(activeSheet, state) : "");
     if (signature === sheetSignature) return;
     sheetSignature = signature;
     el("sheet-title").textContent = titles[activeSheet];
     if (activeSheet === "mercenaries") el("sheet-content").innerHTML = mercenaryCards(state);
+    else if (activeSheet === "equipment" || activeSheet === "fusion") UI.renderEquipmentSheet(activeSheet, state);
     else if (activeSheet === "settings") {
       el("sheet-content").innerHTML = '<p class="sheet-intro">진행 상황은 자동으로 저장됩니다.</p><dl class="settings-info"><div><dt>버전</dt><dd>' + DATA.version + '</dd></div><div><dt>저장 형식 · schemaVersion</dt><dd>' + fmt(state.schemaVersion) + '</dd></div><div><dt>자동 저장 간격</dt><dd>' + fmt(DATA.autosaveMs / 1000) + '초</dd></div></dl><div class="reset-panel"><h3>새로운 원정</h3><p>모든 용병의 성장과 보유 재화를 초기화합니다.</p><button id="reset-game" class="danger-button">게임 초기화</button></div>';
       el("reset-game").addEventListener("click", function () {
@@ -166,9 +171,10 @@ var UI = (function () {
   }
   function openSheet(name) {
     activeSheet = name;
+    if (UI.sheetOpened) UI.sheetOpened(name);
     sheetSignature = "";
     renderSheet(latestState);
-    el("sheet").showModal();
+    if (!el("sheet").open) el("sheet").showModal();
     document.querySelectorAll("[data-tab]").forEach(function (button) { button.classList.toggle("selected", button.dataset.tab === name); });
   }
   function init() {
@@ -189,6 +195,7 @@ var UI = (function () {
     el("close-sheet").addEventListener("click", function () { el("sheet").close(); });
     el("sheet").addEventListener("click", function (event) { if (event.target === el("sheet") && event.clientY < el("sheet").getBoundingClientRect().top) el("sheet").close(); });
     el("sheet").addEventListener("close", function () {
+      if (el("sheet").open) return;
       activeSheet = null;
       document.querySelectorAll("[data-tab]").forEach(function (button) { button.classList.remove("selected"); });
     });
@@ -204,7 +211,6 @@ var UI = (function () {
     if (!document.hidden) Game.resume();
     else hiddenAt = Date.now();
   }
-  return { fmt: fmt, init: init };
+  return { fmt: fmt, init: init, openSheet: openSheet, toast: toast,
+    refreshSheet: function () { sheetSignature = ""; renderSheet(Game.getState()); } };
 })();
-
-UI.init();
