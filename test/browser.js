@@ -139,7 +139,7 @@ async function main() {
     await delay(500); await screenshot("375-dex");
     console.log("PASS roster detail, party toggles and all 18 dex states/silhouettes");
     await evaluate("document.getElementById('close-sheet').click();UI.openSheet('settings');document.getElementById('export-save').click()");
-    assert.equal(await evaluate("JSON.parse(document.getElementById('save-json').value).schemaVersion"),5);
+    assert.equal(await evaluate("JSON.parse(document.getElementById('save-json').value).schemaVersion"),6);
     await evaluate("document.getElementById('save-json').value='bad';document.getElementById('import-save').click()");
     assert.ok(await evaluate("document.getElementById('import-status').textContent.includes('유효한')"));
     await evaluate("document.getElementById('close-sheet').click();Game.catchUp(3600000)");
@@ -152,7 +152,7 @@ async function main() {
     assert.ok(await evaluate("Game.validateSave(Game.save())"));
     await evaluate("Game.save()");await command("Page.reload");await delay(300);await evaluate("Game.pause()");
     assert.ok(await evaluate("Game.getState().roster.length>3 && Game.validateSave(Game.save())"));
-    console.log("PASS offline report/harvest, settings, lifecycle, reload and schema-5 persistence");
+    console.log("PASS offline report/harvest, settings, lifecycle, reload and schema-6 persistence");
     await evaluate(`(()=>{const d=JSON.parse(Game.save());d.state.tamerXP=DATA.rankXP[9];d.state.roster.forEach((m,i)=>m.party=i<5?i:null);Game.load(JSON.stringify(d));Game.selectStage(0);})()`);
     assert.equal(await evaluate("document.querySelectorAll('#party-layer .unit').length"),5);
     await screenshot("375-five-party");
@@ -161,6 +161,7 @@ async function main() {
     await command("Emulation.setDeviceMetricsOverride",{width:1280,height:900,deviceScaleFactor:1,mobile:false});
     assert.equal(await evaluate("document.getElementById('app').getBoundingClientRect().width"),480);
     await require("./browser-m2.js")({evaluate,command,screenshot,delay});
+    await require("./browser-m3.js")({evaluate,command,screenshot,delay});
     const errors=events.filter(e=>e.method==='Runtime.exceptionThrown'||(e.method==='Runtime.consoleAPICalled'&&e.params.type==='error')||(e.method==='Log.entryAdded'&&e.params.entry.level==='error'));
     assert.deepEqual(errors,[]);console.log("PASS zero console/runtime/asset errors; desktop 480px maximum");
     console.log("Screenshots: "+artifacts);

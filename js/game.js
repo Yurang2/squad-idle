@@ -1,7 +1,7 @@
 "use strict";
 var Game = (function () {
   var state, listeners = {}, timer = null, autosave = null, catchingUp = false, savedAt = 0;
-  var storageKey = "squad_v1", monsters, expedition, validator, progression;
+  var storageKey = "squad_v1", monsters, expedition, validator, progression, camp;
   function on(event, fn) {
     if (!listeners[event]) listeners[event] = [];
     listeners[event].push(fn);
@@ -12,7 +12,8 @@ var Game = (function () {
   }
   function fresh(seed) {
     return { schemaVersion: DATA.schemaVersion, rngSeed: (seed === undefined ? DATA.defaultSeed : seed) >>> 0,
-      gold: 0, coins: 0, materials: { enhanceStone: 0 }, accessories: [], nextAccessoryUid: 1,
+      gold: 0, coins: 0, materials: { enhanceStone: 0, wood: 0, stone: 0, essence: 0 }, accessories: [], nextAccessoryUid: 1,
+      camp: freshCamp(),
       tamerXP: 0, roster: ["dewslime", "mistfox"].map(function (id, i) {
         return { uid: "monster-" + (i + 1), speciesId: id, rarity: "rare", level: 1, xp: 0,
           traits: [], enhance: 0, evo: 1, party: i, camp: null, locked: false, accessory: null };
@@ -21,6 +22,10 @@ var Game = (function () {
       })), unlockedStages: [0], clearedStages: [], currentStage: 0, mode: "challenge", transitionTicks: 0,
       stats: { goldPerSec: 0, killsPerSec: 0, elapsedMs: 0, samples: [] }, statsKey: 0, stageStats: {},
       pendingReport: null, battle: null };
+  }
+  function freshCamp() {
+    return { levels: {campfire:1,pen:1,workshop:1,altar:1,storehouse:1,garden:1},
+      production: {wood:0,stone:0,enhanceStone:0,gold:0} };
   }
   function rng() {
     state.rngSeed = (Math.imul(state.rngSeed, 1664525) + 1013904223) >>> 0;
@@ -45,6 +50,7 @@ var Game = (function () {
     state.gold += gold; state.stats.samples.push({ at: state.stats.elapsedMs, gold: gold });
     monsters.grantXP(DATA.balance.xpPerKill * (event.boss ? DATA.balance.bossXpMultiplier : 1));
     if (progression) progression.drop(event);
+    if (camp) camp.drop(event);
   }
   function markSeen() {
     state.battle.enemies.forEach(function (u) { state.dex[u.speciesId].seen = true; });
@@ -82,6 +88,7 @@ var Game = (function () {
   }
   function step() {
     if (state.pendingReport) return;
+    if (camp) camp.accrue(DATA.tickMs);
     state.stats.elapsedMs += DATA.tickMs;
     if (state.battle.status === "fighting") {
       Battle.tick(state.battle, handleBattle);
@@ -124,7 +131,7 @@ var Game = (function () {
   }
   function migrate(data) {
     // DECISION: v1–v3 equipment/mercenary saves cannot represent monster identities; explicitly start fresh.
-    if (!data || ![4, 5].includes(data.schemaVersion) || data.state.schemaVersion !== data.schemaVersion) throw new Error("몬스터 조련단은 새 저장 형식을 사용합니다.");
+    if (!data || ![4, 5, 6].includes(data.schemaVersion) || !data.state || data.state.schemaVersion !== data.schemaVersion) throw new Error("몬스터 조련단은 새 저장 형식을 사용합니다.");
     if (data.schemaVersion === 4) {
       var s = data.state;
       s.schemaVersion = data.schemaVersion = 5;
@@ -135,6 +142,16 @@ var Game = (function () {
         m.locked = false; m.accessory = null;
       });
       if (s.pendingReport) { s.pendingReport.materials = { enhanceStone: 0 }; s.pendingReport.accessories = []; }
+    }
+    if (data.schemaVersion === 5) {
+      var v5 = data.state;
+      v5.schemaVersion = data.schemaVersion = 6; v5.camp = freshCamp();
+      Object.assign(v5.materials, {wood:0,stone:0,essence:0});
+      if (v5.pendingReport) {
+        Object.assign(v5.pendingReport.materials, {wood:0,stone:0,essence:0});
+        v5.pendingReport.campOutput = {wood:0,stone:0,enhanceStone:0,gold:0};
+      }
+      // DECISION: Frozen v5 bags retain their exact rewards; no retroactive camp output.
     }
     return data;
   }
@@ -171,7 +188,7 @@ var Game = (function () {
     emit("update", getState());
   }
   function host() { return { state: function () { return state; }, emit: emit, save: save, beginStage: beginStage, changed: changed,
-    monsters: function () { return monsters; }, progression: function () { return progression; } }; }
+    monsters: function () { return monsters; }, progression: function () { return progression; }, camp: function () { return camp; } }; }
   state = fresh();
   return { on: on, rng: rng, getState: getState, getCP: getCP, step: step, catchUp: catchUp,
     selectStage: selectStage, setMode: setMode, save: save, load: load, validateSave: validateSave, reset: reset,
@@ -179,6 +196,7 @@ var Game = (function () {
     registerMonsters: function (factory) { monsters = factory(host()); Object.assign(Game, monsters.api); delete Game.registerMonsters; beginStage(); },
     registerExpedition: function (factory) { expedition = factory(host()); Object.assign(Game, expedition.api); delete Game.registerExpedition; },
     registerProgression: function (factory) { progression = factory(host()); Object.assign(Game, progression.api); delete Game.registerProgression; },
+    registerCamp: function (factory) { camp = factory(host()); Object.assign(Game, camp.api); delete Game.registerCamp; },
     registerValidation: function (factory) { validator = factory(host()); delete Game.registerValidation; }
   };
 })();

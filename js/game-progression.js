@@ -7,15 +7,15 @@ Game.registerProgression(function (host) {
   function idle() { return !host.state().pendingReport; }
   function protectedMonster(m) {
     // DECISION: Also protect the current battle snapshot after a pending formation change.
-    return m.locked || m.party !== null || m.accessory !== null || host.state().battle.units.some(function (u) { return u.id === m.uid; });
+    return m.locked || m.camp !== null || m.party !== null || m.accessory !== null || host.state().battle.units.some(function (u) { return u.id === m.uid; });
   }
   function evolve(uids) {
     if (!idle() || !Array.isArray(uids) || uids.length !== 3 || new Set(uids).size !== 3) return false;
     var ms = uids.map(monster);
-    if (ms.some(function (m) { return !m || m.locked; }) || ms[0].evo >= DATA.evolution.max ||
+    if (ms.some(function (m) { return !m || m.locked || m.camp !== null; }) || ms[0].evo >= DATA.evolution.max ||
       ms.some(function (m) { return m.speciesId !== ms[0].speciesId || m.evo !== ms[0].evo; })) return false;
     var rank = Math.max.apply(null, ms.map(function (m) { return DATA.rarityOrder.indexOf(m.rarity); }));
-    var bump = Game.rng() < DATA.evolution.bumpRate && rank < 3;
+    var bump = Game.rng() < Game.campEffects().evolutionBump && rank < 3;
     var result = Game.rollMonster(ms[0].speciesId, DATA.rarityOrder[rank + (bump ? 1 : 0)]);
     result.evo = ms[0].evo + 1;
     result.level = Math.max.apply(null, ms.map(function (m) { return m.level; }));
@@ -43,7 +43,7 @@ Game.registerProgression(function (host) {
   }
   function evolutionGroups() {
     var groups = {};
-    host.state().roster.filter(function (m) { return m.evo < 3 && !m.locked; }).sort(function (a,b) {
+    host.state().roster.filter(function (m) { return m.evo < 3 && !m.locked && m.camp === null; }).sort(function (a,b) {
       return a.level - b.level || Number(a.uid.slice(8)) - Number(b.uid.slice(8));
     }).forEach(function (m) { var key = m.speciesId + ":" + m.evo; (groups[key] || (groups[key] = [])).push(m); });
     return copy(groups);
@@ -61,7 +61,7 @@ Game.registerProgression(function (host) {
   function enhance(uid) {
     var m = monster(uid), s = host.state();
     if (!idle() || !m || m.enhance >= DATA.enhancement.max) return false;
-    var cost = DATA.enhanceCost(m.enhance);
+    var cost = Game.enhanceCost(m.enhance);
     if (s.gold < cost.gold || s.materials.enhanceStone < cost.stones) return false;
     s.gold -= cost.gold; s.materials.enhanceStone -= cost.stones; m.enhance++;
     host.changed(); return copy(m);

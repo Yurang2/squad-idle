@@ -1,7 +1,7 @@
 "use strict";
 var UI = (function () {
   var svgNS = "http://www.w3.org/2000/svg", activeSheet = null, hiddenAt = null, sheetSignature = "", latestState;
-  var titles = { monsters: "몬스터", dex: "도감", settings: "설정" };
+  var titles = { monsters: "몬스터", dex: "도감", settings: "설정", facility: "캠프 시설" };
   function el(id) { return document.getElementById(id); }
   function fmt(n) {
     if (!Number.isFinite(n)) return "0";
@@ -80,8 +80,8 @@ var UI = (function () {
     ["repeat","challenge"].forEach(function (mode) { el(mode+"-mode").classList.toggle("active",state.mode===mode); el(mode+"-mode").setAttribute("aria-pressed",String(state.mode===mode)); });
     el("mode-hint").textContent=state.mode==="repeat" ? "이곳에서 동료를 만나고 함께 성장합니다" : "클리어하면 다음 구역으로 나아갑니다";
     el("gold-rate").textContent=fmt(state.stats.goldPerSec);
-    var t=state.battle.tamer, full=state.roster.length>=DATA.rosterCap;
-    el("capture-status").textContent=full ? "보유 한도 도달 · "+fmt(DATA.rosterCap)+"마리" : t.captureCooldown>0 ? "포획 준비 중 · "+fmt(Math.ceil(t.captureCooldown))+"초" : "HP "+fmt(30)+"% 미만이면 자동 포획";
+    var t=state.battle.tamer, full=state.roster.length>=Game.campEffects().rosterCap;
+    el("capture-status").textContent=full ? "보유 한도 도달 · "+fmt(Game.campEffects().rosterCap)+"마리" : t.captureCooldown>0 ? "포획 준비 중 · "+fmt(Math.ceil(t.captureCooldown))+"초" : "HP "+fmt(30)+"% 미만이면 자동 포획";
     el("tamer-skills").innerHTML=DATA.tamerSkills.map(function(s) { return '<span>'+s.name+'<small>'+(s.id==="captureBoost" && t.captureBoost>1 ? "다음 포획 강화" : t.cooldowns[s.id]>0 ? fmt(Math.ceil(t.cooldowns[s.id]))+"초" : "준비됨")+'</small></span>'; }).join("");
     el("battle-result").classList.toggle("shown",state.battle.status!=="fighting");
     el("battle-result").innerHTML=state.battle.status==="clear" ? "<strong>구역 탐험 완료</strong><small>다음 인연을 찾아 떠납니다</small>" : "<strong>잠시 숨을 고릅니다</strong><small>체력을 회복하고 다시 도전합니다</small>";
@@ -92,22 +92,26 @@ var UI = (function () {
     el("squad-strip").innerHTML=state.roster.filter(function(m){return m.party!==null;}).sort(function(a,b){return a.party-b.party;}).map(function(m){
       return '<div class="squad-member"><img src="'+DATA.species[m.speciesId].art+'" alt="'+DATA.species[m.speciesId].name+'"><span><small>Lv. '+fmt(m.level)+'</small></span></div>';
     }).join("")+ '<span class="squad-member"><span>파티<small>'+fmt(state.roster.filter(function(m){return m.party!==null;}).length)+' / '+fmt(Game.partySlots())+'</small></span></span>';
+    if(UI.campVisible)UI.updateCamp(state);
     if(activeSheet)renderSheet(state);
   }
   function renderSheet(state) {
     if(!activeSheet)return;
-    var signature=activeSheet+(activeSheet==="settings" ? "" : JSON.stringify([state.roster,state.dex,state.accessories,state.materials,state.gold,state.coins,Game.getRank()]));
+    var signature=activeSheet+(activeSheet==="settings" ? "" : JSON.stringify([state.roster,state.dex,state.accessories,state.materials,state.gold,state.coins,state.camp.levels,Game.getRank()]));
     if(signature===sheetSignature)return; sheetSignature=signature;
     el("sheet-title").textContent=titles[activeSheet];
     if(activeSheet==="monsters")UI.renderMonsters(state);
     if(activeSheet==="dex")UI.renderDex();
     if(activeSheet==="settings")UI.renderSaveControls();
+    if(activeSheet==="facility")UI.renderCampSheet(state);
   }
   function openSheet(name) {
-    if(name==="adventure") { el("sheet").close(); return; }
+    if(name==="camp" || name==="adventure") {
+      activeSheet=null; el("sheet").close(); UI.showCamp(name==="camp"); return;
+    }
     activeSheet=name; UI.selectedMonster=null; UI.monsterView=null; sheetSignature=""; renderSheet(Game.getState());
     if(!el("sheet").open)el("sheet").showModal();
-    document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab===name);});
+    document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab===(name==="facility"?"camp":name));});
   }
   function setActive(active) {
     if(!active) { if(hiddenAt===null) { hiddenAt=Date.now(); Game.pause(); } }
@@ -120,7 +124,7 @@ var UI = (function () {
   }
   function init() {
     document.querySelectorAll("[data-icon]").forEach(function(n){n.innerHTML=UI.icon(n.dataset.icon);});
-    UI.initArt(); UI.initExpedition(); UI.initProgression();
+    UI.initArt(); UI.initExpedition(); UI.initProgression(); UI.initCamp();
     Game.on("update",update); Game.on("stageStart",function(s){drawScene(s,true);});
     Game.on("wave",function(){drawScene(Game.getState(),false);}); Game.on("hit",hit); Game.on("unitDeath",death);
     Game.on("rankUp",function(e){toast("조련사 랭크 "+fmt(e.rank)+" · 파티 "+fmt(e.slots)+"슬롯");});
@@ -133,7 +137,7 @@ var UI = (function () {
     el("close-sheet").onclick=function(){el("sheet").close();};
     el("sheet").addEventListener("close",function(){
       if(el("sheet").open)return; activeSheet=null; el("app").appendChild(el("toast"));
-      document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab==="adventure");});
+      document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("selected",b.dataset.tab===(UI.campVisible?"camp":"adventure"));});
     });
     document.addEventListener("visibilitychange",function(){setActive(!document.hidden);});
     window.addEventListener("pagehide",function(){setActive(false);});

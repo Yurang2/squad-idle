@@ -1,7 +1,7 @@
 "use strict";
 
 var DATA = {
-  version: "0.6.0 · M2", schemaVersion: 5,
+  version: "0.7.0 · M3", schemaVersion: 6,
   tickMs: 100, autosaveMs: 3000, catchUpMaxMs: 60000, statsWindowMs: 300000,
   resultTicks: 15, defaultSeed: 271828, rosterCap: 40, maxLevel: 100,
   offline: { thresholdMs: 60000, maxMs: 28800000, efficiency: 0.7, captureRate: 0.5, fallbackKillsPerSec: 0.1 },

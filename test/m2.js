@@ -18,13 +18,13 @@ module.exports = function ({test,runtime,plain,ticks,edit,add,DATA,Game}) {
     edit(Game,s=>{s.roster.find(m=>m.uid===mixed[0].uid).speciesId='dewslime';s.roster.find(m=>m.uid===mixed[0].uid).evo=2;});
     assert.equal(Game.evolve(mixed.map(m=>m.uid)),false);
   });
-  test('5000 real evolutions bump rarity within 15% ±2%',()=>{
+  test('5000 real evolutions bump rarity within 17% ±2% with Lv1 altar',()=>{
     Game.reset(77123); let bumps=0;
     for(let i=0;i<5000;i++) {
       const ids=materials().map(m=>m.uid),r=Game.evolve(ids);if(r.bumped)bumps++;
       assert.ok(Game.release([r.monster.uid]));
     }
-    const rate=bumps/5000;console.log('  Evolution bump rate: '+(rate*100).toFixed(2)+'%');assert.ok(Math.abs(rate-.15)<=.02);
+    const rate=bumps/5000;console.log('  Evolution bump rate: '+(rate*100).toFixed(2)+'%');assert.ok(Math.abs(rate-.17)<=.02);
   });
   test('auto evolution cascades, lowest levels first, protects locks and stops at stage III',()=>{
     Game.reset(); const ms=materials(27);edit(Game,s=>{s.roster.find(m=>m.uid===ms[0].uid).level=9;});
@@ -44,7 +44,7 @@ module.exports = function ({test,runtime,plain,ticks,edit,add,DATA,Game}) {
       assert.equal(Game.enhance('monster-1').enhance,i);const now=Game.monsterStats('monster-1');
       Object.keys(DATA.cpWeights).forEach(k=>assert.ok(Math.abs(now[k]-base[k]*(1+.06*i))<1e-9,k));
     }
-    assert.equal(Game.enhance('monster-1'),false);assert.equal(Game.getState().gold,10000-prices.reduce((a,b)=>a+b,0));
+    assert.equal(Game.enhance('monster-1'),false);assert.equal(Game.getState().gold,10000-prices.reduce((a,b)=>a+Math.ceil(b*.95),0));
     const evolved=plain(Game.getState().roster[0]);evolved.evo=3;
     assert.ok(Math.abs(Game.monsterStats(evolved).hp/base.hp-1.6**2*1.6)<1e-9);
   });
@@ -70,7 +70,7 @@ module.exports = function ({test,runtime,plain,ticks,edit,add,DATA,Game}) {
     delete d.state.materials;delete d.state.accessories;delete d.state.nextAccessoryUid;delete d.state.coins;
     d.state.roster.forEach(m=>{delete m.locked;delete m.accessory;delete m.evo;delete m.enhance;});
     const battle=plain(d.state.battle);assert.equal(Game.load(JSON.stringify(d)),true);
-    const s=Game.getState();assert.equal(s.schemaVersion,5);assert.equal(s.materials.enhanceStone,0);assert.equal(s.accessories.length,0);
+    const s=Game.getState();assert.equal(s.schemaVersion,6);assert.equal(s.materials.enhanceStone,0);assert.equal(s.accessories.length,0);
     assert.deepEqual(plain(s.battle),battle);assert.equal(s.roster[0].traits.length,0);assert.ok(Game.validateSave(Game.save()));
     const json=Game.save();assert.equal(Game.load(json),true);assert.deepEqual(Game.getState(),s);
   });
@@ -79,8 +79,8 @@ module.exports = function ({test,runtime,plain,ticks,edit,add,DATA,Game}) {
     const r=Game.catchUp(3*3600000);assert.ok(r.materials.enhanceStone>0&&r.accessories.length>0&&r.monsters.length>0);
     const json=Game.save(),before=Game.getState();assert.equal(Game.enhance('monster-1'),false);assert.equal(Game.releaseDuplicates(),false);
     ticks(Game,30);assert.deepEqual(Game.getState(),before);assert.equal(Game.load(json),true);assert.deepEqual(Game.catchUp(3600000),r);
-    Game.harvest();const s=Game.getState();assert.equal(s.materials.enhanceStone,r.materials.enhanceStone);assert.equal(s.accessories.length,40);
-    assert.equal(s.gold,r.gold+r.accessories.reduce((n,a)=>n+DATA.accessoryGold[DATA.rarityOrder.indexOf(a.rarity)],0));
+    Game.harvest();const s=Game.getState();assert.equal(s.materials.enhanceStone,r.materials.enhanceStone+r.campOutput.enhanceStone);assert.equal(s.accessories.length,40);
+    assert.equal(s.gold,r.gold+r.campOutput.gold+r.accessories.reduce((n,a)=>n+DATA.accessoryGold[DATA.rarityOrder.indexOf(a.rarity)],0));
     assert.equal(Game.harvest(),false);assert.ok(Game.validateSave(Game.save()));
   });
   test('fresh region-1 five-minute capture rate across 20 seeds is 3–8 per run',()=>{

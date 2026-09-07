@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
-const files = ["data", "data-monsters", "data-progression", "battle", "game", "game-monsters", "game-progression", "game-expedition", "game-save"];
+const files = ["data", "data-monsters", "data-progression", "data-camp", "battle", "game", "game-monsters", "game-progression", "game-camp", "game-expedition", "game-save"];
 function runtime() {
   const storage = new Map(), timers = new Map(); let nextTimer = 1;
   const c = vm.createContext({ console, Date, setInterval: (f, ms) => { const id = nextTimer++; timers.set(id, { f, ms }); return id; },
@@ -55,7 +55,7 @@ test("fresh dewslime/mistfox party clears 1-1 and captures within 180 seconds ac
   console.log("  Longest first capture: " + longest / 10 + "s");
 });
 test("capture math, strict 30% boundary, boost/rank and 100% clamp", () => {
-  assert.ok(Math.abs(Battle.captureProbability("mistfox", .2, 3, 1) - .88 * .8 * 1.06) < 1e-12);
+  assert.ok(Math.abs(Battle.captureProbability("mistfox", .2, 3, 1) - .88 * .8 * 1.06 * 1.03) < 1e-12);
   assert.equal(Battle.captureProbability("mistfox", .2, 3, 1.5), 1);
   for (const hp of [0, -.1, .3, .7, NaN]) assert.equal(Battle.captureProbability("mistfox", hp, 1), 0);
 });
@@ -151,7 +151,7 @@ test("rarity/potential helper supplies 1–3 valid traits and stat multipliers",
 });
 test("save/load/export/import preserves roster, HP, cooldowns, XP, dex and RNG", () => {
   Game.reset(123); ticks(Game, 99); const before = Game.getState(), json = Game.exportSave();
-  assert.equal(JSON.parse(json).schemaVersion, 5); assert.ok(Game.validateSave(json));
+  assert.equal(JSON.parse(json).schemaVersion, 6); assert.ok(Game.validateSave(json));
   ticks(Game, 400); assert.equal(Game.load(json), true); assert.deepEqual(Game.getState(), before);
   assert.equal(Game.importSave(json), true); assert.deepEqual(Game.getState(), before);
   const draws = Array.from({ length: 8 }, () => Game.rng()); Game.load(json);
@@ -166,7 +166,7 @@ test("v3 and malformed imports rejected atomically, fresh init replaces old sche
   badEdits.forEach(fn => { const d = JSON.parse(json); fn(d.state); assert.equal(Game.load(JSON.stringify(d)), false); assert.deepEqual(Game.getState(), before); });
   assert.equal(Game.load('{"schemaVersion":3,"state":{}}'), false);
   const c = runtime(); c.storage.set("squad_v1", '{"schemaVersion":3,"state":{}}'); c.Game.init();
-  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 5);
+  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 6);
 });
 test("offline rewards use 70% gold/XP, eight-hour cap, 50% capture probability, one-time harvest", () => {
   Game.reset(); const before = Game.getState(); const report = Game.catchUp(3600000);
@@ -204,4 +204,5 @@ test("10Hz timer and idempotent pause/resume, four namespaces and DOM-free logic
   all.forEach(f => assert.ok(fs.readFileSync(path.join(root, "js", f), "utf8").split('\n').length <= 600, f));
 });
 require("./m2.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
+require("./m3.js")({ test, runtime, plain, ticks, edit, add, DATA, Game, Battle });
 console.log("\n" + passed + " PASS");

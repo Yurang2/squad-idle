@@ -7,17 +7,17 @@
   function resources(s) { return '<p class="resource-line">'+UI.icon('gold')+UI.fmt(s.gold)+' 골드 · 강화석 '+UI.fmt(s.materials.enhanceStone)+' · 스쿼드 코인 '+UI.fmt(s.coins)+'</p>'; }
   UI.rosterActions=function(content,state) {
     content.insertAdjacentHTML('afterbegin','<div class="roster-actions"><button id="open-evolution" class="primary">'+UI.icon('lantern')+'진화</button><button id="open-accessories">'+UI.icon('accessory')+'장신구</button></div>'+resources(state));
-    content.insertAdjacentHTML('beforeend','<button id="release-duplicates" class="back-button bulk-release">일괄 방생: 일반 등급 중복 '+UI.fmt(3)+'마리 초과분</button><p class="detail-note">잠금·파티·장신구 장착·진화 개체는 일괄 방생에서 보호됩니다.</p>');
+    content.insertAdjacentHTML('beforeend','<button id="release-duplicates" class="back-button bulk-release">일괄 방생: 일반 등급 중복 '+UI.fmt(3)+'마리 초과분</button><p class="detail-note">잠금·파티·캠프·장신구 장착·진화 개체는 일괄 방생에서 보호됩니다.</p>');
     click('open-evolution',function(){view('evolution');});click('open-accessories',function(){UI.accessoryTarget=null;view('accessories');});
     click('release-duplicates',function(){var r=Game.releaseDuplicates();UI.toast(UI.fmt(r.count)+'마리 방생 · '+UI.fmt(r.gold)+' 골드');});
   };
   UI.detailProgression=function(m,state,content) {
-    var cost=DATA.enhanceCost(m.enhance), groups=Game.evolutionGroups(), group=groups[m.speciesId+':'+m.evo]||[];
+    var cost=Game.enhanceCost(m.enhance), groups=Game.evolutionGroups(), group=groups[m.speciesId+':'+m.evo]||[];
     var ids=group.some(function(u){return u.uid===m.uid;})?[m.uid].concat(group.filter(function(u){return u.uid!==m.uid;}).slice(0,2).map(function(u){return u.uid;})):[];
     var a=state.accessories.find(function(a){return a.uid===m.accessory;});
-    var protectedM=m.locked||m.party!==null||m.accessory!==null||state.battle.units.some(function(u){return u.id===m.uid;});
+    var protectedM=m.locked||m.camp!==null||m.party!==null||m.accessory!==null||state.battle.units.some(function(u){return u.id===m.uid;});
     content.insertAdjacentHTML('beforeend',resources(state)+'<p class="detail-note">현재 파티 전투력 <b class="detail-cp">'+UI.fmt(Game.getCP())+'</b><br>성장·장신구 능력치는 다음 전투부터 적용됩니다.</p>'+
-      '<section class="trait-list"><h3>진화 '+UI.evoLabel(m.evo)+'</h3><p>같은 종·단계의 동료 '+UI.fmt(3)+'마리 · 능력치 ×'+UI.fmt(1.6)+'</p><button id="detail-evolve" class="primary"'+(ids.length!==3||m.evo===3?' disabled':'')+'>진화 ×'+UI.fmt(1)+'</button><p>잠금 개체는 보호됩니다. 파티 슬롯과 장신구 하나를 계승하고, 나머지 장신구는 보관됩니다.</p></section>'+
+      '<section class="trait-list"><h3>진화 '+UI.evoLabel(m.evo)+'</h3><p>같은 종·단계의 동료 '+UI.fmt(3)+'마리 · 능력치 ×'+UI.fmt(1.6)+'</p><button id="detail-evolve" class="primary"'+(ids.length!==3||m.evo===3?' disabled':'')+'>진화 ×'+UI.fmt(1)+'</button><p>잠금·캠프 배치 개체는 보호됩니다. 파티 슬롯과 장신구 하나를 계승하고, 나머지 장신구는 보관됩니다.</p></section>'+
       '<section class="trait-list"><h3>강화 +'+UI.fmt(m.enhance)+' / '+UI.fmt(10)+'</h3><p>단계마다 모든 능력치 +'+UI.fmt(6)+'% · 실패 없음</p><button id="enhance-monster"'+(m.enhance===10||state.gold<cost.gold||state.materials.enhanceStone<cost.stones?' disabled':'')+'>'+(m.enhance===10?'최대 강화':'강화 · '+UI.fmt(cost.stones)+' 강화석 / '+UI.fmt(cost.gold)+' 골드')+'</button></section>'+
       '<section class="trait-list"><h3>장신구</h3>'+(a?UI.accessoryCard(a):'<p>아직 장착한 장신구가 없습니다.</p>')+'<button id="choose-accessory">장신구 선택</button>'+(a?'<button id="unequip-accessory" class="back-button">해제</button>':'')+'</section>'+
       '<div class="detail-actions"><button id="lock-monster">'+(m.locked?'잠금 해제':'잠금')+'</button><button id="release-monster" class="danger-button"'+(protectedM?' disabled':'')+'>방생 · '+UI.fmt(DATA.releaseGold[DATA.rarityOrder.indexOf(m.rarity)])+' 골드</button></div>');
@@ -30,7 +30,7 @@
   };
   UI.renderEvolution=function(state) {
     var groups=Game.evolutionGroups(), content=document.getElementById('sheet-content');
-    content.innerHTML='<div class="roster-actions"><button id="evolution-back" class="back-button">몬스터 목록</button><button id="auto-evolve" class="primary">자동 진화</button></div><p class="sheet-intro">같은 종·단계 '+UI.fmt(3)+'마리가 한 동료로.<br>최고 등급·레벨·강화 계승, '+UI.fmt(15)+'%로 등급 상승.<br>잠금 개체는 보호됩니다. 편성·장신구 하나를 계승합니다.</p><table class="evolution-table"><thead><tr><th>종</th><th>Ⅰ → Ⅱ</th><th>Ⅱ → Ⅲ</th></tr></thead><tbody>'+Object.values(DATA.species).filter(function(s){return state.dex[s.id].seen;}).map(function(s){
+    content.innerHTML='<div class="roster-actions"><button id="evolution-back" class="back-button">몬스터 목록</button><button id="auto-evolve" class="primary">자동 진화</button></div><p class="sheet-intro">같은 종·단계 '+UI.fmt(3)+'마리가 한 동료로.<br>최고 등급·레벨·강화 계승, '+UI.fmt(Game.campEffects().evolutionBump*100)+'%로 등급 상승.<br>잠금·캠프 배치 개체는 보호됩니다. 편성·장신구 하나를 계승합니다.</p><table class="evolution-table"><thead><tr><th>종</th><th>Ⅰ → Ⅱ</th><th>Ⅱ → Ⅲ</th></tr></thead><tbody>'+Object.values(DATA.species).filter(function(s){return state.dex[s.id].seen;}).map(function(s){
       return '<tr><th>'+s.name+'</th>'+[1,2].map(function(stage){var n=(groups[s.id+':'+stage]||[]).length;return '<td><small>'+UI.fmt(n)+'마리</small><button data-evolve="'+s.id+':'+stage+'" class="primary"'+(n<3?' disabled':'')+'>진화 ×'+UI.fmt(1)+'</button></td>';}).join('')+'</tr>';
     }).join('')+'</tbody></table>';
     click('evolution-back',function(){UI.selectedMonster=null;view(null);});

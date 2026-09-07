@@ -2,7 +2,7 @@
 (function () {
   UI.renderSaveControls=function() {
     var content=document.getElementById('sheet-content');
-    content.innerHTML='<p class="sheet-intro">진행 상황은 자동으로 저장됩니다.</p><dl class="settings-info"><div><dt>버전</dt><dd>'+DATA.version+'</dd></div><div><dt>저장 형식</dt><dd>'+UI.fmt(DATA.schemaVersion)+'</dd></div><div><dt>오프라인 수확 상한</dt><dd>'+UI.fmt(DATA.offline.maxMs/3600000)+'시간</dd></div></dl><div class="save-controls"><button id="export-save">저장 내보내기</button><label for="save-json">저장 데이터</label><textarea id="save-json" spellcheck="false" placeholder="내보낸 저장 데이터를 보관하거나 여기에 붙여 넣으세요."></textarea><button id="copy-save">클립보드에 복사</button><button id="import-save">저장 가져오기</button><p class="sheet-intro" id="import-status" role="status"></p></div><div class="reset-panel"><h3>새로운 탐험</h3><p>모든 몬스터와 진행 상황을 초기화합니다.</p><button id="reset-game" class="danger-button">게임 초기화</button></div>';
+    content.innerHTML='<p class="sheet-intro">진행 상황은 자동으로 저장됩니다.</p><dl class="settings-info"><div><dt>버전</dt><dd>'+DATA.version+'</dd></div><div><dt>저장 형식</dt><dd>'+UI.fmt(DATA.schemaVersion)+'</dd></div><div><dt>오프라인 수확 상한</dt><dd>'+UI.fmt(Game.campEffects().offlineMaxMs/3600000)+'시간</dd></div></dl><div class="save-controls"><button id="export-save">저장 내보내기</button><label for="save-json">저장 데이터</label><textarea id="save-json" spellcheck="false" placeholder="내보낸 저장 데이터를 보관하거나 여기에 붙여 넣으세요."></textarea><button id="copy-save">클립보드에 복사</button><button id="import-save">저장 가져오기</button><p class="sheet-intro" id="import-status" role="status"></p></div><div class="reset-panel"><h3>새로운 탐험</h3><p>모든 몬스터와 진행 상황을 초기화합니다.</p><button id="reset-game" class="danger-button">게임 초기화</button></div>';
     document.getElementById('export-save').onclick=function(){document.getElementById('save-json').value=Game.exportSave();};
     document.getElementById('copy-save').onclick=async function(){
       var field=document.getElementById('save-json');if(!field.value)field.value=Game.exportSave();
@@ -40,6 +40,9 @@
       document.getElementById('report-time').textContent=UI.fmt(minutes)+'분 동안 · '+UI.stageLabel(report.stageIndex)+' 탐험';
       cancelAnimationFrame(frame);phase=0;dialog.className='';document.getElementById('harvest-report').textContent='자루를 푼다';
       document.getElementById('report-rewards').innerHTML='<span>골드 <strong>'+UI.fmt(report.gold)+'</strong></span><span>경험치 <strong>'+UI.fmt(report.xp)+'</strong></span><span>강화석 <strong>'+UI.fmt(report.materials.enhanceStone)+'</strong></span>';
+      document.getElementById('report-rewards').insertAdjacentHTML('beforeend',
+        ['wood','stone','essence'].map(function(k){return '<span>'+DATA.camp.materials[k]+' <strong>'+UI.fmt(report.materials[k])+'</strong></span>';}).join('')+
+        '<div class="camp-report"><h3>캠프에서 모은 선물</h3>'+DATA.camp.resources.map(function(k){return '<span>'+(k==='gold'?'골드':DATA.camp.materials[k])+' <strong>'+UI.fmt(report.campOutput[k])+'</strong></span>';}).join('')+'</div>');
       var items=document.getElementById('report-accessories');
       if(!items){items=document.createElement('div');items.id='report-accessories';document.getElementById('report-monsters').before(items);}
       var room=DATA.accessory.cap-Game.getState().accessories.length,overflow=report.accessories.slice(room);

@@ -30,15 +30,15 @@ Game.registerMonsters(function (host) {
     xp = xp === undefined ? host.state().tamerXP : xp;
     return DATA.rankXP.filter(function (n) { return n <= xp; }).length;
   }
-  function partySlots(rank) {
+  function partySlots(rank, campState) {
     rank = rank === undefined ? getRank() : rank;
-    return DATA.partyRanks.filter(function (n) { return n <= rank; }).length;
+    return Math.min(5, DATA.partyRanks.filter(function (n) { return n <= rank; }).length + (host.camp() ? host.camp().effects(campState).partyBonus : 0));
   }
-  function canCapture() { return host.state().roster.length < DATA.rosterCap && !host.state().pendingReport; }
+  function canCapture() { return host.state().roster.length < Game.campEffects().rosterCap && !host.state().pendingReport; }
   function receive(monster) {
     var s = host.state();
-    if (!monster || !validateMonster(monster) || s.roster.length >= DATA.rosterCap || find(monster.uid)) return false;
-    var m = copy(monster); m.party = null; s.roster.push(m);
+    if (!monster || !validateMonster(monster) || s.roster.length >= Game.campEffects().rosterCap || find(monster.uid)) return false;
+    var m = copy(monster); m.party = null; m.camp = null; s.roster.push(m);
     s.nextMonsterUid = Math.max(s.nextMonsterUid, Number(m.uid.slice(8)) + 1);
     s.dex[m.speciesId] = { seen: true, caught: true };
     return copy(m);
@@ -73,7 +73,7 @@ Game.registerMonsters(function (host) {
   }
   function toggleParty(uid) {
     var s = host.state(), m = find(uid), party = s.roster.filter(function (u) { return u.party !== null; });
-    if (!m || s.pendingReport) return false;
+    if (!m || s.pendingReport || m.camp !== null) return false;
     if (m.party !== null) {
       if (party.length === 1) return false;
       m.party = null;
@@ -99,7 +99,8 @@ Game.registerMonsters(function (host) {
       !Number.isSafeInteger(m.xp) || m.xp < 0 || m.xp >= DATA.xpToNext(m.level) || (m.level === DATA.maxLevel && m.xp !== 0) ||
       !Number.isInteger(m.enhance) || m.enhance < 0 || m.enhance > 10 || !Number.isInteger(m.evo) || m.evo < 1 || m.evo > 3 ||
       typeof m.locked !== "boolean" || (m.accessory !== null && !/^accessory-[1-9]\d*$/.test(m.accessory)) ||
-      m.camp !== null || (m.party !== null && (!Number.isInteger(m.party) || m.party < 0 || m.party > 4))) return false;
+      (m.camp !== null && (!Object.hasOwn(DATA.camp.facilities,m.camp) || m.party !== null)) ||
+      (m.party !== null && (!Number.isInteger(m.party) || m.party < 0 || m.party > 4))) return false;
     var rank = DATA.rarityOrder.indexOf(m.rarity);
     return Array.isArray(m.traits) && (m.traits.length === [1,2,3,3][rank] || (m.evo === 1 && m.traits.length === DATA.rarities[m.rarity].lines)) && m.traits.every(function (t) {
       var def = DATA.potentialPool.find(function (p) { return p.id === t.id; });

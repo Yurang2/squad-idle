@@ -25,7 +25,7 @@ Game.registerValidation(function (host) {
     });
   }
   function validate(s) {
-    if (!s || s.schemaVersion !== 5 || !natural(s.gold) || !natural(s.coins) || !s.materials || !natural(s.materials.enhanceStone) ||
+    if (!s || s.schemaVersion !== 6 || !natural(s.gold) || !natural(s.coins) || !s.materials || !Object.keys(DATA.camp.materials).every(function(k){return natural(s.materials[k]);}) ||
       !natural(s.nextAccessoryUid) || s.nextAccessoryUid < 1 || !Array.isArray(s.accessories) || s.accessories.length > DATA.accessory.cap ||
       !s.accessories.every(accessory) || !natural(s.tamerXP) || !natural(s.rngSeed) || s.rngSeed > 4294967295 ||
       !stage(s.currentStage) || !["repeat", "challenge"].includes(s.mode) || !natural(s.nextMonsterUid) || s.nextMonsterUid < 3 ||
@@ -33,9 +33,14 @@ Game.registerValidation(function (host) {
     if (!Array.isArray(s.unlockedStages) || !unique(s.unlockedStages) || !s.unlockedStages.includes(0) ||
       !s.unlockedStages.includes(s.currentStage) || !s.unlockedStages.every(stage) || !Array.isArray(s.clearedStages) ||
       !unique(s.clearedStages) || !s.clearedStages.every(function (i) { return stage(i) && s.unlockedStages.includes(i); })) return false;
-    if (!Array.isArray(s.roster) || !s.roster.length || s.roster.length > DATA.rosterCap || !s.roster.every(host.monsters().validateMonster) ||
+    if (!s.camp || !s.camp.levels || !s.camp.production || Object.keys(s.camp.levels).length !== 6 ||
+      !Object.keys(DATA.camp.facilities).every(function(id){var l=s.camp.levels[id];return Number.isInteger(l) && l>=1 && l<=5 && l<=s.camp.levels.campfire;}) ||
+      !DATA.camp.resources.every(function(k){return Number.isSafeInteger(s.camp.production[k]) && s.camp.production[k]>=0;}))return false;
+    var caps=host.camp().effects(s);
+    if (!Array.isArray(s.roster) || !s.roster.length || s.roster.length > caps.rosterCap || !s.roster.every(host.monsters().validateMonster) ||
       !unique(s.roster.map(function (m) { return m.uid; }))) return false;
-    var party = s.roster.filter(function (m) { return m.party !== null; }), slots = Game.partySlots(Game.getRank(s.tamerXP));
+    if (!Object.keys(DATA.camp.facilities).every(function(id){return s.roster.filter(function(m){return m.camp===id;}).length<=host.camp().slots(id,s);}))return false;
+    var party = s.roster.filter(function (m) { return m.party !== null; }), slots = Game.partySlots(Game.getRank(s.tamerXP),s);
     if (!party.length || party.length > slots || !unique(party.map(function (m) { return m.party; })) ||
       party.some(function (m) { return m.party >= slots; })) return false;
     if (!s.dex || Object.keys(s.dex).length !== 18 || !Object.keys(DATA.species).every(function (id) {
@@ -45,11 +50,13 @@ Game.registerValidation(function (host) {
     var items = s.accessories.slice(), equipped = s.roster.filter(function (m) { return m.accessory !== null; }).map(function (m) { return m.accessory; });
     if (!unique(equipped) || !equipped.every(function (uid) { return items.some(function (a) { return a.uid === uid; }); })) return false;
     if (report !== null) {
-      if (!report || !natural(report.elapsedMs) || report.elapsedMs > DATA.offline.maxMs || !natural(report.gold) || !natural(report.xp) ||
-        !report.materials || !natural(report.materials.enhanceStone) || !Array.isArray(report.accessories) || report.accessories.length > 100000 ||
+      if (!report || !natural(report.elapsedMs) || report.elapsedMs > caps.offlineMaxMs || !natural(report.gold) || !natural(report.xp) ||
+        !report.materials || !Object.keys(DATA.camp.materials).every(function(k){return natural(report.materials[k]);}) ||
+        !report.campOutput || !DATA.camp.resources.every(function(k){return natural(report.campOutput[k]);}) ||
+        !Array.isArray(report.accessories) || report.accessories.length > 1000000 ||
         !report.accessories.every(function (a) { return accessory(a) && !a.locked; }) ||
-        report.stageIndex !== s.currentStage || !Array.isArray(report.monsters) || report.monsters.length + all.length > DATA.rosterCap ||
-        !report.monsters.every(function (m) { return host.monsters().validateMonster(m) && m.party === null && m.accessory === null && !m.locked; })) return false;
+        report.stageIndex !== s.currentStage || !Array.isArray(report.monsters) || report.monsters.length + all.length > caps.rosterCap ||
+        !report.monsters.every(function (m) { return host.monsters().validateMonster(m) && m.party === null && m.camp === null && m.accessory === null && !m.locked; })) return false;
       all = all.concat(report.monsters);
       items = items.concat(report.accessories);
     }
@@ -69,7 +76,7 @@ Game.registerValidation(function (host) {
         !finite(u.def) || !finite(u.attackSpeed) || u.attackSpeed <= 0 || !finite(u.critChance) || u.critChance > 1 ||
         !finite(u.critDamage) || !Number.isFinite(u.cooldown) || u.cooldown < -60 || u.cooldown > 10 ||
         !finite(u.skillCooldown) || u.skillCooldown > DATA.species[u.speciesId].skill.cooldown || !effects(u.effects)) return false;
-      if (side === "party") return u.position < slots && s.roster.some(function (m) { return m.uid === u.id && m.speciesId === u.speciesId; });
+      if (side === "party") return u.position < slots && s.roster.some(function (m) { return m.uid === u.id && m.speciesId === u.speciesId && m.camp === null; });
       return u.position === index && u.id === "enemy-" + sim.waveIndex + "-" + index &&
         u.speciesId === DATA.stages[sim.stageIndex].waves[sim.waveIndex][index] && typeof u.captured === "boolean" &&
         u.boss === (DATA.stages[sim.stageIndex].boss && sim.waveIndex === 2) && (!u.captured || (!u.boss && u.hp === 0));

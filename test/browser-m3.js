@@ -1,0 +1,60 @@
+"use strict";
+const assert=require('node:assert/strict');
+module.exports=async function({evaluate,command,screenshot,delay}) {
+  await command('Emulation.setDeviceMetricsOverride',{width:375,height:844,deviceScaleFactor:1,mobile:true});
+  await evaluate(`(()=>{Game.pause();Game.reset(83);const ms=['mistfox','pondturtle','lakebat'].map(id=>Game.rollMonster(id)),d=JSON.parse(Game.save());d.state.roster.push(...ms);ms.forEach(m=>d.state.dex[m.speciesId]={seen:true,caught:true});d.state.gold=10000;d.state.materials.wood=100;d.state.materials.stone=100;Game.load(JSON.stringify(d));document.querySelector('[data-tab="camp"]').click();})()`);
+  await delay(100);
+  assert.equal(await evaluate("document.querySelectorAll('[data-tab]').length"),5);
+  assert.ok(await evaluate("UI.campVisible && !document.getElementById('camp-screen').hidden && document.querySelector('[data-tab=camp]').classList.contains('selected')"));
+  assert.ok(await evaluate("(()=>{const sc=document.getElementById('camp-scroll'),b=document.querySelector('[data-facility=campfire]').getBoundingClientRect(),r=sc.getBoundingClientRect();return Math.abs((b.left+b.right)/2-(r.left+r.right)/2)<2 && sc.scrollWidth>sc.clientWidth*2 && sc.scrollWidth<sc.clientWidth*2.3;})()"));
+  await evaluate("Promise.all([...document.querySelectorAll('#camp-screen img')].map(i=>i.decode()))");
+  assert.ok(await evaluate("(()=>{const p=document.querySelector('.camp-harvest'),nav=document.querySelector('.tabs');return p.clientHeight>=p.scrollHeight && p.getBoundingClientRect().bottom<=nav.getBoundingClientRect().top;})()"));
+  assert.ok(await evaluate("[...document.querySelectorAll('.camp-station img')].every(i=>i.naturalWidth===768)"));
+  await screenshot('m3-375-campfire');
+  const oldTransform=await evaluate("getComputedStyle(document.querySelector('.wandering')).transform");await delay(4000);
+  assert.notEqual(await evaluate("getComputedStyle(document.querySelector('.wandering')).transform"),oldTransform);
+  for(const [side,pos] of [['left',0],['right',9999]]) {
+    await evaluate('document.getElementById("camp-scroll").scrollLeft='+pos);await delay(100);await screenshot('m3-375-'+side);
+    assert.ok(await evaluate('document.documentElement.scrollWidth===375'));
+  }
+  for(const id of ['campfire','pen','workshop','altar','storehouse','garden']) {
+    assert.ok(await evaluate(`(()=>{const b=document.querySelector('[data-facility=${id}]'),sc=document.getElementById('camp-scroll');sc.scrollLeft=b.offsetLeft-sc.clientWidth/2;const r=b.getBoundingClientRect(),c=sc.getBoundingClientRect();return r.left>=c.left-1&&r.right<=c.right+1&&r.top>=c.top&&r.bottom<=c.bottom;})()`),'station fully reachable: '+id);
+  }
+  await evaluate("document.querySelector('[data-facility=garden]').click();document.querySelector('[data-empty-slot]').click()");
+  assert.ok(await evaluate("document.querySelector('.camp-picker .job-match').textContent==='✦'"));
+  await screenshot('m3-375-assignment-picker');
+  await evaluate("document.querySelector('[data-assign=\"monster-3\"]').click()");
+  assert.equal(await evaluate("Game.getState().roster.find(m=>m.uid==='monster-3').camp"),'garden');
+  assert.ok(await evaluate("document.querySelector('[data-unassign=\"monster-3\"]') && document.querySelector('[data-resident=garden]')"));
+  await screenshot('m3-375-garden-assigned');
+  await evaluate("document.getElementById('close-sheet').click();for(let i=0;i<3000;i++)Game.step()");
+  assert.equal(await evaluate('Game.campAccrued().wood'),1);
+  assert.ok(await evaluate("document.getElementById('camp-accrued').textContent.includes('나무 1') && !document.getElementById('collect-camp').disabled"));
+  await screenshot('m3-375-production');
+  const wood=await evaluate('Game.getState().materials.wood');
+  await evaluate("document.querySelector('[data-tab=adventure]').click();document.querySelector('[data-tab=camp]').click()");
+  assert.equal(await evaluate('Game.getState().materials.wood'),wood+1);assert.equal(await evaluate('Game.campAccrued().wood'),0);
+  await evaluate("document.querySelector('[data-facility=pen]').click()");
+  assert.ok(await evaluate("document.getElementById('build-facility').disabled && document.getElementById('sheet-content').textContent.includes('모닥불을 먼저')"));
+  await evaluate("document.getElementById('close-sheet').click();document.querySelector('[data-facility=campfire]').click();document.getElementById('build-facility').click()");
+  assert.equal(await evaluate('Game.getState().camp.levels.campfire'),2);
+  await evaluate("document.getElementById('close-sheet').click();document.querySelector('[data-facility=pen]').click();document.getElementById('build-facility').click()");
+  assert.equal(await evaluate('Game.campEffects().rosterCap'),60);assert.ok(await evaluate("document.getElementById('sheet-content').textContent.includes('60마리')"));
+  await screenshot('m3-375-pen-upgrade');
+  await evaluate("document.getElementById('close-sheet').click();document.querySelector('[data-tab=monsters]').click()");
+  assert.ok(await evaluate("document.querySelector('.sheet-intro').textContent.includes('/ 60')"));
+  await evaluate("document.getElementById('close-sheet').click();(()=>{const now=Date.now;Date.now=()=>now()-3*3600000;Game.save();})()");
+  await command('Page.reload');await delay(500);await evaluate('Game.pause()');
+  assert.ok(await evaluate("document.getElementById('offline-report').open && Game.getState().pendingReport.elapsedMs>=3*3600000 && Game.getState().pendingReport.campOutput.wood===36"));
+  await evaluate("document.getElementById('harvest-report').click();document.getElementById('harvest-report').click()");
+  assert.ok(await evaluate("document.querySelector('.camp-report').textContent.includes('나무 36') && document.getElementById('report-rewards').textContent.includes('정수')"));
+  await delay(500);
+  await screenshot('m3-375-three-hour-sack');
+  await evaluate("document.getElementById('harvest-report').click();document.querySelector('[data-tab=camp]').click()");
+  assert.ok(await evaluate('Game.validateSave(Game.save()) && document.documentElement.scrollWidth===375'));
+  await command('Emulation.setDeviceMetricsOverride',{width:375,height:667,deviceScaleFactor:1,mobile:true});
+  assert.ok(await evaluate('document.documentElement.scrollWidth===375'));await screenshot('m3-375-short');
+  await command('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+  assert.equal(await evaluate("document.getElementById('app').getBoundingClientRect().width"),480);
+  console.log('PASS M3 375px campfire centering, six illustrated stations, wandering, assignment/match, tick production/auto-collect, pen cap, real 3h reload sack, narrow/desktop and no page overflow');
+};

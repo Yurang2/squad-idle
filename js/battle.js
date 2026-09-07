@@ -88,7 +88,7 @@ var Battle = (function () {
   function captureProbability(speciesId, hpFraction, rank, multiplier) {
     var species = DATA.species[speciesId];
     if (!species || !Number.isFinite(hpFraction) || hpFraction <= 0 || hpFraction >= DATA.capture.threshold) return 0;
-    return Math.min(1, species.catchRate * (1 - hpFraction) * DATA.rankBonus(rank) * (multiplier === undefined ? 1 : multiplier));
+    return Math.min(1, species.catchRate * (1 - hpFraction) * DATA.rankBonus(rank) * (multiplier === undefined ? 1 : multiplier) * Game.campEffects().catchMultiplier);
   }
   function attemptCapture(sim, emit) {
     if (sim.tamer.captureCooldown > 0.000001 || !Game.canCapture()) return;

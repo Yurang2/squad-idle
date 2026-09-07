@@ -3,6 +3,11 @@
   var captureFrame=0, cardFrame=0;
   UI.icon=function(name) {
     var paths={
+      camp:'<path d="m3 20 9-16 9 16H3zm9-16v16m-5 0 5-8 5 8"/>',
+      wood:'<path d="m9 3-6 9h4l-4 5h7v4h4v-4h7l-4-5h4l-6-9z"/>',
+      stone:'<path d="m3 16 4-10 10-2 4 12-7 5-11-5zm4-10 7 15m7-5L7 6"/>',
+      essence:'<path d="m12 2 7 10-7 10-7-10 7-10zm0 0v20m-7-10h14"/>',
+      enhanceStone:'<path d="m5 6 7-4 7 4 2 10-9 6-9-6L5 6zm0 0 7 16 7-16M5 6h14"/>',
       accessory:'<path d="M4 4c0 12 16 12 16 0M9 16l3-3 3 3-3 5-3-5z"/>',
       gold:'<circle cx="12" cy="12" r="8"/><path d="M12 7v10m3-8h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9"/>',
       lantern:'<path d="M8 8h8l2 12H6L8 8zm1 0V5a3 3 0 0 1 6 0v3M5 20h14M9 12v4m6-4v4"/>',
