@@ -106,6 +106,7 @@ async function main() {
       if (await evaluate("document.readyState === 'complete' && typeof UI !== 'undefined'")) break;
       await delay(100);
     }
+    await require("./polish-checks")({evaluate, command, screenshot, delay});
     await require("./art-checks")({evaluate, command, screenshot, delay});
     const errors = events.filter(e => e.method === "Runtime.exceptionThrown" ||
       (e.method === "Runtime.consoleAPICalled" && e.params.type === "error") ||

@@ -139,3 +139,11 @@
 - Chrome 152, 375×844: 28개 PNG 디코딩, 3지역 배경과 몬스터/보스, 96/140 크기, 120ms 공격 복귀, 2초 호흡, 300ms 카운트업, 레벨 라벨, 5개 시트와 탭 활성 이동, 최소 44px 버튼, 문서/시트 가로 넘침 없음 확인. 매핑 삭제·실제 PNG 디코딩 실패·분리된 이미지 콜백에서 폴백과 오류 없음 확인.
 - 기존 P1/P2/P3 브라우저 검증도 변경하지 않고 임시 실행 래퍼로 함께 실행하여 통과했다. 임시 프로필에서 `BROWSER_NO_SANDBOX=1`, `BROWSER_FAST=1` 사용; 120초 전투는 1,200틱 재생, 이미지/모션은 실제 브라우저 프레임으로 검사했다.
 - **환경 제한:** 실제 Google Fonts 요청은 관리 환경에서 `ERR_NETWORK_ACCESS_DENIED` 네트워크 진단을 남긴다. 시스템 폰트로 정상 표시되는 것은 직접 확인했다. 오류 0 브라우저 회귀는 `FONT_FALLBACK=1`로 외부 폰트 CSS만 빈 응답으로 대체한 명시적 폴백 환경에서 통과했으며, 앱의 콘솔·런타임·에셋 오류는 0이었다. 원격 Google Fonts 다운로드 성공까지 검증한 것은 아니다. 별도 아트 검증 명령: `$env:FONT_FALLBACK='1'; $env:BROWSER_NO_SANDBOX='1'; node test/browser-art.js`.
+
+
+## Polish - 2026-09-07
+
+- Generated `assets/icon/merc.png`, `fusion.png`, and `settings.png` with built-in image_gen, normalized to 256x256 while preserving native alpha. Final prompts and source paths are in `assets/prompts.json` and `assets/generation_log.jsonl`; manifest, DATA.assets, asset review grid and PNG verification now cover 31 files. All five bottom tabs use PNG icons with existing fallbacks.
+- `js/ui.js` functions `position()` / `drawUnit()` / `drawScene()`: 52-unit ally sprites in 72-unit slots, warrior front-right, archer middle, mage back-left. Ghosts paint first at 35% opacity with labels below their feet. Smaller ally lunges preserve the clear gap. Game and Battle logic are unchanged.
+- `style.css`: max-height 700px compact spacing and typography, 260px minimum scene, bottom tabs inside the viewport. Added independent `test/polish-checks.js`; existing assertions remain intact except asset totals 28 -> 31.
+- Validation: all js/*.js syntax checks passed (per-file PowerShell glob expansion); node test/run.js: 38 PASS with unchanged long-run results; 31 PNG dimension/alpha checks passed. Chrome at 375x844 and 375x667 passed all three recruitment states, 12px+ sprite gaps, below-feet ghost labels, layer order, no overlapping page sections, visible tabs and no horizontal scroll. Short scene measured 263px. Existing art/browser assertions passed with zero console/runtime/asset errors. FONT_FALLBACK=1 explicitly substituted remote font CSS; successful remote font download was not tested.

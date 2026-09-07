@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "key": "merc.warrior.idle",
     "path": "assets/merc/warrior_idle.png",
@@ -166,5 +166,23 @@
     "path": "assets/bg/volcano.png",
     "size": 1080,
     "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. same art style as a single game's character set. Volcanic landscape with lava river and orange sky, maintain bright cheerful colors. Environment background overrides transparent/full-body terms: entirely opaque landscape 1080x760. Horizon exactly 55% down; lower 45% fairly flat unobstructed walkable ground for sprites. Lava if present stays in distant upper half. No characters or icons. Critical composition: the entire lower HALF of the image must be a continuous flat unobstructed standing platform. Ground rear edge is at y=0.50 of canvas height. No large foreground rocks, crystals, vegetation, rivers, fences or cliffs in lower half. All scenic details restricted to upper half."
+  },
+  {
+    "key": "icon.merc",
+    "path": "assets/icon/merc.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. Two crossed cartoon swords with a small shield in front, silver blades and orange-gold hilts and shield, front view. Single centered isolated mobile game tab icon, 256x256 transparent PNG with genuine alpha, generous transparent padding, recognizable at 30px, no background tile or lettering."
+  },
+  {
+    "key": "icon.fusion",
+    "path": "assets/icon/fusion.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. Object-only inventory icon: exactly three small gems (blue, green, red) at the bottom merge via short magical trails into exactly one larger glowing purple gem above. ONLY four gemstones and short light trails. No person, no character, no face, no body, no hands, no mascot. The chibi keywords describe chunky cute object proportions only. Centered front view, bold simple silhouette readable at 30px, 256x256 PNG, genuine transparent alpha background, generous padding."
+  },
+  {
+    "key": "icon.settings",
+    "path": "assets/icon/settings.png",
+    "size": 256,
+    "prompt": "chibi, big head small body, cute, thick dark-brown outlines, cel-shaded, bright saturated colors, glossy, casual mobile game style, full body, transparent background, no text, no watermark. One glossy orange gear, chunky rounded teeth, circular open center, front view. Single centered isolated mobile game tab icon, 256x256 transparent PNG with genuine alpha, generous transparent padding, recognizable at 30px, no background tile or lettering."
   }
 ]

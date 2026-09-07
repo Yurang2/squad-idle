@@ -58,10 +58,11 @@ button, .battle-scene { -webkit-user-select: none; user-select: none; }
 #battle-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .scene-caption { position: absolute; bottom: 10px; left: 12px; right: 12px; text-align: center; font-size: 12px; }
 #region-subtitle { background: var(--panel); padding: 3px 10px; border-radius: 18px; }
-.locked-unit { opacity: .3; } .locked-label { fill: var(--ink); font-size: 12px; font-weight: bold; }
+.locked-unit { opacity: .35; } .locked-label { fill: var(--ink); font-size: 12px; font-weight: bold; }
 .hp-fill { transition: width .1s linear; } .fallen { visibility: hidden; }
 .unit-body { transform-box: fill-box; transform-origin: center bottom; animation: breathe 2s ease-in-out infinite; }
 .lunge-right { animation: lunge-right .12s ease-out; } .lunge-left { animation: lunge-left .12s ease-out; }
+.mercenary .lunge-right { animation-name: ally-lunge; }
 .hit-flash { animation: hit-flash .18s ease-out; }
 .death-fade { animation: death-fade .45s ease-in forwards; pointer-events: none; } .death-fade .unit-body { animation: none; }
 .damage-number, .skill-label, .level-up-label { fill: white; stroke: var(--ink); stroke-width: 3px; paint-order: stroke; font-size: 18px; font-weight: 800; animation: float-damage .8s ease-out forwards; pointer-events: none; }
@@ -191,6 +192,7 @@ dialog::backdrop { background: #8FD3FF80; backdrop-filter: blur(3px); } dialog[o
 .harvest-footer p { font-size: 12px; margin-bottom: 10px; } #harvest-report { width: 100%; min-height: 58px; font-size: 18px; }
 @keyframes breathe { 50% { translate: 0 -3px; } }
 @keyframes lunge-right { 50% { translate: 10px 0; rotate: 4deg; } }
+@keyframes ally-lunge { 50% { translate: 4px 0; rotate: 2deg; } }
 @keyframes lunge-left { 50% { translate: -8px 0; rotate: -4deg; } }
 @keyframes hit-flash { 20%, 60% { filter: brightness(0) invert(1); } }
 @keyframes death-fade { to { opacity: 0; translate: 0 10px; } }
@@ -207,4 +209,24 @@ dialog::backdrop { background: #8FD3FF80; backdrop-filter: blur(3px); } dialog[o
 @keyframes fusion-flash { 35% { box-shadow: 0 0 28px 8px var(--gold); filter: brightness(1.3); } }
 @keyframes potential-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
 @media (max-width: 350px) { .chapter-label { display: none; } .resource { padding: 4px; } .stage-header h2 { font-size: 19px; } .inventory-grid { grid-template-columns: repeat(5, minmax(44px, 1fr)); } .flip-inner { width: 72px; } .stage-controls { grid-template-columns: 1fr 1fr; } }
+@media (max-height: 700px) {
+  #app { height: 100vh; height: 100dvh; }
+  .hud, .stage-header, .squad-strip, .stage-controls, .harvest-row { line-height: 1.2; }
+  .hud { margin-top: 4px; padding: calc(4px + env(safe-area-inset-top)) 8px 4px; }
+  .brand-row { margin-bottom: 5px; }
+  .brand-row h1 { font-size: 20px; }
+  .resource .asset-icon { width: 20px; height: 20px; }
+  .resource strong, .power strong { font-size: 22px; }
+  .resource { padding: 3px 5px; }
+  .stage-header { padding: 8px 13px 5px; }
+  .stage-header h2 { font-size: 20px; }
+  .eyebrow { margin-bottom: 2px; }
+  .battle-scene { min-height: 260px; }
+  .squad-strip { padding-top: 6px; padding-bottom: 2px; flex-shrink: 0; }
+  .squad-member { padding: 2px 6px; }
+  .harvest-row { padding-top: 3px; padding-bottom: 3px; }
+  .stage-controls { padding-top: 5px; padding-bottom: 8px; gap: 4px 8px; }
+  .bottom-tabs { padding-top: 7px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); flex-shrink: 0; }
+  .bottom-tabs button { min-height: 58px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; transition-duration: .01s !important; } .unit-body { animation: none; } #toast.visible { animation-duration: 3.4s !important; } }

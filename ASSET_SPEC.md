@@ -49,6 +49,9 @@
 | `icon/skillbook.png` | 반짝이는 마법책 |
 | `icon/gold.png` | 금화 |
 | `icon/coin.png` | 보라 보석 (스쿼드 코인) |
+| `icon/merc.png` | 교차한 만화 검 두 자루와 작은 방패 |
+| `icon/fusion.png` | 작은 보석 세 개가 빛나는 보석 하나로 합쳐지는 모습 |
+| `icon/settings.png` | 광택 있는 주황 톱니바퀴 |
 
 등급 색은 코드에서 테두리로 칠하므로 아이콘은 등급 무관 1종.
 

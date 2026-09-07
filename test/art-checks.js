@@ -6,7 +6,7 @@ module.exports = async function ({ evaluate, command, screenshot, delay }) {
   await evaluate("Game.reset(); Game.pause()");
   assert.equal(await evaluate(`Promise.all(Object.values(DATA.assets).map(src => {
     const image = new Image(); image.src = src; return image.decode().then(() => true);
-  })).then(images => images.length)`), 28);
+  })).then(images => images.length)`), 31);
   await delay(300);
   await screenshot("restyle-375-battle");
   const layout = await evaluate(`({ width: document.documentElement.scrollWidth,
@@ -34,7 +34,7 @@ module.exports = async function ({ evaluate, command, screenshot, delay }) {
   assert.notEqual(await evaluate("document.getElementById('gold').textContent"), "1,000");
   await delay(200);
   assert.equal(await evaluate("document.getElementById('gold').textContent"), "1,000");
-  console.log("PASS 28 PNG decodes, 375px, 44px targets, 2s idle, 120ms attack, level label and 300ms counter");
+  console.log("PASS 31 PNG decodes, 375px, 44px targets, 2s idle, 120ms attack, level label and 300ms counter");
 
   await evaluate(`window.artFixture = function(stage, boss) {
     Game.reset(); Game.pause(); const save = JSON.parse(Game.save()), state = save.state;

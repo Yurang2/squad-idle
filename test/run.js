@@ -482,10 +482,10 @@ test("P2: transferring gear clears old owner, and changing gear never revives a 
   c.Game.unequip("warrior", "hat");
   assert.equal(c.Game.getState().battle.units[0].hp, 0);
 });
-test("Art: DATA.assets matches all 28 manifest keys and files exist", () => {
+test("Art: DATA.assets matches all 31 manifest keys and files exist", () => {
   const c = context();
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "../assets/manifest.json"), "utf8"));
-  assert.equal(Object.keys(manifest).length, 28);
+  assert.equal(Object.keys(manifest).length, 31);
   assert.deepEqual(plain(c.DATA.assets), manifest);
   for (const file of Object.values(c.DATA.assets)) assert.ok(fs.statSync(path.join(__dirname, "..", file)).isFile(), file);
 });

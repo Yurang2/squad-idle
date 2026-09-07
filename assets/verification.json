@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "total": 28,
+  "total": 31,
   "missing": [],
   "assets": [
     {
@@ -391,6 +391,48 @@
       "bytes": 870853,
       "alphaRange": [
         255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.merc",
+      "path": "assets/icon/merc.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 62732,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.fusion",
+      "path": "assets/icon/fusion.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 60637,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "key": "icon.settings",
+      "path": "assets/icon/settings.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "bytes": 55376,
+      "alphaRange": [
+        0,
         255
       ],
       "passed": true

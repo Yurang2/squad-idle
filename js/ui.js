@@ -32,7 +32,8 @@ var UI = (function () {
     return '<path d="M-9-17l-6 20m22-20 7 20" stroke="#3DDC97" stroke-width="7"/><path d="M-17-42h30l7 28-39 2z" fill="' + color + '"/><path d="M-13-58l-15-6 8 17m29-12 17-6-8 19" fill="' + color + '"/><ellipse cy="-49" rx="17" ry="14" fill="' + color + '"/><path d="M-11-50l7 2m8 0 7-2" stroke="#4A2C12" stroke-width="3"/><path d="M-7-41h12" stroke="#f1dbb2" stroke-width="3"/><path d="M-20-31l-10 11" stroke="' + color + '" stroke-width="7"/><path d="M-31-39v39" stroke="#8A6A4A" stroke-width="5"/><path d="M-38-41h13l4 12-16 2z" fill="#FFC93C"/>';
   }
   function position(unit) {
-    if (unit.side === "mercenary") return [{ x: 143, y: 236 }, { x: 91, y: 255 }, { x: 47, y: 224 }][unit.position];
+    // DECISION: 52-unit allies in 72-unit slots leave room for attack motion and a 12px gap at 375px.
+    if (unit.side === "mercenary") return [{ x: 182, y: 246 }, { x: 110, y: 234 }, { x: 38, y: 222 }][unit.position];
     if (unit.type === "boss") return { x: 284, y: 245 };
     return [{ x: 252, y: 242 }, { x: 313, y: 216 }, { x: 335, y: 271 }, { x: 274, y: 289 }][unit.position];
   }
@@ -42,11 +43,11 @@ var UI = (function () {
       "data-x": p.x, "data-y": p.y, class: "unit " + (locked ? "locked-unit" : unit.side) });
     group.appendChild(svgNode("ellipse", { cx: 0, cy: 4, rx: unit.type === "boss" ? 40 : 25, ry: 7, fill: "#4A2C12", opacity: ".4" }));
     var body = svgNode("g", { class: "unit-body" });
-    var fallback = svgNode("g", { class: "asset-fallback", transform: unit.type === "boss" ? "scale(1.6)" : "scale(1.15)" });
+    var fallback = svgNode("g", { class: "asset-fallback", transform: unit.type === "boss" ? "scale(1.6)" : unit.side === "mercenary" ? "scale(.55)" : "scale(1.15)" });
     fallback.innerHTML = figure(unit.type, color); body.appendChild(fallback);
     var region = DATA.stages[Game.getState().currentStage].region;
     var key = unit.side === "mercenary" ? "merc." + unit.type + ".idle" : "mon." + UI.artRegion(region).monsters[unit.type];
-    UI.spriteImage(body, key, unit.type === "boss" ? 140 : 96);
+    UI.spriteImage(body, key, unit.type === "boss" ? 140 : unit.side === "mercenary" ? 52 : 96);
     body.addEventListener("animationend", function (event) {
       if (event.target === body) body.classList.remove("lunge-left", "lunge-right", "hit-flash");
     });
@@ -64,7 +65,11 @@ var UI = (function () {
     if (clearEffects) el("effect-layer").replaceChildren();
     el("mercenary-layer").replaceChildren();
     el("enemy-layer").replaceChildren();
-    DATA.mercenaries.slice().reverse().forEach(function (merc) {
+    DATA.mercenaries.slice().reverse().sort(function (a, b) {
+      // DECISION: SVG paint order always puts unrecruited ghosts behind recruited allies.
+      return Number(state.battle.units.some(function (u) { return u.id === a.id; })) -
+        Number(state.battle.units.some(function (u) { return u.id === b.id; }));
+    }).forEach(function (merc) {
       var unit = state.battle.units.find(function (u) { return u.id === merc.id; });
       el("mercenary-layer").appendChild(drawUnit(unit || { id: merc.id, type: merc.id, side: "mercenary", position: merc.position }, merc.color, !unit));
     });
