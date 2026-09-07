@@ -17,7 +17,15 @@ for (const name of ["index.html", "style.css", "js", "assets"]) {
     }
   });
 }
-const manifest = JSON.parse(fs.readFileSync(path.join(out, "assets/manifest.json"), "utf8"));
+// DECISION: Package only the three character concepts used by M1, not the concept review/source files.
+const characters = ["tamer_side.png", "tamer_capture.png", "fox_companion.png"];
+fs.mkdirSync(path.join(out, "concepts/character"), { recursive: true });
+for (const name of characters) {
+  const source = path.join(root, "concepts/character", name);
+  if (fs.lstatSync(source).isSymbolicLink()) throw new Error("Symlink in character assets");
+  fs.copyFileSync(source, path.join(out, "concepts/character", name));
+}
+const manifest = JSON.parse(fs.readFileSync(path.join(out, "assets/monsters/manifest.json"), "utf8"));
 for (const [key, value] of Object.entries(manifest)) {
   if (typeof value !== "string") throw new Error("Invalid manifest path: " + key);
   const file = path.resolve(out, value);

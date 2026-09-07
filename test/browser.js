@@ -18,8 +18,8 @@ const browserPath = [process.env.CHROME_PATH,
 if (!browserPath) throw new Error("Set CHROME_PATH to an existing Chrome or Edge executable.");
 
 async function main() {
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), "p1-browser-"));
-  const artifacts = fs.mkdtempSync(path.join(os.tmpdir(), "p1-screenshots-"));
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), "m1-browser-"));
+  const artifacts = fs.mkdtempSync(path.join(os.tmpdir(), "m1-screenshots-"));
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
     const file = path.resolve(root, "." + (pathname === "/" ? "/index.html" : pathname));
@@ -88,83 +88,81 @@ async function main() {
     await command("Runtime.enable");
     await command("Page.enable");
     await command("Log.enable");
-    await command("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await command("Emulation.setDeviceMetricsOverride", { width: 375, height: 844, deviceScaleFactor: 1, mobile: true });
     const url = "http://127.0.0.1:" + server.address().port;
     await command("Page.navigate", { url });
     for (let i = 0; i < 100; i++) {
       if (await evaluate("document.readyState === 'complete' && typeof UI !== 'undefined'")) break;
       await delay(100);
     }
-    const initial = await evaluate("({stage:Game.getState().currentStage,status:Game.getState().battle.status,mode:Game.getState().mode})");
-    assert.deepEqual(initial, { stage: 0, status: "fighting", mode: "challenge" });
-    await screenshot("mobile-battle");
-    const layout = await evaluate(`({width:innerWidth, scroll:document.documentElement.scrollWidth, height:innerHeight,
-      app:document.getElementById('app').getBoundingClientRect().height,
-      smallButtons:[...document.querySelectorAll('button')].filter(b=>b.getBoundingClientRect().height>0 && (b.getBoundingClientRect().width<44 || b.getBoundingClientRect().height<44)).map(b=>b.id)})`);
-    assert.equal(layout.width, 390);
-    assert.ok(layout.scroll <= 390, JSON.stringify(layout));
-    assert.ok(layout.app <= 844, JSON.stringify(layout));
-    assert.deepEqual(layout.smallButtons, []);
-    console.log("PASS mobile 390×844 layout, tap sizes, initial auto-fight");
-
-    await evaluate("document.querySelector('[data-tab=mercenaries]').click()");
-    assert.equal(await evaluate("document.querySelectorAll('.merc-card').length"), 3);
-    assert.equal(await evaluate("document.querySelectorAll('.equipment-slot').length"), 12);
-    await screenshot("mercenaries");
-    await evaluate("document.getElementById('close-sheet').click()");
-    for (const tab of ["equipment", "fusion", "skills"]) {
-      await evaluate("document.querySelector('[data-tab=" + tab + "]').click()");
-      const selector = { equipment: ".inventory-grid", fusion: ".fusion-table", skills: ".skill-card" }[tab];
-      assert.ok(await evaluate("document.getElementById('sheet').open && !!document.querySelector('" + selector + "')"));
-      await evaluate("document.getElementById('close-sheet').click()");
-    }
-    await evaluate("document.querySelector('[data-tab=settings]').click()");
-    assert.ok(await evaluate("document.getElementById('sheet-content').textContent.includes('schemaVersion')"));
-    const confirmClick = evaluate("document.getElementById('reset-game').click()");
-    for (let i = 0; i < 30 && !events.some(e => e.method === "Page.javascriptDialogOpening"); i++) await delay(100);
-    assert.ok(events.some(e => e.method === "Page.javascriptDialogOpening" && e.params.type === "confirm"));
-    await command("Page.handleJavaScriptDialog", { accept: false });
-    await confirmClick;
-    await evaluate("document.getElementById('close-sheet').click()");
-    console.log("PASS mercenary cards, equipment slots, placeholders, settings and reset confirmation");
-
-    if (process.env.BROWSER_FAST === "1") await evaluate("while(Game.getState().currentStage === 0) Game.step()");
-    for (let i = 0; i < 240; i++) {
-      if (await evaluate("Game.getState().currentStage === 1")) break;
+    await evaluate("Game.pause();Game.reset();window.captureCount=0;window.captureTime=0;Game.on('capture',()=>{captureCount++;captureTime=performance.now();});window.poseTimes=[];new MutationObserver(()=>poseTimes.push({at:performance.now(),href:document.getElementById('tamer-image').getAttribute('href')})).observe(document.getElementById('tamer-image'),{attributes:true,attributeFilter:['href']});window.freshStarted=performance.now();Game.resume()");
+    for(let i=0;i<1800;i++) {
+      if(await evaluate("captureCount>0"))break;
       await delay(100);
     }
-    assert.equal(await evaluate("Game.getState().currentStage"), 1);
-    assert.ok(await evaluate("Game.getState().gold > 0 && Game.getState().squadCoins === 10"));
-    await screenshot("challenge-advanced");
-    console.log("PASS real 100ms timer clears 1-1 and advances to 1-2 without input");
-    await evaluate("document.getElementById('repeat-mode').click();document.getElementById('previous-stage').click()");
-    assert.ok(await evaluate("Game.getState().currentStage === 0 && Game.getState().mode === 'repeat'"));
-    await evaluate("Game.catchUp(30000)");
-    assert.equal(await evaluate("Game.getState().currentStage"), 0);
-    assert.equal(await evaluate("Game.getState().squadCoins"), 10);
-    await command("Emulation.setDeviceMetricsOverride", { width: 320, height: 640, deviceScaleFactor: 1, mobile: true });
-    assert.ok(await evaluate("document.documentElement.scrollWidth <= 320"));
-    await command("Emulation.setDeviceMetricsOverride", { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-    assert.equal(await evaluate("document.getElementById('app').getBoundingClientRect().width"), 480);
-    console.log("PASS repeat, arrows, 320px no overflow and desktop 480px maximum width");
-
-    await require("./browser-equipment")({ evaluate, command, screenshot, delay });
-
-    await require("./browser-p3")({ evaluate, command, screenshot, delay, events });
-
-    await evaluate("Game.pause();Game.save()");
-    const before = await evaluate("({gold:Game.getState().gold,seed:Game.getState().rngSeed})");
-    await command("Page.reload");
-    await delay(250);
-    assert.ok(await evaluate("Game.getState().gold >= " + before.gold));
-    assert.equal(await evaluate("Game.getState().mode"), "challenge");
+    assert.ok(await evaluate("captureCount>0 && captureTime-freshStarted<180000"));
+    console.log("PASS real 100ms timer: first capture in " + await evaluate("((captureTime-freshStarted)/1000).toFixed(2)") + "s");
     await evaluate("Game.pause()");
-    const errors = events.filter(e => e.method === "Runtime.exceptionThrown" ||
-      (e.method === "Runtime.consoleAPICalled" && e.params.type === "error") ||
-      (e.method === "Log.entryAdded" && e.params.entry.level === "error"));
-    assert.deepEqual(errors, []);
-    console.log("PASS reload persistence; zero browser console/runtime errors");
-    console.log("Screenshots: " + artifacts);
+    await screenshot("375-capture");
+    await delay(450);
+    assert.ok(await evaluate("poseTimes.length>=2 && poseTimes[0].href.includes('tamer_capture') && poseTimes[1].href.includes('tamer_side') && poseTimes[1].at-poseTimes[0].at>=110 && poseTimes[1].at-poseTimes[0].at<250"));
+    assert.ok(await evaluate("getComputedStyle(document.querySelector('.capture-card')).opacity==='1'"));
+    await screenshot("375-capture-card");
+    await delay(1500);
+    await screenshot("375-battle");
+    const layout=await evaluate(`({width:innerWidth,scroll:document.documentElement.scrollWidth,app:document.getElementById('app').getBoundingClientRect().width,
+      panel:getComputedStyle(document.querySelector('.panel')).borderTopWidth,ink:getComputedStyle(document.body).color,
+      party:document.querySelectorAll('#party-layer image').length,enemy:document.querySelectorAll('#enemy-layer image').length,
+      flip:[...document.querySelectorAll('#party-layer .unit-body>g')].every(n=>n.getAttribute('transform')==='scale(-1 1)'),
+      small:[...document.querySelectorAll('button')].filter(b=>b.getBoundingClientRect().height>0 && b.getBoundingClientRect().height<44).map(b=>b.id)})`);
+    assert.equal(layout.width,375);assert.equal(layout.app,375);assert.equal(layout.scroll,375);
+    assert.ok(await evaluate("document.querySelector('.save-line').getBoundingClientRect().bottom<=document.querySelector('.tabs').getBoundingClientRect().top"));
+    assert.equal(layout.panel,'1px');assert.equal(layout.ink,'rgb(123, 108, 109)');assert.equal(layout.party,2);assert.ok(layout.enemy);assert.ok(layout.flip);assert.deepEqual(layout.small,[]);
+    assert.ok(await evaluate(`Promise.all([...Object.values(DATA.species).map(s=>s.art),...Object.values(DATA.assets)].map(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false);img.src=src;}))).then(r=>r.every(Boolean))`));
+    console.log("PASS 375px pastel panel, art decoding, facing, tap sizes and no overflow");
+    await evaluate("document.querySelector('[data-tab=monsters]').click()");
+    assert.equal(await evaluate("document.querySelectorAll('#sheet .monster-card').length"),3);
+    await screenshot("375-monsters");
+    await evaluate("document.querySelector('[data-monster=monster-2]').click()");
+    assert.ok(await evaluate("document.querySelector('.monster-detail').textContent.includes('안개여우')"));
+    await evaluate("document.getElementById('toggle-party').click()");
+    assert.equal(await evaluate("Game.getState().roster.find(m=>m.uid==='monster-2').party"),null);
+    await evaluate("document.getElementById('back-roster').click();document.querySelector('[data-monster=monster-3]').click();document.getElementById('toggle-party').click()");
+    assert.notEqual(await evaluate("Game.getState().roster.find(m=>m.uid==='monster-3').party"),null);
+    await screenshot("375-detail");
+    assert.ok(await evaluate("document.getElementById('sheet').scrollWidth<=375"));
+    await evaluate("document.getElementById('close-sheet').click();UI.openSheet('dex')");
+    assert.equal(await evaluate("document.querySelectorAll('.dex-entry').length"),18);
+    assert.ok(await evaluate("document.querySelectorAll('.dex-entry .silhouette').length>0"));
+    assert.ok(await evaluate("getComputedStyle(document.querySelector('.silhouette')).filter!=='none'"));
+    assert.ok(await evaluate("document.querySelector('[data-species=icewolf]').textContent.includes('미발견')"));
+    await delay(500); await screenshot("375-dex");
+    console.log("PASS roster detail, party toggles and all 18 dex states/silhouettes");
+    await evaluate("document.getElementById('close-sheet').click();UI.openSheet('settings');document.getElementById('export-save').click()");
+    assert.equal(await evaluate("JSON.parse(document.getElementById('save-json').value).schemaVersion"),4);
+    await evaluate("document.getElementById('save-json').value='bad';document.getElementById('import-save').click()");
+    assert.ok(await evaluate("document.getElementById('import-status').textContent.includes('유효한')"));
+    await evaluate("document.getElementById('close-sheet').click();Game.catchUp(3600000)");
+    await delay(2400);await screenshot("375-offline");
+    assert.ok(await evaluate("document.getElementById('offline-report').open && document.getElementById('report-monsters').children.length>0"));
+    assert.ok(await evaluate("document.getElementById('offline-report').scrollWidth<=375"));
+    await evaluate("document.getElementById('harvest-report').click()");
+    assert.equal(await evaluate("Game.getState().pendingReport"),null);
+    await evaluate("UI.setActive(false);UI.setActive(false);UI.setActive(true);Game.pause()");
+    assert.ok(await evaluate("Game.validateSave(Game.save())"));
+    await evaluate("Game.save()");await command("Page.reload");await delay(300);await evaluate("Game.pause()");
+    assert.ok(await evaluate("Game.getState().roster.length>3 && Game.validateSave(Game.save())"));
+    console.log("PASS offline report/harvest, settings, lifecycle, reload and schema-4 persistence");
+    await evaluate(`(()=>{const d=JSON.parse(Game.save());d.state.tamerXP=DATA.rankXP[9];d.state.roster.forEach((m,i)=>m.party=i<5?i:null);Game.load(JSON.stringify(d));Game.selectStage(0);})()`);
+    assert.equal(await evaluate("document.querySelectorAll('#party-layer .unit').length"),5);
+    await screenshot("375-five-party");
+    await command("Emulation.setDeviceMetricsOverride",{width:375,height:667,deviceScaleFactor:1,mobile:true});
+    assert.ok(await evaluate("document.documentElement.scrollWidth<=375"));await screenshot("375-short");
+    await command("Emulation.setDeviceMetricsOverride",{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+    assert.equal(await evaluate("document.getElementById('app').getBoundingClientRect().width"),480);
+    const errors=events.filter(e=>e.method==='Runtime.exceptionThrown'||(e.method==='Runtime.consoleAPICalled'&&e.params.type==='error')||(e.method==='Log.entryAdded'&&e.params.entry.level==='error'));
+    assert.deepEqual(errors,[]);console.log("PASS zero console/runtime/asset errors; desktop 480px maximum");
+    console.log("Screenshots: "+artifacts);
   } catch (error) {
     console.log("Screenshots: " + artifacts);
     console.error(browserLog.slice(-2500));
@@ -175,7 +173,7 @@ async function main() {
     server.close();
     await delay(500);
     const resolved = path.resolve(profile);
-    if (path.dirname(resolved) === path.resolve(os.tmpdir()) && path.basename(resolved).startsWith("p1-browser-")) {
+    if (path.dirname(resolved) === path.resolve(os.tmpdir()) && path.basename(resolved).startsWith("m1-browser-")) {
       fs.rmSync(resolved, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
     }
   }

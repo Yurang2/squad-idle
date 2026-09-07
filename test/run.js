@@ -1,493 +1,206 @@
 "use strict";
-
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function context() {
-  const storage = new Map();
-  const intervals = new Map();
-  let timerId = 0;
-  const sandbox = vm.createContext({
-    localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
-    setInterval: (fn, ms) => { intervals.set(++timerId, { fn, ms }); return timerId; },
-    clearInterval: id => intervals.delete(id)
-  });
-  for (const file of ["data", "battle", "game", "game-equipment", "game-expedition"]) {
-    vm.runInContext(fs.readFileSync(path.join(__dirname, "../js/" + file + ".js"), "utf8"), sandbox, { filename: file + ".js" });
-  }
-  return { ...sandbox, storage, intervals };
+const root = path.resolve(__dirname, "..");
+const files = ["data", "data-monsters", "battle", "game", "game-monsters", "game-expedition", "game-save"];
+function runtime() {
+  const storage = new Map(), timers = new Map(); let nextTimer = 1;
+  const c = vm.createContext({ console, Date, setInterval: (f, ms) => { const id = nextTimer++; timers.set(id, { f, ms }); return id; },
+    clearInterval: id => timers.delete(id), localStorage: { getItem: k => storage.get(k), setItem: (k, v) => storage.set(k, v) } });
+  files.forEach(f => vm.runInContext(fs.readFileSync(path.join(root, "js", f + ".js"), "utf8"), c, { filename: f + ".js" }));
+  return { ...c, storage, timers };
 }
-function plain(value) { return JSON.parse(JSON.stringify(value)); }
-function simulate(c, stage, squad = [{ id: "warrior", level: 1 }], emit) {
-  const sim = c.Battle.start(stage, squad, emit);
-  while (sim.status === "fighting") c.Battle.tick(sim, emit);
-  return sim;
-}
-function untilResult(c) {
-  for (let i = 0; i < 601 && c.Game.getState().battle.status === "fighting"; i++) c.Game.step();
-  return c.Game.getState();
-}
-function fixture(c, stage, level = 1) {
-  c.Game.reset();
-  const state = c.Game.getState();
-  state.currentStage = stage;
-  state.unlockedStages = Array.from({ length: stage + 1 }, (_, i) => i);
-  state.clearedStages = Array.from({ length: stage }, (_, i) => i);
-  state.mercenaries.forEach((merc, i) => {
-    merc.level = level;
-    merc.unlocked = i === 0 || c.DATA.mercenaries[i].unlockStage < stage;
-  });
-  state.battle = c.Battle.start(stage, state.mercenaries.filter(m => m.unlocked));
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
-  assert.equal(c.Game.load(), true);
-}
+const plain = v => JSON.parse(JSON.stringify(v));
 let passed = 0;
-function test(name, fn) {
-  try { fn(); console.log("PASS " + name); passed++; }
-  catch (error) { console.error("FAIL " + name); console.error(error); process.exitCode = 1; }
+function test(name, fn) { fn(); console.log("PASS " + name); passed++; }
+function ticks(g, n) { for (let i = 0; i < n; i++) g.step(); }
+function edit(g, fn) { const d = JSON.parse(g.save()); fn(d.state); assert.equal(g.load(JSON.stringify(d)), true); }
+function add(g, id, rarity = "rare") {
+  const m = g.rollMonster(id, rarity);
+  edit(g, s => { s.roster.push(m); s.dex[id] = { seen: true, caught: true }; });
+  return m;
 }
-
-test("(a) fresh squad clears stage 1-1 within 60 seconds", () => {
-  const c = context();
-  const sim = simulate(c, 0);
-  assert.equal(sim.status, "clear");
-  assert.ok(sim.ticks <= 600);
-  console.log("     Stage 1-1: " + sim.ticks / 10 + "s");
-});
-test("(b) stage 3-10 defeats a fresh level-1 squad, even with all classes", () => {
-  const c = context();
-  assert.equal(simulate(c, 29).status, "fail");
-  assert.equal(simulate(c, 29, c.DATA.mercenaries.map(m => ({ id: m.id, level: 1 }))).status, "fail");
-});
-test("(c) save/load preserves the entire state and ongoing battle", () => {
-  const c = context();
-  for (let i = 0; i < 211; i++) c.Game.step();
-  c.Game.setMode("repeat");
-  const before = plain(c.Game.getState());
-  c.Game.save();
-  const stored = c.storage.get("squad_v1");
-  c.Game.step();
-  assert.equal(c.Game.load(), true);
-  assert.deepEqual(plain(c.Game.getState()), before);
-  const other = context();
-  other.storage.set("squad_v1", stored);
-  assert.equal(other.Game.load(), true);
-  for (let i = 0; i < 70; i++) { c.Game.step(); other.Game.step(); }
-  assert.deepEqual(plain(c.Game.getState()), plain(other.Game.getState()));
-});
-test("(d) equal RNG seeds produce equal sequences (including seed zero)", () => {
-  const c = context();
-  for (const seed of [0, 42, 4294967295]) {
-    c.Game.reset(seed);
-    const first = Array.from({ length: 100 }, () => c.Game.rng());
-    c.Game.reset(seed);
-    assert.deepEqual(Array.from({ length: 100 }, () => c.Game.rng()), first);
-    assert.ok(first.every(n => n >= 0 && n < 1));
+const { DATA, Game, Battle } = runtime();
+test("18 exact species and manifest paths exist, one skill per species, no equipment/mercenaries", () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, "assets/monsters/manifest.json"), "utf8"));
+  assert.equal(Object.keys(DATA.species).length, 18);
+  assert.deepEqual(Object.keys(DATA.species).sort(), Object.keys(manifest).sort());
+  for (const s of Object.values(DATA.species)) {
+    assert.equal(s.art, manifest[s.id]); assert.ok(fs.statSync(path.join(root, s.art)).size > 10000);
+    assert.ok(s.baseStats.hp > 0 && s.growth > 0 && s.catchRate > 0 && s.catchRate <= 1 && s.campJob);
+    assert.ok(["hit", "heal", "shield", "dot"].includes(s.skill.effect.type));
   }
+  Object.values(DATA.assets).forEach(f => assert.ok(fs.existsSync(path.join(root, f))));
+  assert.equal(DATA.mercenaries, undefined); assert.equal(DATA.equipmentSlots, undefined);
 });
-test("balance: unupgraded level-1 warrior clears 1-1 through 1-5 and fails 1-6", () => {
-  const c = context();
-  for (let stage = 0; stage < 6; stage++) {
-    c.Game.reset();
-    const sim = simulate(c, stage);
-    assert.equal(sim.status, stage < 5 ? "clear" : "fail", "stage " + (stage + 1));
-  }
-});
-test("P1 baseline without active skills first fails at 1-6, then gains XP on retry", () => {
-  const c = context();
-  c.DATA.defaultSkills.warrior = []; c.Game.reset();
-  let failure;
-  c.Game.on("stageFail", e => { failure = e; });
-  for (let i = 0; i < 2400 && !failure; i++) c.Game.step();
-  assert.equal(failure.stageIndex, 5);
-  assert.deepEqual(plain(c.Game.getState().clearedStages), [0, 1, 2, 3, 4]);
-  const xp = c.Game.getState().mercenaries[0].xp;
-  for (let i = 0; i < 100; i++) c.Game.step();
-  assert.notEqual(c.Game.getState().mercenaries[0].xp, xp);
-});
-test("repeat keeps stage; first-clear coins cannot be farmed; challenge advances", () => {
-  const c = context();
-  c.Game.setMode("repeat");
-  untilResult(c);
-  assert.equal(c.Game.getState().squadCoins, 10);
-  assert.deepEqual(plain(c.Game.getState().unlockedStages), [0, 1]);
-  for (let i = 0; i < c.DATA.resultTicks; i++) c.Game.step();
-  assert.equal(c.Game.getState().currentStage, 0);
-  untilResult(c);
-  assert.equal(c.Game.getState().squadCoins, 10);
-  c.Game.setMode("challenge");
-  for (let i = 0; i < c.DATA.resultTicks; i++) c.Game.step();
-  assert.equal(c.Game.getState().currentStage, 1);
-});
-test("archer unlocks only on 1-6 clear; mage only on 2-6 clear", () => {
-  const c = context();
-  fixture(c, 5, 50);
-  assert.equal(c.Game.getState().mercenaries[1].unlocked, false);
-  untilResult(c);
-  assert.equal(c.Game.getState().mercenaries[1].unlocked, true);
-  assert.equal(c.Game.getState().mercenaries[2].unlocked, false);
-  fixture(c, 15, 100);
-  untilResult(c);
-  assert.equal(c.Game.getState().mercenaries[2].unlocked, true);
-});
-test("wave, hit, kill, death, clear and fail events; boss is the last wave", () => {
-  const c = context();
-  const events = [];
-  simulate(c, 9, [{ id: "warrior", level: 150 }], (name, data) => events.push({ name, data }));
-  assert.deepEqual(events.filter(e => e.name === "wave").map(e => e.data.wave), [1, 2, 3]);
-  assert.equal(events.filter(e => e.name === "kill").length, 6);
-  assert.equal(events.filter(e => e.name === "unitDeath").length, 6);
-  assert.ok(events.some(e => e.name === "kill" && e.data.type === "boss"));
-  assert.equal(events.at(-1).name, "stageClear");
-  const fails = [];
-  simulate(c, 29, undefined, (name, data) => { if (name === "stageFail") fails.push(data); });
-  assert.equal(fails.length, 1);
-});
-test("frontline priority survives reversed squad order and switches after death", () => {
-  const c = context();
-  const sim = c.Battle.start(0, [{ id: "mage", level: 1 }, { id: "archer", level: 1 }, { id: "warrior", level: 1 }]);
-  sim.units.forEach(u => { u.cooldown = 999; });
-  sim.units[0].hp = 1;
-  sim.enemies.forEach(u => { u.cooldown = 0; });
-  const targets = [];
-  c.Battle.tick(sim, (name, event) => { if (name === "hit" && event.side === "enemy") targets.push(event.targetId); });
-  assert.deepEqual(targets, ["warrior", "archer"]);
-});
-test("defense, forced critical damage, dead units and exact 60s timeout", () => {
-  const c = context();
-  const sim = c.Battle.start(0, [{ id: "warrior", level: 1 }]);
-  sim.units[0].critChance = 1;
-  sim.units[0].atk = 10;
-  sim.units[0].critDamage = 2;
-  sim.enemies[0].def = 20;
-  let hit;
-  c.Battle.tick(sim, (name, event) => { if (name === "hit") hit = event; });
-  assert.equal(hit.amount, 10);
-  assert.equal(hit.crit, true);
-  sim.units.concat(sim.enemies).forEach(u => { u.cooldown = 999; });
-  let reason;
-  while (sim.status === "fighting") c.Battle.tick(sim, (name, e) => { if (name === "stageFail") reason = e.reason; });
-  assert.equal(sim.ticks, 600);
-  assert.equal(reason, "timeout");
-  c.Battle.tick(sim, () => assert.fail("Finished battle emitted again"));
-});
-test("failure restores squad HP and retries the same stage without currency penalty", () => {
-  const c = context();
-  fixture(c, 29);
-  const before = c.Game.getState().gold;
-  assert.equal(untilResult(c).battle.status, "fail");
-  for (let i = 0; i < c.DATA.resultTicks; i++) c.Game.step();
-  const state = c.Game.getState();
-  assert.equal(state.currentStage, 29);
-  assert.equal(state.battle.status, "fighting");
-  assert.ok(state.battle.units.every(u => u.hp === u.maxHp));
-  assert.ok(state.gold >= before);
-});
-test("catchUp below 60 seconds preserves deterministic fast-forward", () => {
-  const a = context(); const b = context();
-  assert.equal(a.Game.catchUp(59999), 599);
-  for (let i = 0; i < 599; i++) b.Game.step();
-  assert.deepEqual(plain(a.Game.getState()), plain(b.Game.getState()));
-  assert.equal(a.Game.catchUp(-1), 0);
-  assert.equal(a.Game.catchUp(NaN), 0);
-  assert.equal(a.Game.catchUp(Infinity), 0);
-  assert.equal(a.Game.catchUp(99), 0);
-});
-test("XP raises level and CP; the rolling five-minute window expires kills", () => {
-  const c = context();
-  const cp = c.Game.getCP();
-  for (let i = 0; i < 1800; i++) c.Game.step();
-  assert.ok(c.Game.getState().mercenaries[0].level > 1);
-  assert.ok(c.Game.getCP() > cp);
-  assert.ok(c.Game.getState().stats.goldPerSec > 0);
-  fixture(c, 29);
-  const state = c.Game.getState();
-  state.stats = { elapsedMs: 300000, samples: [{ at: 0, gold: 5 }], goldPerSec: 1, killsPerSec: 1 };
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
-  assert.equal(c.Game.load(), true);
-  c.Game.step();
-  assert.equal(c.Game.getState().stats.goldPerSec, 0);
-  assert.equal(c.Game.getState().stats.killsPerSec, 0);
-});
-test("locked stages and invalid modes are rejected; corrupted saves preserve live state", () => {
-  const c = context();
-  assert.equal(c.Game.selectStage(1), false);
-  assert.equal(c.Game.selectStage(-1), false);
-  assert.equal(c.Game.setMode("chaos"), false);
-  const before = plain(c.Game.getState());
-  for (const value of ["{", "null", '{"schemaVersion":2}', '{"schemaVersion":1,"state":{}}']) {
-    c.storage.set("squad_v1", value);
-    assert.equal(c.Game.load(), false);
-    assert.deepEqual(plain(c.Game.getState()), before);
-  }
-  const corrupt = plain(before);
-  corrupt.battle.enemies[0].position = 99;
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: 1, savedAt: Date.now(), state: corrupt }));
-  assert.equal(c.Game.load(), false);
-  assert.deepEqual(plain(c.Game.getState()), before);
-});
-test("runtime installs only 100ms combat and 3s autosave timers; pause clears both", () => {
-  const c = context();
-  c.Game.resume(); c.Game.resume();
-  assert.deepEqual([...c.intervals.values()].map(t => t.ms), [100, 3000]);
-  c.Game.pause();
-  assert.equal(c.intervals.size, 0);
-  assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 3);
-});
-test("all 30 stages, equipment data and P3 default skills are defined", () => {
-  const c = context();
-  assert.equal(c.DATA.stages.length, 30);
-  assert.equal(c.DATA.equipmentTiers.length, 8);
-  c.DATA.stages.forEach((stage, i) => {
-    assert.equal(stage.index, i);
-    assert.equal(stage.timeLimit, 60);
-    assert.equal(stage.boss, i % 10 === 9);
-    assert.equal(stage.waves.length, 3);
-    stage.waves.forEach((wave, n) => assert.ok(stage.boss && n === 2 ? wave.length === 1 : wave.length >= 2 && wave.length <= 4));
+test("30 regional stages, three waves and uncapturable placeholder boss species", () => {
+  assert.equal(DATA.stages.length, 30);
+  DATA.stages.forEach((s, i) => {
+    assert.equal(s.timeLimit, 60); assert.equal(s.waves.length, 3);
+    s.waves.flat().forEach(id => assert.equal(DATA.species[id].region, DATA.regions[s.region].id));
+    assert.equal(s.boss, i % 10 === 9);
   });
-  assert.equal(c.Game.getState().inventory.length, 0);
-  assert.ok(c.Game.getState().battle.units.every(u => u.skills.length === 3 && u.skills.every(s => c.DATA.skills.some(d => d.id === s))));
 });
-function setState(c, state) {
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
-  assert.equal(c.Game.load(), true);
-}
-function itemsOf(c, count, slot = "weapon", tier = 1, rarity = "rare") {
-  const items = [];
-  while (items.length < count) {
-    const item = c.Game.rollItem(0, { forcedTier: tier });
-    if (item.slot === slot && item.rarity === rarity) items.push(item);
+test("fresh dewslime/mistfox party clears 1-1 and captures within 180 seconds across 30 seeds", () => {
+  let longest = 0;
+  for (let seed = 1; seed <= 30; seed++) {
+    Game.reset(seed); let captureAt = 0, tick = 0;
+    const off = Game.on("capture", () => { if (!captureAt) captureAt = tick; });
+    while ((!Game.getState().clearedStages.includes(0) || !captureAt) && tick < 1800) { tick++; Game.step(); }
+    assert.ok(Game.getState().clearedStages.includes(0)); assert.ok(captureAt > 0 && captureAt <= 1800);
+    longest = Math.max(longest, captureAt); off();
   }
-  return items;
-}
-function stock(c, items, gold = 1000000, coins = 100) {
-  const state = c.Game.getState();
-  state.inventory = items;
-  state.gold = gold; state.squadCoins = coins;
-  state.mercenaries.forEach(m => { m.equipment = { weapon: null, hat: null, gloves: null, shoes: null }; });
-  setState(c, state);
-}
-test("P2: 2,000 rolls per stage band respect tier bounds, boss tiers, rarity lines and ranges", () => {
-  const c = context();
-  for (const band of c.DATA.dropTables) {
-    for (let n = 0; n < 2000; n++) {
-      const item = c.Game.rollItem(n % 2 ? band.min : band.max);
-      assert.ok(band.tierWeights[item.tier] > 0);
-      if (band.guaranteedTier) assert.equal(item.tier, band.guaranteedTier);
-      assert.equal(item.potentials.length, c.DATA.equipmentRarities[item.rarity].lines);
-      const rank = c.DATA.rarityOrder.indexOf(item.rarity);
-      for (const p of item.potentials) {
-        const option = c.DATA.potentialPool.find(o => o.id === p.id);
-        assert.ok(option.weights[rank] > 0 && p.value >= option.ranges[rank][0] && p.value <= option.ranges[rank][1]);
-      }
-    }
+  console.log("  Longest first capture: " + longest / 10 + "s");
+});
+test("capture math, strict 30% boundary, boost/rank and 100% clamp", () => {
+  assert.ok(Math.abs(Battle.captureProbability("mistfox", .2, 3, 1) - .88 * .8 * 1.06) < 1e-12);
+  assert.equal(Battle.captureProbability("mistfox", .2, 3, 1.5), 1);
+  for (const hp of [0, -.1, .3, .7, NaN]) assert.equal(Battle.captureProbability("mistfox", hp, 1), 0);
+});
+test("capture success removes target, grants one reward, creates exact monster instance", () => {
+  Game.reset(); let captured;
+  const off = Game.on("capture", e => { captured = e; }); Game.step(); off();
+  assert.ok(captured); const s = Game.getState(), enemy = s.battle.enemies.find(e => e.id === captured.id);
+  assert.equal(enemy.hp, 0); assert.equal(enemy.captured, true); assert.equal(s.roster.length, 3);
+  assert.deepEqual(Object.keys(captured.monster).sort(), ["uid", "speciesId", "rarity", "level", "xp", "traits", "enhance", "evo", "party", "camp"].sort());
+  assert.equal(s.gold, DATA.goldPerKill(0)); assert.equal(s.tamerXP, DATA.balance.xpPerKill);
+  assert.equal(s.battle.tamer.captureCooldown, 8);
+});
+test("capture failure consumes boost and respects eight-second cooldown", () => {
+  Game.reset(); const sim = Battle.start(0, Game.getState().roster);
+  sim.enemies[0].hp = sim.enemies[0].maxHp * .2;
+  sim.tamer.cooldowns.captureBoost = 18; sim.tamer.captureBoost = 1.5;
+  const old = Game.rng; Game.rng = () => .999999;
+  // Use lower-rate lakebat so even the boost remains below one at 29% HP.
+  sim.enemies[0].speciesId = "lakebat"; sim.enemies[0].hp = sim.enemies[0].maxHp * .299;
+  let failures = 0, attempts = 0;
+  Battle.tick(sim, e => { if (e === "captureFail") failures++; if (e === "captureAttempt") attempts++; });
+  Game.rng = old; assert.equal(failures, 1); assert.equal(attempts, 1); assert.equal(sim.tamer.captureBoost, 1);
+  assert.equal(sim.tamer.captureCooldown, 8);
+  Battle.tick(sim, e => { if (e === "captureAttempt") attempts++; }); assert.equal(attempts, 1);
+});
+test("roster cap stops capture without deleting existing monsters, offline obeys same cap", () => {
+  Game.reset(); while (Game.getState().roster.length < 20) add(Game, "mistfox");
+  const ids = Game.getState().roster.map(m => m.uid); let attempts = 0;
+  const off = Game.on("captureAttempt", () => attempts++); ticks(Game, 1800); off();
+  assert.equal(attempts, 0); assert.deepEqual(Game.getState().roster.map(m => m.uid), ids);
+  assert.equal(Game.canCapture(), false); const r = Game.catchUp(3600000); assert.equal(r.monsters.length, 0);
+  Game.harvest(); assert.equal(Game.getState().roster.length, 20);
+});
+test("party slots unlock at ranks 3/6/10, slots unique, final member protected", () => {
+  Game.reset(); assert.deepEqual([1, 2, 3, 5, 6, 9, 10, 20].map(r => Game.partySlots(r)), [2, 2, 3, 3, 4, 4, 5, 5]);
+  const m = add(Game, "lakebat"); assert.equal(Game.toggleParty(m.uid), false);
+  edit(Game, s => { s.tamerXP = DATA.rankXP[2]; }); assert.equal(Game.getRank(), 3); assert.equal(Game.toggleParty(m.uid), true);
+  assert.equal(Game.getState().roster.find(u => u.uid === m.uid).party, 2);
+  assert.equal(Game.toggleParty("monster-1"), true); assert.equal(Game.toggleParty("monster-2"), true);
+  assert.equal(Game.toggleParty(m.uid), false); assert.equal(Game.toggleParty("missing"), false);
+});
+test("formation changes wait until next attempt, no healing or capture cooldown reset", () => {
+  Game.reset(); ticks(Game, 12); const before = Game.getState().battle;
+  Game.toggleParty("monster-2"); assert.deepEqual(Game.getState().battle, before);
+  Game.selectStage(0); const after = Game.getState().battle;
+  assert.equal(after.units.length, 1); assert.equal(after.tamer.captureCooldown, before.tamer.captureCooldown);
+});
+test("tank role takes enemy targeting priority independent of roster slot", () => {
+  Game.reset(); const sim = Battle.start(0, Game.getState().roster.slice().reverse());
+  sim.units.forEach(u => { u.cooldown = 10; u.skillCooldown = 10; });
+  sim.enemies.forEach(u => { u.cooldown = 0; });
+  const targets = []; Battle.tick(sim, (e, p) => { if (e === "hit" && p.side === "enemy") targets.push(p.targetId); });
+  assert.ok(targets.length); assert.ok(targets.every(id => id === "monster-1"));
+});
+test("tamer cheer lasts five seconds, heal restores 20%, boost applies to next capture", () => {
+  Game.reset(); const sim = Battle.start(0, Game.getState().roster);
+  sim.units.forEach(u => { u.hp = u.maxHp * .5; u.cooldown = 10; u.skillCooldown = 10; });
+  sim.enemies.forEach(u => { u.cooldown = 10; u.skillCooldown = 10; });
+  sim.tamer.cooldowns = { cheer: 0, heal: 0, captureBoost: 0 };
+  Battle.tick(sim); assert.equal(sim.tamer.captureBoost, 1.5);
+  sim.units.forEach(u => { assert.ok(Math.abs(u.hp / u.maxHp - .7) < 1e-9); assert.ok(u.effects.cheer.remaining > 4.8); });
+  for (let i = 0; i < 50; i++) { sim.enemies.forEach(u => { u.hp = u.maxHp; }); Battle.tick(sim); }
+  assert.ok(sim.units.every(u => !u.effects.cheer));
+});
+test("monster skills heal, shield, hit and DOT; boss cannot be captured", () => {
+  for (const id of ["lakebat", "dewslime", "mistfox", "glowmoth"]) {
+    Game.reset(); const m = Game.rollMonster(id); m.party = 0;
+    const sim = Battle.start(0, [m]); sim.units[0].skillCooldown = 0; sim.units[0].hp *= .5;
+    sim.tamer.cooldowns = { cheer: 15, heal: 12, captureBoost: 18 }; sim.tamer.captureCooldown = 8;
+    const events = []; Battle.tick(sim, (e, p) => events.push([e, p]));
+    assert.ok(events.some(([e, p]) => e === "skill" && p.id === m.uid));
+    if (id === "lakebat") assert.ok(sim.units[0].hp > sim.units[0].maxHp * .5);
+    if (id === "dewslime") assert.ok(sim.units[0].effects.shield.power > 0);
+    if (id === "glowmoth") assert.ok(sim.enemies.some(u => u.effects.poison));
+    if (id === "mistfox") assert.ok(events.some(([e]) => e === "hit"));
   }
-  for (let tier = 1; tier <= 8; tier++) assert.equal(c.Game.rollItem(0, { forcedTier: tier }).tier, tier);
-  assert.equal(c.Game.rollItem(-1), null);
-  assert.equal(c.Game.rollItem(30), null);
-  assert.equal(c.Game.rollItem(0, { forcedTier: 9 }), null);
+  Game.reset(); const sim = Battle.start(9, Game.getState().roster); sim.enemies.forEach(u => { u.boss = true; u.hp *= .2; });
+  let attempts = 0; Battle.tick(sim, e => { if (e === "captureAttempt") attempts++; }); assert.equal(attempts, 0);
 });
-test("P2: every real boss kill drops its guaranteed tier, and fresh play drops in two minutes", () => {
-  const c = context();
-  for (const stage of [9, 19, 29]) {
-    fixture(c, stage, 150);
-    const drops = [];
-    const off = c.Game.on("itemDrop", item => drops.push(item));
-    untilResult(c); off();
-    assert.ok(drops.some(i => i.enemyId === "enemy-2-0" && i.tier === Math.floor(stage / 10) + 2));
-  }
-  c.Game.reset();
-  for (let n = 0; n < 1200; n++) c.Game.step();
-  console.log("     Fresh 120s drops: " + c.Game.getState().inventory.length);
-  assert.ok(c.Game.getState().inventory.length >= 3);
+test("60-second timeout, three waves, repeat and challenge progression", () => {
+  Game.reset(); const sim = Battle.start(0, Game.getState().roster); sim.ticks = 599;
+  sim.units.concat(sim.enemies).forEach(u => { u.cooldown = 10; u.skillCooldown = 10; });
+  Battle.tick(sim); assert.equal(sim.status, "fail"); assert.equal(sim.ticks, 600);
+  Game.setMode("repeat"); ticks(Game, 600); assert.equal(Game.getState().currentStage, 0);
+  Game.setMode("challenge"); ticks(Game, 600); assert.ok(Game.getState().currentStage > 0);
 });
-test("P2: fusion validates three distinct matching unlocked unequipped materials and gold", () => {
-  const c = context();
-  const items = itemsOf(c, 3).concat(itemsOf(c, 1, "hat"), itemsOf(c, 1, "weapon", 2));
-  stock(c, items, 99);
-  const uids = items.slice(0, 3).map(i => i.uid);
-  assert.equal(c.Game.fuse(uids), null);
-  stock(c, items);
-  const before = plain(c.Game.getState());
-  for (const bad of [[], uids.slice(0, 2), [uids[0], uids[0], uids[1]], [uids[0], uids[1], "missing"],
-    [uids[0], uids[1], items[3].uid], [uids[0], uids[1], items[4].uid]]) assert.equal(c.Game.fuse(bad), null);
-  assert.deepEqual(plain(c.Game.getState()), before);
-  c.Game.toggleLock(uids[0]); assert.equal(c.Game.fuse(uids), null); c.Game.toggleLock(uids[0]);
-  c.Game.equip(uids[0], "warrior"); assert.equal(c.Game.fuse(uids), null); c.Game.unequip("warrior", "weapon");
-  const result = c.Game.fuse(uids);
-  assert.equal(result.tier, 2); assert.equal(result.slot, "weapon");
-  assert.equal(c.Game.getState().gold, 999900);
-  assert.ok(!c.Game.getState().inventory.some(i => uids.includes(i.uid)));
-  stock(c, itemsOf(c, 3, "weapon", 8));
-  assert.equal(c.Game.fuse(c.Game.getState().inventory.map(i => i.uid)), null);
+test("rarity/potential helper supplies 0–3 valid traits and stat multipliers", () => {
+  Game.reset(); const base = Game.monsterStats("monster-2");
+  DATA.rarityOrder.forEach((r, i) => {
+    const m = Game.rollMonster("mistfox", r); assert.equal(m.traits.length, i);
+    const stats = Game.monsterStats(m); assert.ok(stats.hp >= base.hp * DATA.rarities[r].multiplier - 1);
+  });
 });
-test("P2: rarity bumps at 0.15 ± 0.02 over 5,000 actual fusions; highest rarity is retained", () => {
-  const c = context();
-  let bumps = 0;
-  for (let n = 0; n < 5000; n++) {
-    const items = itemsOf(c, 3);
-    stock(c, items);
-    const item = c.Game.fuse(items.map(i => i.uid));
-    if (item.rarity === "epic") bumps++;
-    else assert.equal(item.rarity, "rare");
-  }
-  console.log("     Fusion bump rate: " + bumps / 5000);
-  assert.ok(Math.abs(bumps / 5000 - 0.15) <= 0.02);
-  const mixed = itemsOf(c, 2).concat(itemsOf(c, 1, "weapon", 1, "legendary"));
-  stock(c, mixed);
-  assert.equal(c.Game.fuse(mixed.map(i => i.uid)).rarity, "legendary");
+test("save/load/export/import preserves roster, HP, cooldowns, XP, dex and RNG", () => {
+  Game.reset(123); ticks(Game, 99); const before = Game.getState(), json = Game.exportSave();
+  assert.equal(JSON.parse(json).schemaVersion, 4); assert.ok(Game.validateSave(json));
+  ticks(Game, 400); assert.equal(Game.load(json), true); assert.deepEqual(Game.getState(), before);
+  assert.equal(Game.importSave(json), true); assert.deepEqual(Game.getState(), before);
+  const draws = Array.from({ length: 8 }, () => Game.rng()); Game.load(json);
+  assert.deepEqual(Array.from({ length: 8 }, () => Game.rng()), draws);
 });
-test("P2: autoFuse cascades lowest tier first, respects protection, gold and tier 8", () => {
-  const c = context();
-  const items = itemsOf(c, 27).concat(itemsOf(c, 6, "hat"), itemsOf(c, 3, "shoes", 8));
-  items[27].locked = true;
-  stock(c, items);
-  c.Game.equip(items[28].uid, "warrior");
-  const results = c.Game.autoFuse();
-  assert.equal(results.at(-1).tier, 4);
-  assert.ok(results.slice(0, 10).every(i => i.tier === 2));
-  const state = c.Game.getState();
-  assert.equal(state.inventory.find(i => i.uid === items[27].uid).locked, true);
-  assert.equal(state.inventory.find(i => i.uid === items[28].uid).equippedBy, "warrior");
-  for (const slot of c.DATA.equipmentSlots) for (let t = 1; t < 8; t++) {
-    assert.ok(state.inventory.filter(i => i.slot === slot.id && i.tier === t && !i.locked && !i.equippedBy).length < 3);
-  }
-  c.Game.unequip("warrior", "hat");
-  stock(c, itemsOf(c, 9), 100);
-  assert.equal(c.Game.autoFuse().length, 1);
-  assert.equal(c.Game.getState().gold, 0);
+test("v3 and malformed imports rejected atomically, fresh init replaces old schema", () => {
+  Game.reset(); const json = Game.save(), before = Game.getState();
+  const badEdits = [s => { s.roster[0].party = 4; }, s => { s.roster[1].uid = s.roster[0].uid; },
+    s => { s.battle.units[0].hp = -1; }, s => { s.battle.tamer.captureBoost = 99; }, s => { s.dex = {}; },
+    s => { s.roster[0].speciesId = "__proto__"; }, s => { s.roster[0].enhance = 1; },
+    s => { s.pendingReport = { elapsedMs: 1, gold: 10, xp: 1, monsters: [s.roster[0]], stageIndex: 0 }; }];
+  badEdits.forEach(fn => { const d = JSON.parse(json); fn(d.state); assert.equal(Game.load(JSON.stringify(d)), false); assert.deepEqual(Game.getState(), before); });
+  assert.equal(Game.load('{"schemaVersion":3,"state":{}}'), false);
+  const c = runtime(); c.storage.set("squad_v1", '{"schemaVersion":3,"state":{}}'); c.Game.init();
+  assert.equal(c.Game.getState().roster.length, 2); assert.equal(JSON.parse(c.storage.get("squad_v1")).schemaVersion, 4);
 });
-test("P2: equip raises CP immediately, preserves HP ratio and unequip restores CP", () => {
-  const c = context();
-  const items = itemsOf(c, 1).concat(itemsOf(c, 1, "hat"));
-  stock(c, items);
-  for (let i = 0; i < 20; i++) c.Game.step();
-  const cp = c.Game.getCP(), unit = c.Game.getState().battle.units[0];
-  assert.equal(c.Game.equip(items[0].uid, "archer"), false);
-  c.Game.equip(items[0].uid, "warrior"); c.Game.equip(items[1].uid, "warrior");
-  assert.ok(c.Game.getCP() > cp);
-  const after = c.Game.getState().battle.units[0];
-  assert.ok(after.atk > unit.atk && after.maxHp > unit.maxHp);
-  assert.ok(Math.abs(after.hp / after.maxHp - unit.hp / unit.maxHp) < 1e-12);
-  c.Game.unequip("warrior", "weapon"); c.Game.unequip("warrior", "hat");
-  assert.equal(c.Game.getCP(), cp);
-  assert.equal(c.Game.getState().inventory[0].equippedBy, null);
+test("offline rewards use 70% gold/XP, eight-hour cap, 50% capture probability, one-time harvest", () => {
+  Game.reset(); const before = Game.getState(); const report = Game.catchUp(3600000);
+  assert.equal(report.gold, 1260); assert.equal(report.xp, 756); assert.ok(report.monsters.length > 0 && report.monsters.length <= 18);
+  assert.equal(Game.getState().gold, before.gold); assert.equal(Game.getState().roster.length, 2);
+  const pending = Game.save(), frozen = Game.getState(); ticks(Game, 100); assert.deepEqual(Game.getState(), frozen);
+  assert.deepEqual(Game.catchUp(3600000), report); assert.equal(Game.load(pending), true);
+  assert.deepEqual(Game.harvest(), report); const after = Game.getState(); assert.equal(Game.harvest(), false); assert.deepEqual(Game.getState(), after);
+  assert.equal(after.gold, report.gold); assert.equal(after.roster.length, report.monsters.length + 2);
+  Game.reset(); assert.equal(Game.catchUp(99 * 3600000).elapsedMs, 8 * 3600000);
+  // At 20% HP, .6 passes online rates but exceeds all region-1 half-probabilities.
+  Game.reset(); const old = Game.rng; Game.rng = () => .6;
+  assert.equal(Game.catchUp(60000).monsters.length, 0); Game.rng = old;
 });
-test("P2: sell is atomic, lock protects materials, reroll charges 20 and works while locked/equipped", () => {
-  const c = context();
-  const items = itemsOf(c, 3);
-  stock(c, items, 0, 20);
-  c.Game.toggleLock(items[0].uid);
-  assert.equal(c.Game.sell([items[0].uid, items[1].uid]), false);
-  c.Game.equip(items[1].uid, "warrior");
-  assert.equal(c.Game.sell([items[1].uid]), false);
-  assert.equal(c.Game.sell([items[2].uid, items[2].uid]), false);
-  assert.equal(c.Game.sell(["missing"]), false);
-  assert.equal(c.Game.sell([items[2].uid]), c.DATA.sellPrice(1, "rare"));
-  c.Game.equip(items[0].uid, "warrior");
-  let event; c.Game.on("potentialReroll", e => { event = e; });
-  const rolled = c.Game.rerollPotentials(items[0].uid);
-  assert.equal(rolled.locked, true); assert.equal(rolled.equippedBy, "warrior");
-  assert.equal(event.before.length, event.after.length);
-  assert.equal(c.Game.getState().squadCoins, 0);
-  assert.equal(c.Game.rerollPotentials(items[0].uid), null);
+test("short offline catch-up uses half capture probability, correct threshold and bounded ticks", () => {
+  Game.reset(); const old = Game.rng; Game.rng = () => .6;
+  assert.equal(Game.catchUp(100), 1); assert.equal(Game.getState().roster.length, 2); Game.rng = old;
+  assert.equal(Game.captureMultiplier(), 1); assert.equal(Game.catchUp(NaN), 0);
+  Game.reset(); assert.equal(Game.catchUp(59999), 599); assert.equal(Game.getState().pendingReport, null);
+  assert.ok(Game.catchUp(60000).monsters);
 });
-test("P2: schema v1 migration and populated v2 round-trip; bad equipment saves rejected", () => {
-  const c = context();
-  const legacy = c.Game.getState();
-  legacy.schemaVersion = 1;
-  delete legacy.inventory; delete legacy.overflow; delete legacy.nextItemUid;
-  legacy.mercenaries.forEach(m => { delete m.equipment; });
-  c.storage.set("squad_v1", JSON.stringify({ schemaVersion: 1, savedAt: Date.now(), state: legacy }));
-  assert.equal(c.Game.load(), true);
-  assert.equal(c.Game.getState().schemaVersion, 3);
-  assert.deepEqual(plain(c.Game.getState().inventory), []);
-  const item = itemsOf(c, 1)[0]; stock(c, [item]); c.Game.equip(item.uid, "warrior");
-  c.Game.save(); const before = plain(c.Game.getState());
-  assert.equal(c.Game.load(), true); assert.deepEqual(plain(c.Game.getState()), before);
-  for (const corrupt of [s => { s.inventory.push(s.inventory[0]); }, s => { s.inventory[0].base.atk = 999; },
-    s => { s.mercenaries[0].equipment.weapon = null; }, s => { s.inventory[0].potentials[0].value = 500; }]) {
-    const state = plain(before); corrupt(state);
-    c.storage.set("squad_v1", JSON.stringify({ schemaVersion: c.DATA.schemaVersion, savedAt: Date.now(), state }));
-    assert.equal(c.Game.load(), false); assert.deepEqual(plain(c.Game.getState()), before);
-  }
+test("dex tracks seen vs caught and supplies silhouettes only for unseen entries", () => {
+  Game.reset(); let dex = Game.getDex(); assert.equal(dex.length, 18);
+  assert.ok(dex.find(e => e.speciesId === "dewslime").caught);
+  assert.equal(dex.find(e => e.speciesId === "lakebat").seen, true); assert.equal(dex.find(e => e.speciesId === "lakebat").caught, false);
+  assert.equal(dex.find(e => e.speciesId === "icewolf").silhouette, true); assert.equal(dex.find(e => e.speciesId === "icewolf").name, "미발견");
+  Game.step(); dex = Game.getDex(); assert.ok(dex.find(e => e.speciesId === "mistfox").caught);
+  dex.forEach(e => assert.equal(e.silhouette, !e.seen));
 });
-test("P2: inventory cap sells lowest eligible rare; fully protected bag monetizes incoming drop", () => {
-  const c = context();
-  fixture(c, 9, 150);
-  const items = itemsOf(c, 60, "weapon", 3);
-  items[0].locked = true;
-  stock(c, items);
-  c.Game.equip(items[1].uid, "warrior");
-  const events = [], drops = [];
-  c.Game.on("inventoryFull", e => events.push(e)); c.Game.on("itemDrop", e => drops.push(e));
-  untilResult(c);
-  assert.ok(events.length >= 1); assert.equal(events.length, drops.length);
-  assert.equal(c.Game.getState().inventory.length, 60);
-  assert.ok(events.every(e => e.sold.tier === 2 && !e.kept || e.sold.tier === 3 && e.kept));
-  assert.ok(c.Game.getState().inventory.some(i => i.uid === items[0].uid));
-  assert.ok(c.Game.getState().inventory.some(i => i.uid === items[1].uid));
-  fixture(c, 9, 150);
-  const protectedItems = itemsOf(c, 60); protectedItems.forEach(i => { i.locked = true; }); stock(c, protectedItems);
-  events.length = 0; drops.length = 0; untilResult(c);
-  assert.ok(events.length >= 1 && events.every(e => !e.kept && e.gold > 0));
-  assert.equal(c.Game.getState().overflow, events.length);
-  assert.equal(c.Game.getState().inventory.length, 60);
+test("10Hz timer and idempotent pause/resume, four namespaces and DOM-free logic", () => {
+  const c = runtime(); c.Game.resume(); c.Game.resume(); assert.equal(c.timers.size, 2);
+  assert.ok([...c.timers.values()].some(t => t.ms === 100)); c.Game.pause(); c.Game.pause(); assert.equal(c.timers.size, 0);
+  files.forEach(f => { const text = fs.readFileSync(path.join(root, "js", f + ".js"), "utf8"); assert.ok(!/Math\.random\(|\bdocument\b|\bwindow\b/.test(text), f); });
+  const all = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith('.js'));
+  all.forEach(f => assert.ok(fs.readFileSync(path.join(root, "js", f), "utf8").split('\n').length <= 600, f));
 });
-test("P2: all combat potentials apply, gold/drop bonuses work and invincibility is enabled", () => {
-  const c = context();
-  const items = c.DATA.equipmentSlots.map(s => itemsOf(c, 1, s.id, 1, "legendary")[0]);
-  items[0].potentials = [{ id: "atkPct", value: .2 }, { id: "hpPct", value: .25 }, { id: "defPct", value: .25 }];
-  items[1].potentials = [{ id: "attackSpeedPct", value: .15 }, { id: "critChance", value: .12 }, { id: "critDamage", value: .4 }];
-  items[2].potentials = [{ id: "goldPct", value: .3 }, { id: "dropPct", value: .12 }, { id: "invincibleOnHit", value: .06 }];
-  items[3].potentials = [{ id: "atkPct", value: .2 }, { id: "hpPct", value: .25 }, { id: "defPct", value: .25 }];
-  stock(c, items, 0);
-  items.forEach(i => c.Game.equip(i.uid, "warrior"));
-  const base = c.DATA.mercenaryStats("warrior", 1), stats = c.Game.mercenaryStats("warrior");
-  for (const key of ["atk", "hp", "def", "attackSpeed", "critChance", "critDamage"]) {
-    const flat = base[key] + items.reduce((sum, i) => sum + (i.base[key] || 0), 0);
-    const expected = ({ atk: flat * 1.4, hp: flat * 1.5, def: flat * 1.5, attackSpeed: flat * 1.15,
-      critChance: flat + .12, critDamage: flat + .4 })[key];
-    assert.ok(Math.abs(stats[key] - expected) < 1e-10, key);
-  }
-  assert.equal(stats.invincibleOnHit, true);
-  const save = JSON.parse(c.Game.save());
-  save.state.battle.enemies[0].hp = 1; save.state.battle.units[0].skills = [];
-  setState(c, save.state);
-  c.Game.rng = () => .085; // Above 8%, below the equipped 8.96% drop threshold.
-  c.Game.step();
-  assert.equal(c.Game.getState().gold, 7);
-  assert.equal(c.Game.getState().inventory.length, 5);
-  const plainGame = context();
-  const plainState = plainGame.Game.getState(); plainState.battle.enemies[0].hp = 1; plainState.battle.units[0].skills = []; setState(plainGame, plainState);
-  plainGame.Game.rng = () => .085;
-  plainGame.Game.step();
-  assert.equal(plainGame.Game.getState().inventory.length, 0);
-  assert.equal(plainGame.Game.getState().gold, 5);
-});
-test("P2: transferring gear clears old owner, and changing gear never revives a downed ally", () => {
-  const c = context(); fixture(c, 6, 1);
-  const item = itemsOf(c, 1, "hat")[0]; stock(c, [item]);
-  const before = c.Game.getCP(); c.Game.equip(item.uid, "warrior"); c.Game.equip(item.uid, "archer");
-  let state = c.Game.getState();
-  assert.equal(state.mercenaries[0].equipment.hat, null);
-  assert.equal(state.mercenaries[1].equipment.hat, item.uid);
-  assert.equal(state.inventory[0].equippedBy, "archer");
-  c.Game.unequip("archer", "hat"); assert.equal(c.Game.getCP(), before);
-  state = c.Game.getState(); state.battle.units[0].hp = 0; setState(c, state);
-  c.Game.equip(item.uid, "warrior");
-  assert.equal(c.Game.getState().battle.units[0].hp, 0);
-  c.Game.unequip("warrior", "hat");
-  assert.equal(c.Game.getState().battle.units[0].hp, 0);
-});
-test("Art: DATA.assets matches all 31 manifest keys and files exist", () => {
-  const c = context();
-  const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "../assets/manifest.json"), "utf8"));
-  assert.equal(Object.keys(manifest).length, 31);
-  assert.deepEqual(plain(c.DATA.assets), manifest);
-  for (const file of Object.values(c.DATA.assets)) assert.ok(fs.statSync(path.join(__dirname, "..", file)).isFile(), file);
-});
-require("./p3")({ test, context, plain, setState, fixture, untilResult, assert });
-console.log("\n" + passed + " tests passed.");
+console.log("\n" + passed + " PASS");

@@ -1,6 +1,6 @@
 "use strict";
 
-var Native = (function () {
+UI.native = (function () {
   var initialized = false;
   function isNative() { return !!window.Capacitor?.isNativePlatform(); }
   function plugin(name) {

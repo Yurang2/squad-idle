@@ -1,100 +1,62 @@
 "use strict";
-
 (function () {
-  var failed = new Set(), counters = new Map();
-  var regions = DATA.artRegions;
-  UI.artRegion = function (index) { return regions[index]; };
-  UI.assetPath = function (key) { return failed.has(key) ? null : DATA.assets[key]; };
-  UI.assetError = function (node) {
-    failed.add(node.dataset.asset);
-    node.removeAttribute("href"); node.removeAttribute("src"); node.style.display = "none";
-    var fallback = node.parentNode?.querySelector(".asset-fallback");
-    if (fallback) fallback.style.display = "";
+  var captureFrame=0, cardFrame=0;
+  UI.icon=function(name) {
+    var paths={
+      gold:'<circle cx="12" cy="12" r="8"/><path d="M12 7v10m3-8h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9"/>',
+      lantern:'<path d="M8 8h8l2 12H6L8 8zm1 0V5a3 3 0 0 1 6 0v3M5 20h14M9 12v4m6-4v4"/>',
+      compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5 5-3z"/>',
+      paw:'<ellipse cx="7" cy="7" rx="2" ry="3"/><ellipse cx="16" cy="6" rx="2" ry="3"/><ellipse cx="21" cy="12" rx="1.5" ry="2.5"/><ellipse cx="3" cy="13" rx="1.5" ry="2.5"/><path d="M7 15q5-8 10 0c6 8-16 8-10 0z"/>',
+      book:'<path d="M12 5v16M3 4q5-2 9 1 4-3 9-1v15q-5-2-9 2-4-4-9-2V4z"/>',
+      settings:'<circle cx="12" cy="12" r="4"/><path d="M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1 1-3z"/>',
+      close:'<path d="m6 6 12 12M18 6 6 18"/>',left:'<path d="m14 5-7 7 7 7"/>',right:'<path d="m10 5 7 7-7 7"/>'
+    };
+    return '<svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true">'+(paths[name]||paths.lantern)+'</svg>';
   };
-  UI.assetLoaded = function (node) {
-    var fallback = node.parentNode?.querySelector(".asset-fallback");
-    if (fallback) fallback.style.display = "none";
+  UI.sceneBackground=function(region) {
+    var layer=document.getElementById("background-layer");
+    if(layer.dataset.region===String(region))return; layer.dataset.region=region;
+    // DECISION: Three sparse layers follow STYLE v2; old detailed/chibi backgrounds are retired.
+    var distant=[
+      '<path d="M0 145q60-40 120-8t130-4 125-5v90H0z" fill="#E6D8DF"/>',
+      '<path d="m0 165 72-87 48 54 74-74 100 89 42-60 39 62v70H0z" fill="#DCCFD8"/>',
+      '<path d="M0 135h74v19h50v-37h72v27h57v-42h72v46h50v74H0z" fill="#E6D8DF"/>'
+    ][region];
+    layer.innerHTML='<rect width="375" height="330" fill="url(#dawn)"/>'+distant+
+      '<path d="M0 200q95-20 190 0t185-4v134H0z" fill="#FBE8DF"/><path d="M0 255q130-25 220-7t155-2v84H0z" fill="#FEF4E7"/>'+
+      '<path d="M17 291h35m211 16h42M208 180h36" fill="none" stroke="#DCCFD8" stroke-width="1"/>';
   };
-  UI.icon = function (key, fallback) {
-    var path = UI.assetPath("icon." + key);
-    return '<span class="asset-icon" aria-hidden="true"><span class="asset-fallback">' + fallback + '</span>' +
-      (path ? '<img alt="" src="' + path + '" data-asset="icon.' + key + '" onload="UI.assetLoaded(this)" onerror="UI.assetError(this)">' : '') + '</span>';
-  };
-  UI.portrait = function (id, fallback) {
-    var key = "merc." + id + ".idle", path = UI.assetPath(key);
-    return '<svg viewBox="-48 -92 96 100" aria-hidden="true"><g class="asset-fallback">' + fallback + '</g>' +
-      (path ? '<image x="-48" y="-91.2" width="96" height="96" href="' + path + '" data-asset="' + key +
-        '" onload="UI.assetLoaded(this)" onerror="UI.assetError(this)"/>' : '') + '</svg>';
-  };
-  UI.spriteImage = function (parent, key, size) {
-    var path = UI.assetPath(key);
-    if (!path) return null;
-    var image = document.createElementNS("http://www.w3.org/2000/svg", "image");
-    image.setAttribute("class", "sprite-image"); image.dataset.asset = key;
-    image.setAttribute("x", -size / 2); image.setAttribute("y", -size * .95);
-    image.setAttribute("width", size); image.setAttribute("height", size);
-    image.addEventListener("error", function () { UI.assetError(image); });
-    image.addEventListener("load", function () { UI.assetLoaded(image); });
-    parent.appendChild(image); image.setAttribute("href", path);
-    return image;
-  };
-  UI.sceneBackground = function (region) {
-    var parent = document.getElementById("scene-background"), key = "bg." + regions[region].bg;
-    if (parent.dataset.asset === key) return;
-    parent.dataset.asset = key;
-    parent.querySelector("image")?.remove();
-    parent.querySelector(".asset-fallback").style.display = "";
-    var image = UI.spriteImage(parent, key, 390);
-    if (image) {
-      image.setAttribute("x", 0); image.setAttribute("y", 0);
-      image.setAttribute("width", 390); image.setAttribute("height", 340);
-      image.setAttribute("preserveAspectRatio", "xMidYMid slice"); image.setAttribute("class", "region-image");
-    }
-  };
-  UI.attackSprite = function (sprite) {
-    var image = sprite.querySelector(".sprite-image");
-    if (!image || !image.dataset.asset.startsWith("merc.")) return;
-    var idle = image.dataset.asset.replace(".attack", ".idle"), attack = idle.replace(".idle", ".attack");
-    if (!UI.assetPath(attack)) return;
-    cancelAnimationFrame(image.attackFrame);
-    image.dataset.asset = attack; image.setAttribute("href", UI.assetPath(attack));
-    var start = performance.now();
+  function afterFrames(duration,fn,kind) {
+    var started=performance.now();
     function frame(now) {
-      if (!image.isConnected) return;
-      if (now - start < 120) { image.attackFrame = requestAnimationFrame(frame); return; }
-      image.dataset.asset = idle;
-      if (UI.assetPath(idle)) { image.style.display = ""; image.setAttribute("href", UI.assetPath(idle)); }
+      if(now-started>=duration){fn();return;}
+      if(kind==="pose")captureFrame=requestAnimationFrame(frame); else cardFrame=requestAnimationFrame(frame);
     }
-    image.attackFrame = requestAnimationFrame(frame);
+    if(kind==="pose")captureFrame=requestAnimationFrame(frame); else cardFrame=requestAnimationFrame(frame);
+  }
+  UI.initArt=function() {
+    Object.values(DATA.assets).forEach(function(src){var img=new Image();img.src=src;});
+    Game.on("captureAttempt",function() {
+      cancelAnimationFrame(captureFrame);
+      var tamer=document.getElementById("tamer-image"); tamer.setAttribute("href",DATA.assets.tamerCapture);tamer.classList.add("capturing");
+      afterFrames(120,function(){tamer.setAttribute("href",DATA.assets.tamer);tamer.classList.remove("capturing");},"pose");
+    });
+    Game.on("capture",function(e) {
+      var target=document.getElementById("sprite-"+e.id);
+      if(target) {
+        var glow=UI.svgNode("circle",{cx:target.dataset.x,cy:Number(target.dataset.y)-25,r:37,class:"lantern-glow"});
+        document.getElementById("effect-layer").appendChild(glow);glow.addEventListener("animationend",function(){glow.remove();},{once:true});
+      }
+      var species=DATA.species[e.monster.speciesId], rarity=DATA.rarities[e.monster.rarity];
+      var card=document.getElementById("capture-reveal");cancelAnimationFrame(cardFrame);
+      card.innerHTML='<div class="capture-card" style="border-color:'+rarity.color+'"><span>새로운 동료</span><img src="'+species.art+'" alt=""><strong>'+species.name+'</strong><small>'+rarity.name+'</small></div>';
+      afterFrames(1800,function(){card.replaceChildren();},"card");
+    });
+    Game.on("captureFail",function(){UI.toast("랜턴 빛을 벗어났어요. 잠시 후 다시 시도합니다.");});
+    Game.on("skill",function(e) {
+      var unit=document.getElementById("sprite-"+e.id);
+      var text=UI.svgNode("text",{x:unit?unit.dataset.x:60,y:unit?Number(unit.dataset.y)-72:97,"text-anchor":"middle",class:"skill-label"},e.name);
+      document.getElementById("effect-layer").appendChild(text);text.addEventListener("animationend",function(){text.remove();},{once:true});
+    });
   };
-  UI.countUp = function (id, value) {
-    var node = document.getElementById(id), counter = counters.get(id);
-    if (!counter) { counters.set(id, { target: value, value: value }); node.textContent = UI.fmt(value); return; }
-    if (counter.target === value) return;
-    cancelAnimationFrame(counter.frame);
-    var from = counter.value, start = performance.now(); counter.target = value;
-    function frame(now) {
-      var t = Math.min(1, (now - start) / 300);
-      counter.value = from + (value - from) * (1 - (1 - t) ** 3);
-      node.textContent = UI.fmt(Math.round(counter.value));
-      if (t < 1) counter.frame = requestAnimationFrame(frame);
-    }
-    counter.frame = requestAnimationFrame(frame);
-  };
-  UI.levelUp = function (event) {
-    var sprite = document.getElementById("sprite-" + event.id);
-    if (!sprite) return;
-    var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", sprite.dataset.x); label.setAttribute("y", Number(sprite.dataset.y) - 104);
-    label.setAttribute("text-anchor", "middle"); label.setAttribute("class", "level-up-label");
-    label.textContent = "LEVEL UP!"; document.getElementById("effect-layer").appendChild(label);
-    label.addEventListener("animationend", function () { label.remove(); }, { once: true });
-  };
-  document.querySelectorAll("[data-icon]").forEach(function (node) { node.innerHTML = UI.icon(node.dataset.icon, node.textContent); });
-  // DECISION: Warm attack frames before the first combat tick; failed frames are never retried this session.
-  DATA.mercenaries.forEach(function (merc) {
-    var key = "merc." + merc.id + ".attack", path = UI.assetPath(key);
-    if (!path) return;
-    var frame = new Image(); frame.onerror = function () { failed.add(key); }; frame.src = path;
-  });
 })();
