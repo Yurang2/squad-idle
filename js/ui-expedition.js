@@ -19,7 +19,7 @@
     el("sheet-content").innerHTML = '<p class="sheet-intro">슬롯 순서대로 자동 발동합니다. 해제 후 탭하면 마지막 슬롯에 배치됩니다.</p>' +
       '<div class="skill-selector">' + state.mercenaries.map(function (m) {
         return '<button data-skill-owner="' + m.id + '" aria-pressed="' + (owner === m.id) + '" class="' + (owner === m.id ? 'active' : '') + '">' + mercName(m.id) + '</button>';
-      }).join('') + '</div><p class="skill-books">' + mercName(owner) + ' 스킬북 <b>' + UI.fmt(state.skillBooks[owner]) + '</b></p>' +
+      }).join('') + '</div><p class="skill-books">' + UI.icon('skillbook', '▤') + mercName(owner) + ' 스킬북 <b>' + UI.fmt(state.skillBooks[owner]) + '</b></p>' +
       '<div class="active-skills">' + [0, 1, 2].map(function (index) {
         var skill = DATA.skills.find(function (s) { return s.id === merc.skills[index]; });
         return '<span>' + UI.fmt(index + 1) + ' · ' + (skill ? skill.name : '빈 슬롯') + '</span>';
@@ -79,14 +79,14 @@
   var overlay = document.createElement("dialog");
   overlay.id = "offline-report"; overlay.setAttribute("aria-labelledby", "report-title");
   overlay.innerHTML = '<div class="report-heading"><p class="eyebrow">용병단이 돌아왔습니다</p><h2 id="report-title">원정 보고서</h2><p id="report-duration"></p></div>' +
-    '<div class="report-gold"><span>획득 골드</span><strong id="report-gold">0</strong></div><p id="report-stats"></p>' +
+    '<div class="report-gold"><span>' + UI.icon("gold", "🪙") + '획득 골드</span><strong id="report-gold">0</strong></div><p id="report-stats"></p>' +
     '<p id="report-progress" aria-live="polite">탭하면 모두 공개</p><div id="report-items"></div>' +
     '<div class="harvest-footer"><p>장비함이 가득 차면 자동 판매 규칙이 적용됩니다.</p><button id="harvest-report" class="primary">수확하기</button></div>';
   el("app").appendChild(overlay);
   function revealOne(item) {
     var card = document.createElement("div");
     card.className = "fusion-card";
-    var content = item.kind === "skillBook" ? '<span class="item-card book-card"><span class="item-icon">▤</span><b>' + mercName(item.owner) + '</b><small>스킬북 ×' + UI.fmt(item.count) + '</small></span>' : UI.itemCard(item);
+    var content = item.kind === "skillBook" ? '<span class="item-card book-card"><span class="item-icon">' + UI.icon("skillbook", "▤") + '</span><b>' + mercName(item.owner) + '</b><small>스킬북 ×' + UI.fmt(item.count) + '</small></span>' : UI.itemCard(item);
     card.innerHTML = '<div class="flip-inner"><div class="card-back">◇</div><div class="card-front">' + content + '</div></div>';
     el("report-items").appendChild(card);
     if (DATA.rarityOrder.indexOf(item.rarity) >= 2) { card.classList.add("rarity-upgrade"); UI.lootFlash(true); if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(30); }
@@ -95,11 +95,11 @@
   function tick(now) {
     if (!overlay.open) return;
     var elapsed = now - started;
-    el("report-gold").textContent = UI.fmt(Math.floor(report.gold * Math.min(1, elapsed / 1000)));
-    var count = Math.min(report.items.length, Math.max(0, Math.floor((elapsed - 1000) / 200) + 1));
+    el("report-gold").textContent = UI.fmt(Math.floor(report.gold * Math.min(1, elapsed / 300)));
+    var count = Math.min(report.items.length, Math.max(0, Math.floor((elapsed - 300) / 200) + 1));
     while (shown < count) revealOne(report.items[shown++]);
     progress();
-    if (elapsed < 1000 || shown < report.items.length) frame = requestAnimationFrame(tick);
+    if (elapsed < 300 || shown < report.items.length) frame = requestAnimationFrame(tick);
     else frame = null;
   }
   function skip() {
@@ -127,6 +127,7 @@
   Game.on("skill", function (event) {
     var sprite = el("sprite-" + event.id);
     if (!sprite) return;
+    UI.attackSprite(sprite);
     var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", sprite.dataset.x); label.setAttribute("y", Number(sprite.dataset.y) - 94);
     label.setAttribute("text-anchor", "middle"); label.setAttribute("class", "skill-label"); label.textContent = event.name;

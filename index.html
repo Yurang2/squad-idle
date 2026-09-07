@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#111916">
+  <meta name="theme-color" content="#8FD3FF">
   <meta name="description" content="안개 너머로 나아가는 작은 용병단. 자동 전투와 성장의 첫 번째 원정.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23111916'/%3E%3Ctext x='20' y='29' text-anchor='middle' font-size='28' fill='%23e4af65'%3E⚔%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/icon/weapon.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;700;800&amp;family=Jua&amp;display=swap">
   <link rel="stylesheet" href="style.css">
   <title>용병단 · 첫 번째 원정</title>
 </head>
@@ -14,9 +15,9 @@
     <header class="hud">
       <div class="brand-row"><h1><span class="brand-mark">⚔</span> 용병단</h1><span class="chapter-label">첫 번째 원정</span><span class="save-state" id="save-status">자동 저장</span></div>
       <div class="resources">
-        <div class="resource power"><span class="resource-label">전투력 <small>CP</small></span><strong id="cp">0</strong></div>
-        <div class="resource"><span class="resource-label"><i class="gold-dot"></i> 골드</span><strong id="gold">0</strong></div>
-        <div class="resource"><span class="resource-label"><i class="coin-gem">◆</i> 코인</span><strong id="coins">0</strong></div>
+        <div class="resource power"><span class="resource-label"><span data-icon="weapon">⚔</span>전투력</span><strong id="cp">0</strong></div>
+        <div class="resource"><span class="resource-label"><span data-icon="gold">🪙</span>골드</span><strong id="gold">0</strong></div>
+        <div class="resource"><span class="resource-label"><span data-icon="coin">◆</span>코인</span><strong id="coins">0</strong></div>
       </div>
     </header>
     <section class="expedition" aria-label="자동 전투">
@@ -24,20 +25,14 @@
       <div class="time-track"><div id="time-fill"></div></div>
       <div class="battle-scene">
         <div class="scene-topline"><span class="auto-badge"><i></i> 자동 전투 중</span><span id="wave-label">웨이브 1 / 3</span></div>
-        <svg id="battle-svg" viewBox="0 0 390 340" role="img" aria-label="용병과 몬스터의 자동 전투 장면">
-          <defs>
-            <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#1b302c"/><stop offset="1" stop-color="#111e1c"/></linearGradient>
-            <radialGradient id="moon-glow"><stop stop-color="#bdd0b0" stop-opacity=".2"/><stop offset="1" stop-color="#bdd0b0" stop-opacity="0"/></radialGradient>
-            <linearGradient id="ground" x2="0" y2="1"><stop stop-color="#2c3b30"/><stop offset="1" stop-color="#14211c"/></linearGradient>
-          </defs>
-          <rect width="390" height="340" fill="url(#sky)"/>
-          <circle cx="250" cy="81" r="107" fill="url(#moon-glow)"/><circle cx="250" cy="81" r="25" fill="#b6c6a4" opacity=".35"/><circle cx="263" cy="72" r="23" fill="#233830"/>
-          <g fill="#142522"><path d="M11 246V45L1 22l15 10 9-32 4 65 26-27-17 42 10 166z"/><path d="M77 246l8-160-22-30 27 16 11-64 6 104 28-27-19 44 3 117z"/><path d="M315 252l1-155-24-42 33 22 13-62 6 78 33-39-25 69 17 129z"/></g>
-          <g fill="none" stroke="#395043" stroke-width="2" opacity=".3"><path d="M158 238V121a37 37 0 0 1 74 0v117M150 234V120a45 45 0 0 1 90 0v115"/><path d="M158 141h-8m82 0h8m-82 34h-8m82 0h8"/></g>
-          <path d="M0 247Q84 228 156 242T390 232V340H0Z" fill="url(#ground)"/>
-          <path d="M135 340l49-92 21-1 59 93" fill="#9aab85" opacity=".045"/>
-          <g fill="#0d1b18"><path d="M0 0h24l-7 115 25-22-22 45 4 118-24 8zM390 0h-22l6 88-31-26 29 49-7 145 25 9z"/><path d="M0 304l16-18-5 26 29-12-13 22 41-5-12 23H0zm390-13-23-15 8 30-30-8 12 21-39 4 10 17h62z"/></g>
-          <g fill="#b9c8a4" opacity=".5"><circle cx="47" cy="135" r="1.3"/><circle cx="283" cy="176" r="1.5"/><circle cx="123" cy="189" r="1"/><circle cx="321" cy="118" r="1"/><circle cx="215" cy="203" r="1.4"/></g>
+        <svg id="battle-svg" viewBox="0 0 390 340" preserveAspectRatio="xMidYMid slice" role="img" aria-label="용병과 몬스터의 자동 전투 장면">
+          <g id="scene-background"><g class="asset-fallback">
+            <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#8FD3FF"/><stop offset="1" stop-color="#EAF7FF"/></linearGradient></defs>
+            <rect width="390" height="340" fill="url(#sky)"/><circle cx="300" cy="72" r="30" fill="#FFC93C"/>
+            <path d="M0 187Q80 150 160 185T390 175V340H0Z" fill="#95E888"/>
+            <path d="M140 340l30-145h50l75 145" fill="#FFE9B8"/>
+            <g fill="#3DDC97" stroke="#4A2C12" stroke-width="3"><path d="M20 180V65m-20 80Q-20 80 25 55q55 35 10 92zM365 180V50m-22 93q-40-55 18-95 60 35 25 93z"/></g>
+          </g></g>
           <g id="mercenary-layer"></g><g id="enemy-layer"></g><g id="effect-layer" aria-hidden="true"></g>
         </svg>
         <div id="battle-result" class="battle-result" aria-live="polite"></div>
@@ -54,9 +49,9 @@
     </section>
     <nav class="bottom-tabs" aria-label="게임 메뉴">
       <button data-tab="mercenaries" aria-haspopup="dialog"><span>⚔</span>용병</button>
-      <button data-tab="equipment" aria-haspopup="dialog"><span>♜</span>장비<b id="equipment-badge" hidden>0</b></button>
+      <button data-tab="equipment" aria-haspopup="dialog"><span data-icon="hat">♜</span>장비<b id="equipment-badge" hidden>0</b></button>
       <button data-tab="fusion" aria-haspopup="dialog"><span>◇</span>합성</button>
-      <button data-tab="skills" aria-haspopup="dialog"><span>✧</span>스킬</button>
+      <button data-tab="skills" aria-haspopup="dialog"><span data-icon="skillbook">✧</span>스킬</button>
       <button data-tab="settings" aria-haspopup="dialog"><span>⚙</span>설정</button>
     </nav>
     <div id="toast" role="status"></div>
@@ -68,6 +63,7 @@
   <script src="js/game-equipment.js"></script>
   <script src="js/game-expedition.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/ui-art.js"></script>
   <script src="js/ui-equipment.js"></script>
   <script src="js/ui-expedition.js"></script>
 </body>

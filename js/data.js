@@ -1,7 +1,49 @@
 "use strict";
 
 var DATA = {
-  version: "0.3.0 · P3",
+  // DECISION: Inline manifest; static hosting and offline play need no JSON request.
+  assets: {
+    "merc.warrior.idle": "assets/merc/warrior_idle.png",
+    "merc.archer.idle": "assets/merc/archer_idle.png",
+    "merc.mage.idle": "assets/merc/mage_idle.png",
+    "mon.slime": "assets/mon/slime.png",
+    "mon.goblin": "assets/mon/goblin.png",
+    "mon.mushroom": "assets/mon/mushroom.png",
+    "mon.boss_treant": "assets/mon/boss_treant.png",
+    "bg.forest": "assets/bg/forest.png",
+    "icon.weapon": "assets/icon/weapon.png",
+    "icon.hat": "assets/icon/hat.png",
+    "icon.gloves": "assets/icon/gloves.png",
+    "icon.shoes": "assets/icon/shoes.png",
+    "icon.skillbook": "assets/icon/skillbook.png",
+    "icon.gold": "assets/icon/gold.png",
+    "icon.coin": "assets/icon/coin.png",
+    "merc.warrior.attack": "assets/merc/warrior_attack.png",
+    "merc.archer.attack": "assets/merc/archer_attack.png",
+    "merc.mage.attack": "assets/merc/mage_attack.png",
+    "mon.ice_bat": "assets/mon/ice_bat.png",
+    "mon.yeti": "assets/mon/yeti.png",
+    "mon.frost_wolf": "assets/mon/frost_wolf.png",
+    "mon.boss_ice_golem": "assets/mon/boss_ice_golem.png",
+    "bg.peak": "assets/bg/peak.png",
+    "mon.lava_slime": "assets/mon/lava_slime.png",
+    "mon.imp": "assets/mon/imp.png",
+    "mon.salamander": "assets/mon/salamander.png",
+    "mon.boss_dragon": "assets/mon/boss_dragon.png",
+    "bg.volcano": "assets/bg/volcano.png"
+  },
+  // DECISION: ASSET_SPEC region order affects only art; stage balance and saved indices stay intact.
+  artRegions: [
+    { bg: "forest", name: "잊힌 숲", subtitle: "햇살 아래, 첫 번째 원정", bossName: "고목 수호자",
+      monsters: { slime: "slime", goblin: "goblin", brute: "mushroom", boss: "boss_treant" } },
+    { bg: "peak", name: "얼어붙은 봉우리", subtitle: "반짝이는 눈길을 따라", bossName: "얼음 골렘",
+      stages: ["눈 덮인 고개", "얼어붙은 호수", "눈꽃 초소", "푸른 회랑", "얼음 정원", "마법사의 봉화", "백야의 탑", "서리 다리", "눈보라 성문", "얼음 왕좌"],
+      monsters: { slime: "ice_bat", goblin: "yeti", brute: "frost_wolf", boss: "boss_ice_golem" } },
+    { bg: "volcano", name: "잿빛 화산", subtitle: "뜨거운 모험이 기다려요", bossName: "아기 드래곤",
+      stages: ["불꽃의 경계", "메마른 강", "갈라진 절벽", "붉은 모래", "용암 광산", "불꽃 감옥", "황금 용광로", "불씨의 다리", "용의 둥지", "드래곤 봉우리"],
+      monsters: { slime: "lava_slime", goblin: "imp", brute: "salamander", boss: "boss_dragon" } }
+  ],
+  version: "0.4.0 · Restyle",
   schemaVersion: 3,
   offline: { thresholdMs: 60000, maxMs: 86400000, efficiency: 0.7, fallbackKillsPerSec: 0.1, maxRolls: 500 },
   chaos: { hp: 8, atk: 5, gold: 4, firstClearCoins: 3 },

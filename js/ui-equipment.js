@@ -10,7 +10,7 @@
   function slot(id) { return DATA.equipmentSlots.find(function (s) { return s.id === id; }); }
   function name(item) { return "T" + UI.fmt(item.tier) + " " + DATA.equipmentRarities[item.rarity].name + " " + slot(item.slot).name; }
   function itemCard(item, extra) {
-    return '<span class="item-card rarity-' + item.rarity + ' ' + (extra || "") + '"><span class="item-icon">' + slot(item.slot).icon +
+    return '<span class="item-card rarity-' + item.rarity + ' ' + (extra || "") + '"><span class="item-icon">' + UI.icon(item.slot, slot(item.slot).icon) +
       '</span><b>T' + UI.fmt(item.tier) + '</b><small>' + DATA.equipmentRarities[item.rarity].name + '</small></span>';
   }
   function lines(options) {
@@ -32,7 +32,7 @@
     var item = state.inventory.find(function (i) { return i.uid === merc.equipment[definition.id]; });
     return '<button class="equipment-slot ' + (item ? 'rarity-' + item.rarity : '') + '" data-merc-slot="' + definition.id +
       '" data-merc="' + merc.id + '" ' + (merc.unlocked ? '' : 'disabled') + ' aria-label="' + definition.name + ' ' +
-      (item ? name(item) : '빈 슬롯') + '"><span>' + definition.icon + '</span><small>' + definition.name + '</small><em>' +
+      (item ? name(item) : '빈 슬롯') + '"><span>' + UI.icon(definition.id, definition.icon) + '</span><small>' + definition.name + '</small><em>' +
       (item ? 'T' + UI.fmt(item.tier) + ' · ' + DATA.equipmentRarities[item.rarity].name : '비어 있음') + '</em></button>';
   };
   function detail(item, state) {
@@ -66,7 +66,7 @@
       [['tier', '티어↓'], ['rarity', '등급↓'], ['recent', '최근']].map(function (s) { return '<option value="' + s[0] + '" ' + (sort === s[0] ? 'selected' : '') + '>' + s[1] + '</option>'; }).join('') +
       '</select></label></div>' + (item ? detail(item, state) : '') + '<div class="inventory-grid">' + items.map(function (i) {
         return '<button class="inventory-cell rarity-' + i.rarity + (selected === i.uid ? ' selected-item' : '') + '" data-item="' + i.uid + '" aria-label="' + name(i) +
-          (i.locked ? ' 잠금' : '') + (i.equippedBy ? ' 장착 중' : '') + '"><span>' + slot(i.slot).icon + '</span><b>T' + UI.fmt(i.tier) +
+          (i.locked ? ' 잠금' : '') + (i.equippedBy ? ' 장착 중' : '') + '"><span>' + UI.icon(i.slot, slot(i.slot).icon) + '</span><b>T' + UI.fmt(i.tier) +
           '</b>' + (i.locked ? '<em>🔒</em>' : '') + (i.equippedBy ? '<i>장착</i>' : '') + '</button>';
       }).join("") + '</div>' + (!items.length ? '<p class="equipment-empty">적을 처치하면 장비가 떨어집니다.<br>같은 슬롯·티어 세 개를 모아 합성해 보세요.</p>' : '') +
       '<p class="equipment-note">가득 차면 잠금·장착을 제외한 최저 티어 레어를 자동 판매합니다. 판매할 레어가 없으면 새 드롭을 골드로 받습니다.</p>';
@@ -76,7 +76,7 @@
     DATA.equipmentSlots.forEach(function (s) {
       for (var tier = 1; tier <= 8; tier++) {
         var count = state.inventory.filter(function (i) { return i.slot === s.id && i.tier === tier && !i.locked && !i.equippedBy; }).length;
-        rows += '<tr><th>' + s.icon + ' ' + s.name + '</th><td>T' + UI.fmt(tier) + '</td><td>' + UI.fmt(count) + '개</td><td>' + (tier === 8 ? '<small>최대 티어</small>' :
+        rows += '<tr><th>' + UI.icon(s.id, s.icon) + ' ' + s.name + '</th><td>T' + UI.fmt(tier) + '</td><td>' + UI.fmt(count) + '개</td><td>' + (tier === 8 ? '<small>최대 티어</small>' :
           '<button data-fuse-slot="' + s.id + '" data-tier="' + tier + '" ' + (count < 3 || state.gold < DATA.fusionCost(tier) ? 'disabled' : '') +
           '>합성 ×' + UI.fmt(1) + '<small>' + UI.fmt(DATA.fusionCost(tier)) + ' 골드</small></button>') + '</td></tr>';
       }
@@ -96,7 +96,7 @@
     void el("cp").offsetWidth;
     el("cp").classList.add("cp-jump");
     function frame(now) {
-      var t = Math.min(1, (now - start) / 500);
+      var t = Math.min(1, (now - start) / 300);
       cpValue = from + (value - from) * (1 - (1 - t) ** 3);
       el("cp").textContent = UI.fmt(Math.round(cpValue));
       if (t < 1) cpFrame = requestAnimationFrame(frame);
@@ -104,10 +104,14 @@
     cpFrame = requestAnimationFrame(frame);
   };
   function flash(strong) {
-    var scene = document.querySelector("#offline-report[open]") || document.querySelector(".battle-scene");
-    scene.classList.remove("loot-flash", "loot-flash-strong");
-    void scene.offsetWidth;
-    scene.classList.add(strong ? "loot-flash-strong" : "loot-flash");
+    // DECISION: Keep the scene's existing feedback hook; also flash the visible top-layer sheet.
+    var surfaces = [document.querySelector(".battle-scene"),
+      document.querySelector("#offline-report[open]") || document.querySelector("#fusion-reveal[open]")];
+    surfaces.filter(Boolean).forEach(function (scene) {
+      scene.classList.remove("loot-flash", "loot-flash-strong");
+      void scene.offsetWidth;
+      scene.classList.add(strong ? "loot-flash-strong" : "loot-flash");
+    });
   }
   function drop(item) {
     if (!item.autoSold && currentSheet !== "equipment") { unread++; badge(); }
@@ -140,7 +144,7 @@
     card.innerHTML = '<div class="flip-inner"><div class="card-back">◇</div><div class="card-front">' + itemCard(event.item) +
       '</div></div><p>' + (event.upgraded ? '✦ 등급 상승!' : slot(event.item.slot).name) + '</p>';
     el("reveal-cards").appendChild(card);
-    if (event.upgraded) flash(true);
+    if (event.upgraded || ranks.indexOf(event.item.rarity) >= 2) flash(true);
   }
   function revealTick(now) {
     if (!reveal.open) { revealFrame = null; return; }
